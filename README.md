@@ -1,4 +1,4 @@
-popvssoda
+Pop vs Soda
 =========
 
 The Pop vs Soda Page is a linguistic survey created by [Alan McConchie](https//github.com/almccon) and hosted at http://popvssoda.com.
