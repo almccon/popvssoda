@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.landshadow {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 4px;
+	stroke-linejoin: round;
+}
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+.counties {
+	fill: #fff;
+}
+/*
+.counties :hover {
+	stroke: yellow !important;
+	stroke-width: 2px;
+}
+*/
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v0.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="jquery.tipsy.js"></script>
+<link href="tipsy.css" rel="stylesheet" type="text/css" />
+<script>
+
+var width = 960,
+    height = 500;
+
+var fill = d3.scale.linear()
+    .domain([0, 1])
+    .range(["white", "green"]);
+
+var path = d3.geo.path();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+queue()
+    .defer(d3.json, "us.json")
+    .defer(d3.tsv, "pvscounty_fips.tsv")
+    .await(ready);
+
+function ready(error, us, pvscounty_fips) {
+  var rgbById = {};
+  var cmykById = {};
+  var hovertext = {}
+
+  pvscounty_fips.forEach(function(d) { 
+	d.PCTPOP = +d.PCTPOP;
+  	d.PCTSODA = +d.PCTSODA;
+  	d.PCTCOKE = +d.PCTCOKE;
+  	d.PCTOTHER = +d.PCTOTHER;
+  	
+  	if (d.PCTPOP == 0 && d.PCTSODA == 0 && d.PCTCOKE == 0 && d.PCTOTHER == 0) {
+  		rgbById[d.id] = "white";
+		cmykById[d.id] = "white";
+		hovertext[d.id] = d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>"
+						+ "No data";
+
+	} else {
+	  	
+	  	rgbById[d.id] = "rgb(" + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%," + Math.round(d.PCTCOKE * 100) + "%)";
+	  	cmykById[d.id] = "rgb(" + Math.round((d.PCTPOP + d.PCTCOKE) * 100) + "%," + Math.round((d.PCTSODA + d.PCTPOP) * 100) + "%," + Math.round((d.PCTCOKE + d.PCTSODA) * 100) + "%)";
+		hovertext[d.id] = "<span style=\"align=left\">"
+						+ d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>"
+						+ "Pop: " + d.SUMPOP + " (" + Math.round(d.PCTPOP * 100) + "%)<br>"
+						+ "Soda: " + d.SUMSODA + " (" + Math.round(d.PCTSODA * 100) + "%)<br>"
+						+ "Coke: " + d.SUMCOKE + " (" + Math.round(d.PCTCOKE * 100) + "%)<br>"
+						+ "Other: " + d.SUMOTHER + " (" + Math.round(d.PCTOTHER * 100) + "%)</span>";
+	}	  	
+  });
+  
+  
+  svg.append("path")
+      .datum(topojson.object(us, us.objects.land))
+      .attr("class", "landshadow")
+      .attr("d", path);
+  
+      
+  svg.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+      .data(topojson.object(us, us.objects.counties).geometries)
+    .enter().append("path")
+      .attr("d", path)
+	  .style("fill", function(d) { 
+	  	//return "rgb(" + (d.PCTPOP * 100) + "," + (d.PCTSODA * 100) + "," + (d.PCTCOKE * 100) + ")";
+	  	//return "rgb(" + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%," + Math.round(d.PCTCOKE * 100) + "%)";
+	  	//return "rgb(" + Math.round(d.PCTPOP * 100) + "%," + 0 + "%," + 0 + "%)";
+	  	//return "rgb(" + Math.round(.301 * 100) + "%," + 0 + "%," + 0 + "%)";
+	  	//return rgbById[d.id];
+	  	/*
+	  	if(d.id in cmykById) {
+	  		return cmykById[d.id];
+	  	} else {
+	  		return "white";
+	  	}
+	  	*/
+
+	  	//if(cmykById[d.id] === undefined) {
+	  	if(cmykById[d.id] == undefined ) {
+	  		return "white";
+	  	} else {
+	  		return cmykById[d.id];
+	  	}
+	  	
+	  		  	
+	})
+/*
+	.append("svg:title")
+//		.text(function(d) { return "Pop: " + d.PCTPOP + "%"; });
+		.text(function(d, i) { 
+			return "Name: " + d.County_Name + "%"; 
+		})
+	*/
+	
+	.on("mouseover", function(d,i){
+		d3.select(this)
+			.attr("stroke","gray");
+	/*
+		var x; var y;
+		if (d3.event.pageX != undefined && d3.event.pageY != undefined) {
+		    x = d3.event.pageX;
+		    y = d3.event.pageY;
+		} else {
+		    x = d3.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		    y = d3.event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+		}
+		
+		var bubble_code = "<div id='plot_overlay' style='position:absolute; top:"
+		    + y + "px; left:" + x + "px; border: 1px solid blue; z-index: 1;'><b>"
+		    + "POP: " + d.PCTPOP + " donors from " + d.PCTSODA + "</b><br />"
+		    + "</div>";
+
+		var bubble_code = "<div id='plot_overlay' style='position:absolute; top:"
+		    + "300" + "px; left:" + "300" + "px; border: 1px solid blue; z-index: 1;'><b>"
+		    + "TIP</b><br />"
+		    + "</div>";
+		$("body").append(bubble_code);
+		*/
+	}).on("mouseout", function(d,i){
+		d3.select(this)
+		    .attr("stroke", "none");
+		//$("#plot_overlay").remove();
+	});
+	
+//	  });
+
+	$('svg path').tipsy({ 
+        gravity: 'w', 
+        html: true, 
+        title: function(d, i) {
+          var d = this.__data__;
+          return hovertext[d.id];
+          //return 'Hi there! Value: ' + cmykById[d.id] + ' ' + pvscounty_fips[d.id].PCTPOP; 
+        }
+      });
+
+  svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a.id !== b.id; }))
+      .attr("class", "states")
+      .attr("d", path);
+}
+
+</script>
+</body>
