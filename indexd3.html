@@ -79,7 +79,9 @@
 					<svg id="d3map" width=757 height=490></svg>
 					-->
 					<svg id="d3map"></svg>
+					<button id="button">Toggle CMYK/RGB</button>
 				</div>
+				
 				<!--
 				<div id="tabs">
 					<ul>
@@ -447,65 +449,33 @@
 
 					} else {
 
-						rgbById[d.id] = "rgb(" + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%," + Math.round(d.PCTCOKE * 100) + "%)";
+						rgbById[d.id] = "rgb(" + Math.round(d.PCTCOKE * 100) + "%," + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%)";
 						cmykById[d.id] = "rgb(" + Math.round((d.PCTPOP + d.PCTCOKE) * 100) + "%," + Math.round((d.PCTSODA + d.PCTPOP) * 100) + "%," + Math.round((d.PCTCOKE + d.PCTSODA) * 100) + "%)";
 						hovertext[d.id] = "<span style=\"align=left\">" + d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" + "Pop: " + d.SUMPOP + " (" + Math.round(d.PCTPOP * 100) + "%)<br>" + "Soda: " + d.SUMSODA + " (" + Math.round(d.PCTSODA * 100) + "%)<br>" + "Coke: " + d.SUMCOKE + " (" + Math.round(d.PCTCOKE * 100) + "%)<br>" + "Other: " + d.SUMOTHER + " (" + Math.round(d.PCTOTHER * 100) + "%)</span>";
 					}
 				});
 
-				svg.append("path").datum(topojson.object(us, us.objects.land)).attr("class", "landshadow").attr("d", path);
+				svg.append("path").datum(topojson.object(us, us.objects.land))
+					.attr("class", "landshadow")
+					.attr("d", path);
 
-				svg.append("g").attr("class", "counties").selectAll("path").data(topojson.object(us, us.objects.counties).geometries).enter().append("path").attr("d", path).style("fill", function(d) {
-					//return "rgb(" + (d.PCTPOP * 100) + "," + (d.PCTSODA * 100) + "," + (d.PCTCOKE * 100) + ")";
-					//return "rgb(" + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%," + Math.round(d.PCTCOKE * 100) + "%)";
-					//return "rgb(" + Math.round(d.PCTPOP * 100) + "%," + 0 + "%," + 0 + "%)";
-					//return "rgb(" + Math.round(.301 * 100) + "%," + 0 + "%," + 0 + "%)";
-					//return rgbById[d.id];
-					/*
-					if(d.id in cmykById) {
-					return cmykById[d.id];
-					} else {
-					return "white";
-					}
-					*/
+				var counties = svg.append("g")
+					.attr("class", "counties")
+					.selectAll("path")
+						.data(topojson.object(us, us.objects.counties).geometries)
+					.enter().append("path")
+						.attr("d", path)
+						.style("fill", function(d) {
 
-					//if(cmykById[d.id] === undefined) {
 					if (cmykById[d.id] == undefined) {
 						return "white";
 					} else {
 						return cmykById[d.id];
 					}
 
-				})
-				/*
-				 .append("svg:title")
-				 //		.text(function(d) { return "Pop: " + d.PCTPOP + "%"; });
-				 .text(function(d, i) {
-				 return "Name: " + d.County_Name + "%";
-				 })
-				 */.on("mouseover", function(d, i) {
+				}).on("mouseover", function(d, i) {
 					d3.select(this).attr("stroke", "gray");
-					/*
-					 var x; var y;
-					 if (d3.event.pageX != undefined && d3.event.pageY != undefined) {
-					 x = d3.event.pageX;
-					 y = d3.event.pageY;
-					 } else {
-					 x = d3.event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-					 y = d3.event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-					 }
 
-					 var bubble_code = "<div id='plot_overlay' style='position:absolute; top:"
-					 + y + "px; left:" + x + "px; border: 1px solid blue; z-index: 1;'><b>"
-					 + "POP: " + d.PCTPOP + " donors from " + d.PCTSODA + "</b><br />"
-					 + "</div>";
-
-					 var bubble_code = "<div id='plot_overlay' style='position:absolute; top:"
-					 + "300" + "px; left:" + "300" + "px; border: 1px solid blue; z-index: 1;'><b>"
-					 + "TIP</b><br />"
-					 + "</div>";
-					 $("body").append(bubble_code);
-					 */
 				}).on("mouseout", function(d, i) {
 					d3.select(this).attr("stroke", "none");
 					//$("#plot_overlay").remove();
@@ -528,6 +498,31 @@
 				})).attr("class", "states").attr("d", path);
 				
 				svg.attr("transform", "scale(.4)");
+				
+				var state = 0;
+			
+				d3.select("#button").on("click", function() {
+					counties
+						.transition()
+						.style("fill", function(d) {
+							if (state == 0) {
+								if (rgbById[d.id] == undefined) {
+									return "white";
+								} else {
+									return rgbById[d.id];
+								}
+								state = 1;
+							} else {
+								if (cmykById[d.id] == undefined) {
+									return "white";
+								} else {
+									return cmykById[d.id];
+								}
+								state = 0;
+								
+							}
+						});
+				});
 			}
 
 		</script>

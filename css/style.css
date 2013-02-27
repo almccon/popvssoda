@@ -438,3 +438,9 @@ form#pvs input[type=radio] {
 @media all and (orientation: landscape) {
 	
 }
+
+#button {
+    left: 620px;
+    position: absolute;
+    bottom: 20px;
+}
