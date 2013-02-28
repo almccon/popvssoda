@@ -79,7 +79,8 @@
 					<svg id="d3map" width=757 height=490></svg>
 					-->
 					<svg id="d3map"></svg>
-					<button id="button">Toggle CMYK/RGB</button>
+					<button class="buttonstyle1" id="cmykbutton">CMYK</button>
+					<button class="buttonstyle2" id="rgbbutton">RGB</button>
 				</div>
 				
 				<!--
@@ -499,27 +500,23 @@
 				
 				svg.attr("transform", "scale(.4)");
 				
-				var state = 0;
-			
-				d3.select("#button").on("click", function() {
+				d3.select("#cmykbutton").on("click", function() {
 					counties
-						.transition()
 						.style("fill", function(d) {
-							if (state == 0) {
-								if (rgbById[d.id] == undefined) {
-									return "white";
-								} else {
-									return rgbById[d.id];
-								}
-								state = 1;
+							if (cmykById[d.id] == undefined) {
+								return "white";
 							} else {
-								if (cmykById[d.id] == undefined) {
-									return "white";
-								} else {
-									return cmykById[d.id];
-								}
-								state = 0;
-								
+								return cmykById[d.id];
+							}
+						});
+				});
+				d3.select("#rgbbutton").on("click", function() {
+					counties
+						.style("fill", function(d) {
+							if (rgbById[d.id] == undefined) {
+								return "white";
+							} else {
+								return rgbById[d.id];
 							}
 						});
 				});
