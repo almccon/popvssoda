@@ -79,11 +79,8 @@
 					<svg id="d3map" width=757 height=490></svg>
 					-->
 					<svg id="d3map"></svg>
-					<button class="buttonstyle1" id="cmykbutton">CMYK</button>
-					<button class="buttonstyle2" id="rgbbutton">RGB</button>
 				</div>
 				
-				<!--
 				<div id="tabs">
 					<ul>
 						<li>
@@ -98,63 +95,32 @@
 					</ul>
 					<div id="tabs-1">
 						<ul>
-							<li onMouseOver="if(cb()==true){SmallMap.src=AllMapCMYK.src;} return true">
-								show all
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=PopMapCMYK.src;} return true">
-								pop</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=SodaMapCMYK.src;} return true">
-								soda</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=CokeMapCMYK.src;} return true">
-								coke</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=OtherMap.src;} return true">
-								other</a>
-							</li>
+							<li id="cmykbutton"> show all </li>
+							<li id="cmykpopbutton"> pop </li>
+							<li id="cmyksodabutton"> soda </li>
+							<li id="cmykcokebutton"> coke </li>
+							<li id="cmykotherbutton"> other </li>
 						</ul>
 					</div>
 					<div id="tabs-2">
 						<ul>
-							<li onMouseOver="if(cb()==true){SmallMap.src=AllMapRGB.src;} return true">
-								show all</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=PopMapRGB.src;} return true">
-								pop</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=SodaMapRGB.src;} return true">
-								soda</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=CokeMapRGB.src;} return true">
-								coke</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=OtherMap.src;} return true">
-								other</a>
-							</li>
+							<li id="rgbbutton"> show all </li>
+							<li id="rgbpopbutton"> pop </li>
+							<li id="rgbsodabutton"> soda </li>
+							<li id="rgbcokebutton"> coke </li>
+							<li id="rgbotherbutton"> other </li>
 						</ul>
 					</div>
 					<div id="tabs-3">
 						<ul>
-							<li class="not_avail">
-								show all
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=PopMapBlack.src;} return true">
-								pop</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=SodaMapBlack.src;} return true">
-								soda</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=CokeMapBlack.src;} return true">
-								coke</a>
-							</li>
-							<li onMouseOver="if(cb()==true){SmallMap.src=OtherMap.src;} return true">
-								other</a>
-							</li>
+							<li class="not_avail"> show all </li>
+							<li id="bwpopbutton"> pop </li>
+							<li id="bwsodabutton"> soda </li>
+							<li id="bwcokebutton"> coke </li>
+							<li id="bwotherbutton"> other </li>
 						</ul>
 					</div>
 				</div>
-				-->
 			</section>
 			<section id="form">
 				<form method="post" action="pop.cgiw" id=pvs>
@@ -435,6 +401,16 @@
 			function ready(error, us, pvscounty_fips) {
 				var rgbById = {};
 				var cmykById = {};
+				var cmykpopById = {};
+				var cmyksodaById = {};
+				var cmykcokeById = {};
+				var rgbpopById = {};
+				var rgbsodaById = {};
+				var rgbcokeById = {};
+				var bwpopById = {};
+				var bwsodaById = {};
+				var bwcokeById = {};
+				var otherById = {};
 				var hovertext = {}
 
 				pvscounty_fips.forEach(function(d) {
@@ -452,6 +428,20 @@
 
 						rgbById[d.id] = "rgb(" + Math.round(d.PCTCOKE * 100) + "%," + Math.round(d.PCTPOP * 100) + "%," + Math.round(d.PCTSODA * 100) + "%)";
 						cmykById[d.id] = "rgb(" + Math.round((d.PCTPOP + d.PCTCOKE) * 100) + "%," + Math.round((d.PCTSODA + d.PCTPOP) * 100) + "%," + Math.round((d.PCTCOKE + d.PCTSODA) * 100) + "%)";
+						
+						cmykpopById[d.id] = "rgb(" + 100 + "%," + 100 + "%," + Math.round((1 - d.PCTPOP) * 100) + "%)";
+						cmyksodaById[d.id] = "rgb(" + Math.round((1 - d.PCTSODA) * 100) + "%," + 100 + "%," + 100 + "%)";
+						cmykcokeById[d.id] = "rgb(" + 100 + "%," + Math.round((1 - d.PCTCOKE) * 100) + "%," + 100 + "%)";
+						
+						rgbpopById[d.id] = "rgb(" + Math.round((1 - d.PCTPOP) * 100) + "%," + 100 + "%," + Math.round((1 - d.PCTPOP) * 100) + "%)";
+						rgbsodaById[d.id] = "rgb(" + Math.round((1 - d.PCTSODA) * 100) + "%," + Math.round((1 - d.PCTSODA) * 100) + "%," + 100 + "%)";
+						rgbcokeById[d.id] = "rgb(" + 100 + "%," + Math.round((1 - d.PCTCOKE) * 100) + "%," + Math.round((1 - d.PCTCOKE) * 100) + "%)";
+						
+						bwpopById[d.id] = "rgb(" + Math.round((1 - d.PCTPOP) * 100) + "%," + Math.round((1 - d.PCTPOP) * 100) + "%," + Math.round((1 - d.PCTPOP) * 100) + "%)";
+						bwsodaById[d.id] = "rgb(" + Math.round((1 - d.PCTSODA) * 100) + "%," + Math.round((1 - d.PCTSODA) * 100) + "%," + Math.round((1 - d.PCTSODA) * 100) + "%)";
+						bwcokeById[d.id] = "rgb(" + Math.round((1 - d.PCTCOKE) * 100) + "%," + Math.round((1 - d.PCTCOKE) * 100) + "%," + Math.round((1 - d.PCTCOKE) * 100) + "%)";
+						otherById[d.id] = "rgb(" + Math.round((1 - d.PCTOTHER) * 100) + "%," + Math.round((1 - d.PCTOTHER) * 100) + "%," + Math.round((1 - d.PCTOTHER) * 100) + "%)";
+						
 						hovertext[d.id] = "<span style=\"align=left\">" + d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" + "Pop: " + d.SUMPOP + " (" + Math.round(d.PCTPOP * 100) + "%)<br>" + "Soda: " + d.SUMSODA + " (" + Math.round(d.PCTSODA * 100) + "%)<br>" + "Coke: " + d.SUMCOKE + " (" + Math.round(d.PCTCOKE * 100) + "%)<br>" + "Other: " + d.SUMOTHER + " (" + Math.round(d.PCTOTHER * 100) + "%)</span>";
 					}
 				});
@@ -500,24 +490,96 @@
 				
 				svg.attr("transform", "scale(.4)");
 				
-				d3.select("#cmykbutton").on("click", function() {
+				function lookupColor(data, array) {
+					if (array[data.id] == undefined) {
+						return "white";
+					} else {
+						return array[data.id];
+					}
+				}
+				
+				d3.select("#cmykbutton").on("mouseover", function() {
 					counties
-						.style("fill", function(d) {
-							if (cmykById[d.id] == undefined) {
-								return "white";
-							} else {
-								return cmykById[d.id];
-							}
+						.style("fill", function(d) { 
+							return lookupColor(d, cmykById); 
 						});
 				});
-				d3.select("#rgbbutton").on("click", function() {
+				d3.select("#cmykpopbutton").on("mouseover", function() {
 					counties
-						.style("fill", function(d) {
-							if (rgbById[d.id] == undefined) {
-								return "white";
-							} else {
-								return rgbById[d.id];
-							}
+						.style("fill", function(d) { 
+							return lookupColor(d, cmykpopById); 
+						});
+				});
+				d3.select("#cmyksodabutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, cmyksodaById); 
+						});
+				});
+				d3.select("#cmykcokebutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, cmykcokeById); 
+						});
+				});
+				d3.select("#cmykotherbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, otherById); 
+						});
+				});
+				d3.select("#rgbbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, rgbById); 
+						});
+				});
+				d3.select("#rgbpopbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, rgbpopById); 
+						});
+				});
+				d3.select("#rgbsodabutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, rgbsodaById); 
+						});
+				});
+				d3.select("#rgbcokebutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, rgbcokeById); 
+						});
+				});
+				d3.select("#rgbotherbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, otherById); 
+						});
+				});
+				d3.select("#bwpopbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, bwpopById); 
+						});
+				});
+				d3.select("#bwsodabutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, bwsodaById); 
+						});
+				});
+				d3.select("#bwcokebutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, bwcokeById); 
+						});
+				});
+				d3.select("#bwotherbutton").on("mouseover", function() {
+					counties
+						.style("fill", function(d) { 
+							return lookupColor(d, otherById); 
 						});
 				});
 			}
