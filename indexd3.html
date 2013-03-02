@@ -17,19 +17,12 @@
             .counties {
                 fill: #fff;
             }
-            /*
-             .counties :hover {
-             stroke: yellow !important;
-             stroke-width: 2px;
-             }
-             */
             #map-container {
                 height: 500px;
                 width: 1500px;
                 text-align: center;
                 position: relative;
             }
-
             #d3map {
                 display: block;
                 position: absolute;
@@ -73,11 +66,7 @@
 		<section id="contentcontainer"> <!-- HTML5 section tag for the content 'section' -->
 			<section id="map">
 				<div id="map-container">
-					<!--
-					<img border=0 width=757 height=490 alt="Pop vs. Soda map" src="images/pvslayered cmyk-01.png" NAME="SmallMap">
-
-					<svg id="d3map" width=757 height=490></svg>
-					-->
+					<!-- the D3 map will be rendered here -->
 					<svg id="d3map"></svg>
 				</div>
 				
@@ -386,7 +375,6 @@
 			</section>
 		
 		<script type="application/javascript">
-			//var width = 960, height = 500;
 
 			// Create some scales for univariate modes
 			var bwscale = d3.scale.linear()
@@ -547,16 +535,6 @@
 					return a.id !== b.id;
 				})).attr("class", "states").attr("d", path);
 			
-				svg.attr("transform", "scale(.4)");
-				
-				function lookupColor(data, array) {
-					if (array[data.id] == undefined) {
-						return "white";
-					} else {
-						return array[data.id];
-					}
-				}
-				
 				// Add functions to each button
 				d3.select("#cmykbutton").on("mouseover", function() {
 					counties
