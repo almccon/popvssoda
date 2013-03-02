@@ -456,19 +456,12 @@
 				.await(ready);
 
 			function ready(error, us, pvscounty_fips) {
-				var hovertext = {}
 
 				pvscounty_fips.forEach(function(d) {
 					d.PCTPOP = +d.PCTPOP;
 					d.PCTSODA = +d.PCTSODA;
 					d.PCTCOKE = +d.PCTCOKE;
 					d.PCTOTHER = +d.PCTOTHER;
-
-					if (d.PCTPOP == 0 && d.PCTSODA == 0 && d.PCTCOKE == 0 && d.PCTOTHER == 0) {
-						hovertext[d.id] = d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" + "No data";
-					} else {
-						hovertext[d.id] = "<span style=\"align=left\">" + d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" + "Pop: " + d.SUMPOP + " (" + Math.round(d.PCTPOP * 100) + "%)<br>" + "Soda: " + d.SUMSODA + " (" + Math.round(d.PCTSODA * 100) + "%)<br>" + "Coke: " + d.SUMCOKE + " (" + Math.round(d.PCTCOKE * 100) + "%)<br>" + "Other: " + d.SUMOTHER + " (" + Math.round(d.PCTOTHER * 100) + "%)</span>";
-					}
 				});
 
 				// Extract just the land from the us TopoJSON (resulting in a GeoJSON)
@@ -483,7 +476,8 @@
 					.selectAll("path")
 						.data(topojson.object(us, us.objects.counties).geometries)
 					.enter().append("path")
-						.attr("d", path);
+						.attr("d", path)
+						.attr("class", "addhover");
 			
 				// Step through all the TopoJSON objects and add the pvs attributes
 				// to the correct one.
@@ -491,21 +485,26 @@
 				counties.each(function(d, i) {	
 					var d = this.__data__;
 					for (var j = 0; j < pvscounty_fips.length; j++) {
-						var pvs_fips = pvscounty_fips[j].id;
-						if (d.id == pvs_fips) {
+						var p = pvscounty_fips[j];
+						if (d.id == p.id) {
 							// Copy the data values into the TopoJSON
 							// Must be a more efficient way of doing this.
-							d.PCTPOP = pvscounty_fips[j].PCTPOP;
-							d.PCTSODA = pvscounty_fips[j].PCTSODA;
-							d.PCTCOKE = pvscounty_fips[j].PCTCOKE;
-							d.PCTOTHER = pvscounty_fips[j].PCTOTHER;
-							d.County_Name = pvscounty_fips[j].County_Name;
-							d.ENGTYPE = pvscounty_fips[j].ENGTYPE;
-							d.STATE = pvscounty_fips[j].STATE;
-							d.SUMPOP = pvscounty_fips[j].SUMPOP;
-							d.SUMSODA = pvscounty_fips[j].SUMSODA;
-							d.SUMCOKE = pvscounty_fips[j].SUMCOKE;
-							d.SUMOTHER = pvscounty_fips[j].SUMOTHER;
+							d.PCTPOP = p.PCTPOP;
+							d.PCTSODA = p.PCTSODA;
+							d.PCTCOKE = p.PCTCOKE;
+							d.PCTOTHER = p.PCTOTHER;
+							d.County_Name = p.County_Name;
+							d.ENGTYPE = p.ENGTYPE;
+							d.State = p.State;
+							d.SUMPOP = p.SUMPOP;
+							d.SUMSODA = p.SUMSODA;
+							d.SUMCOKE = p.SUMCOKE;
+							d.SUMOTHER = p.SUMOTHER;
+							if (p.PCTPOP == 0 && p.PCTSODA == 0 && p.PCTCOKE == 0 && p.PCTOTHER == 0) {
+								d.NODATA = true
+							} else {
+								d.NODATA = false
+							}
 						}
 					}
 				});
@@ -524,13 +523,22 @@
 			
 				// Use the "tipsy" plugin for mouseover info boxes
 				// http://onehackoranother.com/projects/jquery/tipsy/
-				$('svg path').tipsy({
+				$('path.addhover').tipsy({
 					gravity : 'w',
 					html : true,
+					offset : -50,
 					title : function(d, i) {
 						var d = this.__data__;
-						return hovertext[d.id];
-						//return 'Hi there! Value: ' + cmykById[d.id] + ' ' + pvscounty_fips[d.id].PCTPOP;
+						if (d.NODATA == true) {
+							return "<span style=\"align=left\">" + d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" 
+								+ "No data</span>";
+						} else {
+							return "<span style=\"align=left\">" + d.County_Name + " " + d.ENGTYPE + ", " + d.State + "<br>" 
+								+ "Pop: " + d.SUMPOP + " (" + Math.round(d.PCTPOP * 100) + "%)<br>" 
+								+ "Soda: " + d.SUMSODA + " (" + Math.round(d.PCTSODA * 100) + "%)<br>" 
+								+ "Coke: " + d.SUMCOKE + " (" + Math.round(d.PCTCOKE * 100) + "%)<br>" 
+								+ "Other: " + d.SUMOTHER + " (" + Math.round(d.PCTOTHER * 100) + "%)</span>";
+						}
 					}
 				});
 
