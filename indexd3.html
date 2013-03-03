@@ -436,15 +436,43 @@
 				.projection(d3.geo.albersUsa().translate([400,250]).scale(800));
 
 			var svg = d3.select("#d3map");
+		
+			// The d3_hexbinAngles and hexagon function are (obviously) 
+			// borrowed from https://github.com/d3/d3-plugins/tree/master/hexbin	
 			
-			function trivariate_legend(count) {
+			var d3_hexbinAngles = d3.range(0, 2 * Math.PI, Math.PI / 3);
+			
+			function hexagon(radius) {
+				if (arguments.length < 1) {
+					// This is where I should calculate the correct radius
+					// based on the size of the overall triangle... but then
+					// the hexagon would have to be linked to the legend
+					// somehow.
+					radius = 8;
+				}
+				var x0 = 0, y0 = 0;
+				var points = d3_hexbinAngles.map(function(angle) {
+      				var x1 = Math.sin(angle) * radius,
+          				y1 = -Math.cos(angle) * radius,
+          				dx = x1 - x0,
+          				dy = y1 - y0;
+          			// I'm not sure why this line is in the hexbin code,
+          			// but it was breaking my hexagons, and they work fine
+          			// without it:
+      				//x0 = x1, y0 = y1;
+      				return [dx, dy];
+    			});
+    			return "M" + points.join("L") + "z";
+  			}
+			
+			function trivariate_legend(startx, starty, width, count) {
 				// Create a one-dimensional array storing the elements 
 				// of a trivariate legend (represented as an equilateral triangle). 
 				// Returns the array, suitable for joining with a svg.
+				// Note: count is # of divisions. # of swatches will be count + 1
 				
 				array = new Array(); 
 				id = 0;
-				width = 80;
 				xstep = width / count;
 				ystep = Math.sqrt(3) * xstep / 2;
 				
@@ -457,8 +485,8 @@
 						
 						array.push(
 							{
-								x: j * xstep + width / 2 - i * xstep / 2,
-								y: i * ystep,
+								x: startx + j * xstep + width / 2 - i * xstep / 2,
+								y: starty + i * ystep,
 								i: i,
 								j: j,
 								PCTSODA: (count - i) / count,
@@ -472,25 +500,34 @@
 				}
 				return array;
 			}
-			
-			legend_data = trivariate_legend(20);
+		
+			var x = 660,
+				y = 400,
+				width = 60,
+				count = 10;	
+			legend_data = trivariate_legend(x, y, width, count);
 			
 			legend_svg = svg.append("g")
 				.attr("class", "legend")
-				.selectAll("circle")
+				//.selectAll("circle")
+				//	.data(legend_data)
+			  	//.enter().append("circle")
+			  		//.attr("cx", function(d) {
+			  		//	return d.x;
+			  		//})
+			  		//.attr("cy", function(d) {
+			  		//	return d.y;
+			  		//})
+			  		//.attr("r", 3)
+				.selectAll("path")
 					.data(legend_data)
-			  	.enter().append("circle")
-			  		.attr("cx", function(d) {
-			  			return d.x;
-			  		})
-			  		.attr("cy", function(d) {
-			  			return d.y;
-			  		})
-			  		.attr("r", 3)
+			  	.enter().append("path")
+			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
+			  		// Add 1 just to pad the hexagons a bit so they blend
+			  		.attr("d", hexagon( 1 + width/(count*Math.sqrt(3)) ))
 			  		.style("fill", function(d) {
 			  			return cmyk(d);
 			  		})
-			  		.attr("transform", "translate(" + 660 + "," + 380 + ")")
 
 			// Load the TopoJSON of states and the tsv of popvssoda data in parallel
 			queue()
