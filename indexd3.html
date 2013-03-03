@@ -436,6 +436,61 @@
 				.projection(d3.geo.albersUsa().translate([400,250]).scale(800));
 
 			var svg = d3.select("#d3map");
+			
+			function trivariate_legend(count) {
+				// Create a one-dimensional array storing the elements 
+				// of a trivariate legend (represented as an equilateral triangle). 
+				// Returns the array, suitable for joining with a svg.
+				
+				array = new Array(); 
+				id = 0;
+				width = 80;
+				xstep = width / count;
+				ystep = Math.sqrt(3) * xstep / 2;
+				
+				// Create the rows
+				for (var i = 0; i <= count; i++) {
+					
+					// Create the columns 
+					// (1st column has 1 row, 2nd column has 2 rows, etc)
+					for (var j = 0; j <= i; j++ ) {
+						
+						array.push(
+							{
+								x: j * xstep + width / 2 - i * xstep / 2,
+								y: i * ystep,
+								i: i,
+								j: j,
+								PCTSODA: (count - i) / count,
+								PCTPOP: (i - j) / count, 
+								PCTCOKE: (j) / count,
+								PCTOTHER: 0,
+								id: id++
+							}
+						);
+					}
+				}
+				return array;
+			}
+			
+			legend_data = trivariate_legend(20);
+			
+			legend_svg = svg.append("g")
+				.attr("class", "legend")
+				.selectAll("circle")
+					.data(legend_data)
+			  	.enter().append("circle")
+			  		.attr("cx", function(d) {
+			  			return d.x;
+			  		})
+			  		.attr("cy", function(d) {
+			  			return d.y;
+			  		})
+			  		.attr("r", 3)
+			  		.style("fill", function(d) {
+			  			return cmyk(d);
+			  		})
+			  		.attr("transform", "translate(" + 660 + "," + 380 + ")")
 
 			// Load the TopoJSON of states and the tsv of popvssoda data in parallel
 			queue()
@@ -537,84 +592,140 @@
 			
 				// Add functions to each button
 				d3.select("#cmykbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return cmyk(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return cmyk(d);
 						});
 				});
 				d3.select("#cmykpopbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return cmyk(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return cmykpop(d.PCTPOP);
 						});
 				});
 				d3.select("#cmyksodabutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return cmyk(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return cmyksoda(d.PCTSODA);
 						});
 				});
 				d3.select("#cmykcokebutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return cmyk(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return cmykcoke(d.PCTCOKE);
 						});
 				});
 				d3.select("#cmykotherbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return cmyk(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTOTHER)
 						});
 				});
 				d3.select("#rgbbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return rgb(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return rgb(d)
 						});
 				});
 				d3.select("#rgbpopbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return rgb(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return rgbpop(d.PCTPOP);
 						});
 				});
 				d3.select("#rgbsodabutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return rgb(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return rgbsoda(d.PCTSODA);
 						});
 				});
 				d3.select("#rgbcokebutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return rgb(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return rgbcoke(d.PCTCOKE);
 						});
 				});
 				d3.select("#rgbotherbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return rgb(d);
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTOTHER)
 						});
 				});
 				d3.select("#bwpopbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return bwscale(d.PCTPOP)
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTPOP)
 						});
 				});
 				d3.select("#bwsodabutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return bwscale(d.PCTSODA)
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTSODA)
 						});
 				});
 				d3.select("#bwcokebutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return bwscale(d.PCTCOKE)
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTCOKE)
 						});
 				});
 				d3.select("#bwotherbutton").on("mouseover", function() {
+					legend_svg
+						.style("fill", function(d) { 
+							return bwscale(d.PCTOTHER)
+						});
 					counties
 						.style("fill", function(d) { 
 							return bwscale(d.PCTOTHER)
