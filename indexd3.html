@@ -528,6 +528,34 @@
 			  		.style("fill", function(d) {
 			  			return cmyk(d);
 			  		})
+			
+			var spacing = 10;
+			 		
+			corner_labels = [
+				{
+					label: "pop",
+					x: x-spacing,
+					y: y+width+spacing
+				},
+				{
+					label: "soda",
+					x: x+width/2,
+					y: y-spacing
+				},
+				{
+					label: "coke",
+					x: x+width+spacing,
+					y: y+width+spacing
+				}
+			];
+	  		svg.selectAll("text")
+	  			.data(corner_labels)	
+	  		  .enter().append("text")
+	  		  	.attr("text-anchor", "middle")
+	  			.attr("x", function(d) { return d.x })
+	  			.attr("y", function(d) { return d.y })
+	  			.attr("font-size", "10px")
+	  			.text(function(d) { return d.label });
 
 			// Load the TopoJSON of states and the tsv of popvssoda data in parallel
 			queue()
