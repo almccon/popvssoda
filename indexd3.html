@@ -469,7 +469,9 @@
 				// Create a one-dimensional array storing the elements 
 				// of a trivariate legend (represented as an equilateral triangle). 
 				// Returns the array, suitable for joining with a svg.
-				// Note: count is # of divisions. # of swatches will be count + 1
+				// Note: count is # of divisions. # of swatches will be count + 1.
+				// startx and starty are the upper left corner of the triangle's 
+				// bounding box. Width is the width of the triangle's bounding box.
 				
 				array = new Array(); 
 				id = 0;
@@ -500,7 +502,7 @@
 				}
 				return array;
 			}
-		
+			
 			var x = 660,
 				y = 400,
 				width = 60,
