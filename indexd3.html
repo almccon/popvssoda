@@ -472,6 +472,9 @@
 				// Note: count is # of divisions. # of swatches will be count + 1.
 				// startx and starty are the upper left corner of the triangle's 
 				// bounding box. Width is the width of the triangle's bounding box.
+				// The x and y coordinates of the center of each swatch is stored
+				// in each array element. The caller of this function is responsible
+				// for creating svg symbols at those points (circles, hexagons, etc) 
 				
 				array = new Array(); 
 				id = 0;
@@ -501,6 +504,18 @@
 					}
 				}
 				return array;
+			}
+			
+			function univariate_legend(startx, starty, width, count) {
+				// Create a one-dimensional array storing the elements 
+				// of a univariate legend (represented as a series of adjoining squares). 
+				// Returns the array, suitable for joining with a svg.
+				// Note: count is # of divisions. # of swatches will be count + 1.
+				// startx and starty are the upper left corner of the legend's 
+				// bounding box. Width is the width of the legend's bounding box.
+				// The x and y coordinates of the center of each swatch is stored
+				// in each array element. The caller of this function is responsible
+				// for creating svg symbols at those points (squares, etc) 
 			}
 			
 			var x = 660,
