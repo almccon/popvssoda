@@ -450,7 +450,7 @@
 					// somehow.
 					radius = 8;
 				}
-				var x0 = 0, y0 = 0;
+				var x0 = 0, y0 = 0; // create shape centered at 0,0
 				var points = d3_hexbinAngles.map(function(angle) {
       				var x1 = Math.sin(angle) * radius,
           				y1 = -Math.cos(angle) * radius,
@@ -463,6 +463,25 @@
       				return [dx, dy];
     			});
     			return "M" + points.join("L") + "z";
+  			}
+  			
+  			function square(width) {
+				if (arguments.length < 1) {
+					// This is where I should calculate the correct radius
+					// based on the size of the overall triangle... but then
+					// the hexagon would have to be linked to the legend
+					// somehow.
+					width = 8;
+				}
+				halfwidth = width / 2;
+				var x0 = 0, y0 = 0; // create shape centered at 0,0
+				var points = [
+					[x0 - halfwidth, y0 - halfwidth],
+					[x0 + halfwidth, y0 - halfwidth],
+					[x0 + halfwidth, y0 + halfwidth],
+					[x0 - halfwidth, y0 + halfwidth]
+				]; 
+    			return "M" + points.join("L") + "z";	
   			}
 			
 			function trivariate_legend(startx, starty, width, count) {
@@ -516,18 +535,45 @@
 				// The x and y coordinates of the center of each swatch is stored
 				// in each array element. The caller of this function is responsible
 				// for creating svg symbols at those points (squares, etc) 
+				// 
+				// The more appropriate d3/svg method for a univariate legend 
+				// (I think) would be to create a line with the appropriate 
+				// thickness to give the impression of a row of squares. But 
+				// here I want the squares to be consistent with the color
+				// swatches in the trivariate legend.
+				
+				array = new Array();
+				id = 0;
+				xstep = width / count;
+				
+				// Create the rows
+				for (var i = 0; i <= count; i++) {
+					array.push(
+						{
+							x: startx + i * xstep,
+							y: starty,
+							i: i,
+							PCTSODA: 0,
+							PCTPOP: 0,
+							PCTCOKE: 0,
+							PCTOTHER: i / count,
+							id: id++
+						}
+					);
+				}
+				return array;
 			}
 			
 			var x = 660,
 				y = 400,
 				width = 60,
 				count = 10;	
-			legend_data = trivariate_legend(x, y, width, count);
+			tri_legend_data = trivariate_legend(x, y, width, count);
 			
-			legend_svg = svg.append("g")
+			tri_legend_svg = svg.append("g")
 				.attr("class", "legend")
 				//.selectAll("circle")
-				//	.data(legend_data)
+				//	.data(tri_legend_data)
 			  	//.enter().append("circle")
 			  		//.attr("cx", function(d) {
 			  		//	return d.x;
@@ -537,7 +583,7 @@
 			  		//})
 			  		//.attr("r", 3)
 				.selectAll("path")
-					.data(legend_data)
+					.data(tri_legend_data)
 			  	.enter().append("path")
 			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 			  		// Add 1 just to pad the hexagons a bit so they blend
@@ -565,7 +611,10 @@
 					y: y+width+spacing
 				}
 			];
-	  		svg.selectAll("text")
+
+			svg.append("g")
+				.attr("class", "legend")			
+	  			.selectAll("text")
 	  			.data(corner_labels)	
 	  		  .enter().append("text")
 	  		  	.attr("text-anchor", "middle")
@@ -573,6 +622,45 @@
 	  			.attr("y", function(d) { return d.y })
 	  			.attr("font-size", "10px")
 	  			.text(function(d) { return d.label });
+	  			
+	  		var x = 560,
+				y = 452,
+				width = 60,
+				count = 10;	
+			uni_legend_data = univariate_legend(x, y, width, count);
+			
+			uni_legend_svg = svg.append("g")
+				.attr("class", "legend")
+	  			.selectAll("path")
+					.data(uni_legend_data)
+			  	.enter().append("path")
+			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
+			  		// Add 1 just to pad the hexagons a bit so they blend
+			  		.attr("d", square( 1 + width/count ))
+			  		.style("fill", function(d) {
+			  			return bwscale(d.PCTOTHER);
+			  		})	
+			  		
+			uni_labels = [
+				{
+					label: "other",
+					x: x+width/2,
+					y: y+spacing+8
+				}
+			];
+			
+	  		svg.append("g")
+	  			.attr("class", "legend")
+	  			.selectAll("text")
+	  			.data(uni_labels)	
+	  		  .enter().append("text")
+	  		  	.attr("text-anchor", "middle")
+	  			.attr("x", function(d) { return d.x })
+	  			.attr("y", function(d) { return d.y })
+	  			.attr("font-size", "10px")
+	  			.text(function(d) { return d.label });
+	  			
+	  		// Done creating legend	
 
 			// Load the TopoJSON of states and the tsv of popvssoda data in parallel
 			queue()
@@ -674,59 +762,59 @@
 			
 				// Add functions to each button
 				d3.select("#cmykbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return cmyk(d); });
+					tri_legend_svg.style("fill", function(d) { return cmyk(d); });
 					counties.style("fill", function(d) { return cmyk(d); });
 				});
 				d3.select("#cmykpopbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return cmyk(d); });
+					tri_legend_svg.style("fill", function(d) { return cmyk(d); });
 					counties.style("fill", function(d) { return cmykpop(d.PCTPOP); });
 				});
 				d3.select("#cmyksodabutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return cmyk(d); });
+					tri_legend_svg.style("fill", function(d) { return cmyk(d); });
 					counties.style("fill", function(d) { return cmyksoda(d.PCTSODA); });
 				});
 				d3.select("#cmykcokebutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return cmyk(d); });
+					tri_legend_svg.style("fill", function(d) { return cmyk(d); });
 					counties.style("fill", function(d) { return cmykcoke(d.PCTCOKE); });
 				});
 				d3.select("#cmykotherbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return cmyk(d); });
+					tri_legend_svg.style("fill", function(d) { return cmyk(d); });
 					counties.style("fill", function(d) { return bwscale(d.PCTOTHER) });
 				});
 				d3.select("#rgbbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return rgb(d); });
+					tri_legend_svg.style("fill", function(d) { return rgb(d); });
 					counties.style("fill", function(d) { return rgb(d) });
 				});
 				d3.select("#rgbpopbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return rgb(d); });
+					tri_legend_svg.style("fill", function(d) { return rgb(d); });
 					counties.style("fill", function(d) { return rgbpop(d.PCTPOP); });
 				});
 				d3.select("#rgbsodabutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return rgb(d); });
+					tri_legend_svg.style("fill", function(d) { return rgb(d); });
 					counties.style("fill", function(d) { return rgbsoda(d.PCTSODA); });
 				});
 				d3.select("#rgbcokebutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return rgb(d); });
+					tri_legend_svg.style("fill", function(d) { return rgb(d); });
 					counties.style("fill", function(d) { return rgbcoke(d.PCTCOKE); });
 				});
 				d3.select("#rgbotherbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return rgb(d); });
+					tri_legend_svg.style("fill", function(d) { return rgb(d); });
 					counties.style("fill", function(d) { return bwscale(d.PCTOTHER) });
 				});
 				d3.select("#bwpopbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return bwscale(d.PCTPOP) });
+					tri_legend_svg.style("fill", function(d) { return bwscale(d.PCTPOP) });
 					counties.style("fill", function(d) { return bwscale(d.PCTPOP) });
 				});
 				d3.select("#bwsodabutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return bwscale(d.PCTSODA) });
+					tri_legend_svg.style("fill", function(d) { return bwscale(d.PCTSODA) });
 					counties.style("fill", function(d) { return bwscale(d.PCTSODA) });
 				});
 				d3.select("#bwcokebutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return bwscale(d.PCTCOKE) });
+					tri_legend_svg.style("fill", function(d) { return bwscale(d.PCTCOKE) });
 					counties.style("fill", function(d) { return bwscale(d.PCTCOKE) });
 				});
 				d3.select("#bwotherbutton").on("mouseover", function() {
-					legend_svg.style("fill", function(d) { return bwscale(d.PCTOTHER) });
+					tri_legend_svg.style("fill", function(d) { return bwscale(d.PCTOTHER) });
 					counties.style("fill", function(d) { return bwscale(d.PCTOTHER) });
 				});
 			}
