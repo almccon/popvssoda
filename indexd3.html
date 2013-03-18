@@ -485,6 +485,42 @@
 				]; 
     			return "M" + points.join("L") + "z";	
   			}
+  			
+  			function triangle(x, y, height) {
+  				// Create the svg text representation of an equilateral triangle.
+  				// Unlike the shapes above, do not create this centered on 0,0.
+  				// The x and y are the coordinates of the top of the triangle. 
+  		
+  				x = x;	
+  				y = y;
+				dy = height + 1; // 1 pixel padding so shapes overlap a little
+				dx = dy / Math.sqrt(3);
+				
+  				var points = [
+  					[x, y],
+  					[x + dx, y + dy],
+  					[x - dx, y + dy]
+  				];
+    			return "M" + points.join("L") + "z";	
+  			}
+  			
+  			function upsidedown_triangle(x, y, height) {
+  				// Create the svg text representation of an equilateral triangle.
+  				// Unlike the shapes above, do not create this centered on 0,0.
+  				// The x and y are the coordinates of the center of the top of the triangle. 
+  		
+  				x = x;	
+  				y = y;
+				dy = height;
+				dx = dy / Math.sqrt(3);
+				
+  				var points = [
+  					[x - dx, y],
+  					[x + dx, y],
+  					[x, y + dy]
+  				];
+    			return "M" + points.join("L") + "z";	
+  			}
 			
 			function trivariate_legend(startx, starty, width, count) {
 				// Create a one-dimensional array storing the elements 
@@ -493,9 +529,12 @@
 				// Note: count is # of divisions. # of swatches will be count + 1.
 				// startx and starty are the upper left corner of the triangle's 
 				// bounding box. Width is the width of the triangle's bounding box.
+				// (Technically, the bounding box of the swatch centers.)
 				// The x and y coordinates of the center of each swatch is stored
 				// in each array element. The caller of this function is responsible
 				// for creating svg symbols at those points (circles, hexagons, etc) 
+				
+				make_triangle = true;
 				
 				array = new Array(); 
 				id = 0;
@@ -509,19 +548,45 @@
 					// (1st column has 1 row, 2nd column has 2 rows, etc)
 					for (var j = 0; j <= i; j++ ) {
 						
+						x = startx + j * xstep + width / 2 - i * xstep / 2;
+						y = starty + i * ystep;
+						shape = triangle(x, y, ystep);
+						
 						array.push(
 							{
-								x: startx + j * xstep + width / 2 - i * xstep / 2,
-								y: starty + i * ystep,
+								x: x,
+								y: y,
 								i: i,
 								j: j,
 								PCTSODA: (count - i) / count,
 								PCTPOP: (i - j) / count, 
 								PCTCOKE: (j) / count,
 								PCTOTHER: 0,
-								id: id++
+								id: id++,
+								shp: shape
 							}
 						);
+						
+						if (j > 0) {
+							x = startx + j * xstep + width / 2 - i * xstep / 2 - xstep / 2;
+							y = starty + i * ystep;
+							shape = upsidedown_triangle(x, y, ystep);
+						
+							array.push(
+								{
+									x: x,
+									y: y,
+									i: i,
+									j: j,
+									PCTSODA: (count - i) / count,
+									PCTPOP: (i - j + 0.5) / count, 
+									PCTCOKE: (j - 0.5) / count,
+									PCTOTHER: 0,
+									id: id++,
+									shp: shape
+								}
+							);
+						}
 					}
 				}
 				return array;
@@ -569,7 +634,7 @@
 			var x = 660,
 				y = 400,
 				width = 60,
-				count = 10;	
+				count = 10;
 			tri_legend_data = trivariate_legend(x, y, width, count);
 			
 			tri_legend_svg = svg.append("g")
@@ -587,9 +652,7 @@
 				.selectAll("path")
 					.data(tri_legend_data)
 			  	.enter().append("path")
-			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
-			  		// Add 1 just to pad the hexagons a bit so they blend
-			  		.attr("d", hexagon( 1 + width/(count*Math.sqrt(3)) ))
+			  		.attr("d", function(d) { return d.shp })
 			  		.style("fill", function(d) {
 			  			return cmyk(d);
 			  		})
@@ -623,13 +686,14 @@
 	  			.attr("x", function(d) { return d.x })
 	  			.attr("y", function(d) { return d.y })
 	  			.attr("font-size", "10px")
+			  	.attr("transform", function(d) { return "translate(" + -56 + "," + -50 + ")" }) // why are they shifted?
 	  			.text(function(d) { return d.label });
 	  			
 	  		var x = 560,
 				y = 452,
 				width = 60,
 				height = 10,
-				count = 30;	
+				count = 20;	
 			uni_legend_data = univariate_legend(x, y, height, width, count);
 			
 			uni_legend_svg = svg.append("g")
@@ -648,7 +712,7 @@
 				{
 					label: "other",
 					x: x+width/2,
-					y: y+spacing+8
+					y: y+spacing+10
 				}
 			];
 			
@@ -824,15 +888,15 @@
 
 		</script>
 		<script type="text/javascript">
-			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+			//var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			//document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 		</script>
 		<script type="text/javascript">
-			try {
-				var pageTracker = _gat._getTracker("UA-11836083-1");
-				pageTracker._trackPageview();
-			} catch(err) {
-			}
+			//try {
+			//	var pageTracker = _gat._getTracker("UA-11836083-1");
+			//	pageTracker._trackPageview();
+			//} catch(err) {
+			//}
 		</script>
 	</body>
 </html>
