@@ -445,7 +445,7 @@
 			function hexagon(radius) {
 				if (arguments.length < 1) {
 					// This is where I should calculate the correct radius
-					// based on the size of the overall triangle... but then
+					// based on the number of divisions in the overall triangle... but then
 					// the hexagon would have to be linked to the legend
 					// somehow.
 					radius = 8;
@@ -465,21 +465,23 @@
     			return "M" + points.join("L") + "z";
   			}
   			
-  			function square(width) {
-				if (arguments.length < 1) {
-					// This is where I should calculate the correct radius
-					// based on the size of the overall triangle... but then
-					// the hexagon would have to be linked to the legend
+  			function rectangle(width, height) {
+				if (arguments.length < 2) {
+					// This is where I should calculate the correct size
+					// based on the number of division in the overall triangle... but then
+					// the rectangle would have to be linked to the legend
 					// somehow.
 					width = 8;
+					height = 8;
 				}
 				halfwidth = width / 2;
+				halfheight = height / 2;
 				var x0 = 0, y0 = 0; // create shape centered at 0,0
 				var points = [
-					[x0 - halfwidth, y0 - halfwidth],
-					[x0 + halfwidth, y0 - halfwidth],
-					[x0 + halfwidth, y0 + halfwidth],
-					[x0 - halfwidth, y0 + halfwidth]
+					[x0 - halfwidth, y0 - halfheight],
+					[x0 + halfwidth, y0 - halfheight],
+					[x0 + halfwidth, y0 + halfheight],
+					[x0 - halfwidth, y0 + halfheight]
 				]; 
     			return "M" + points.join("L") + "z";	
   			}
@@ -636,7 +638,7 @@
 			  	.enter().append("path")
 			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 			  		// Add 1 just to pad the hexagons a bit so they blend
-			  		.attr("d", square( 1 + width/count ))
+			  		.attr("d", rectangle( 1 + width/count, 1 + width/count ))
 			  		.style("fill", function(d) {
 			  			return bwscale(d.PCTOTHER);
 			  		})	
