@@ -465,7 +465,7 @@
     			return "M" + points.join("L") + "z";
   			}
   			
-  			function rectangle(width, height) {
+  			function rectangle(height, width) {
 				if (arguments.length < 2) {
 					// This is where I should calculate the correct size
 					// based on the number of division in the overall triangle... but then
@@ -527,7 +527,7 @@
 				return array;
 			}
 			
-			function univariate_legend(startx, starty, width, count) {
+			function univariate_legend(startx, starty, height, width, count) {
 				// Create a one-dimensional array storing the elements 
 				// of a univariate legend (represented as a series of adjoining squares). 
 				// Returns the array, suitable for joining with a svg.
@@ -628,8 +628,9 @@
 	  		var x = 560,
 				y = 452,
 				width = 60,
-				count = 10;	
-			uni_legend_data = univariate_legend(x, y, width, count);
+				height = 10,
+				count = 30;	
+			uni_legend_data = univariate_legend(x, y, height, width, count);
 			
 			uni_legend_svg = svg.append("g")
 				.attr("class", "legend")
@@ -638,7 +639,7 @@
 			  	.enter().append("path")
 			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 			  		// Add 1 just to pad the hexagons a bit so they blend
-			  		.attr("d", rectangle( 1 + width/count, 1 + width/count ))
+			  		.attr("d", rectangle( 1 + height, 1 + width/count ))
 			  		.style("fill", function(d) {
 			  			return bwscale(d.PCTOTHER);
 			  		})	
