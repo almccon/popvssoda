@@ -630,11 +630,22 @@
 				}
 				return array;
 			}
-			
+		
+			// Parameters for the trivariate legend	
 			var x = 660,
 				y = 400,
 				width = 60,
 				count = 10;
+			
+			// Add a drop shadow for the trivariate legend	
+			svg.append("g")
+				.attr("class", "legend")
+				.append("path")
+				// These calculations are a complete mess because I am calculating all my triangles
+				// in different ways. Need to make these more coherent.
+				.attr("d", triangle(x + width / 2, y, 1 + Math.sqrt(3) * (width + count / 2) / 2))
+				.attr("class", "landshadow");
+				
 			tri_legend_data = trivariate_legend(x, y, width, count);
 			
 			tri_legend_svg = svg.append("g")
@@ -688,12 +699,22 @@
 	  			.attr("font-size", "10px")
 			  	.attr("transform", function(d) { return "translate(" + -56 + "," + -50 + ")" }) // why are they shifted?
 	  			.text(function(d) { return d.label });
-	  			
+	  		
+	  		// Parameters for the univariate legend	
 	  		var x = 560,
 				y = 452,
 				width = 60,
 				height = 10,
 				count = 20;	
+			
+			// Add a drop shadow for the univariate legend	
+			svg.append("g")
+				.attr("class", "legend")
+				.append("path")
+			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
+				.attr("d", rectangle( 1 + height, 2 + width ))
+				.attr("class", "landshadow");
+				
 			uni_legend_data = univariate_legend(x, y, height, width, count);
 			
 			uni_legend_svg = svg.append("g")
