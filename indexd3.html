@@ -727,7 +727,7 @@
 			  		.attr("d", rectangle( 1 + height, 1 + width/count ))
 			  		.style("fill", function(d) {
 			  			return bwscale(d.PCTOTHER);
-			  		})	
+			  		});
 			  		
 			uni_labels = [
 				{
@@ -747,6 +747,59 @@
 	  			.attr("y", function(d) { return d.y })
 	  			.attr("font-size", "10px")
 	  			.text(function(d) { return d.label });
+	  			
+	  		// Parameters for the no data swatch
+	  		var x = 510,
+	  			y = 452,
+	  			width = 20,
+	  			height = 9;
+	  			
+	  		// Add a drop shadow for the no data swatch
+			svg.append("g")
+				.attr("class", "legend")
+				.append("path")
+			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
+				.attr("d", rectangle( 1 + height, 2 + width ))
+				.attr("class", "landshadow");  		
+				
+			svg.append("g")
+				.attr("class", "legend")
+				.selectAll("path")
+					.data(
+						new Array(
+							{
+								PCTSODA: 0,
+								PCTPOP: 0,
+								PCTCOKE: 0,
+								PCTOTHER: 0
+							}
+						)
+					)	
+				.enter().append("path")
+			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
+				.attr("d", rectangle( 1 + height, 2 + width ))
+				.style("fill", function(d) {
+					return cmyk(d);
+				});
+			
+			nodata_labels = [
+				{
+					label: "no data",
+					x: x+width/2,
+					y: y+spacing+10
+				}
+			];
+			
+	  		svg.append("g")
+	  			.attr("class", "legend")
+	  			.selectAll("text")
+	  			.data(nodata_labels)	
+	  		  .enter().append("text")
+	  		  	.attr("text-anchor", "middle")
+	  			.attr("x", function(d) { return d.x })
+	  			.attr("y", function(d) { return d.y })
+	  			.attr("font-size", "10px")
+	  			.text(function(d) { return d.label });			
 	  			
 	  		// Done creating legend	
 
