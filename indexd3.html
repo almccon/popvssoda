@@ -637,10 +637,11 @@
 				width = 60,
 				count = 10;
 			
+			tri_legend_g = svg.append("g")
+				.attr("class", "legend");
+				
 			// Add a drop shadow for the trivariate legend	
-			svg.append("g")
-				.attr("class", "legend")
-				.append("path")
+			tri_legend_g.append("path")
 				// These calculations are a complete mess because I am calculating all my triangles
 				// in different ways. Need to make these more coherent.
 				.attr("d", triangle(x + width / 2, y, 1 + Math.sqrt(3) * (width + count / 2) / 2))
@@ -648,19 +649,9 @@
 				
 			tri_legend_data = trivariate_legend(x, y, width, count);
 			
-			tri_legend_svg = svg.append("g")
-				.attr("class", "legend")
-				//.selectAll("circle")
-				//	.data(tri_legend_data)
-			  	//.enter().append("circle")
-			  		//.attr("cx", function(d) {
-			  		//	return d.x;
-			  		//})
-			  		//.attr("cy", function(d) {
-			  		//	return d.y;
-			  		//})
-			  		//.attr("r", 3)
-				.selectAll("path")
+			// Select (and create) swatch class.
+			// Do this instead of selectAll("path") to avoid binding data to the shadow path
+			tri_legend_svg = tri_legend_g.selectAll(".swatch")
 					.data(tri_legend_data)
 			  	.enter().append("path")
 			  		.attr("d", function(d) { return d.shp })
@@ -688,9 +679,7 @@
 				}
 			];
 
-			svg.append("g")
-				.attr("class", "legend")			
-	  			.selectAll("text")
+	  		tri_legend_g.selectAll("text")
 	  			.data(corner_labels)	
 	  		  .enter().append("text")
 	  		  	.attr("text-anchor", "middle")
@@ -707,19 +696,20 @@
 				height = 10,
 				count = 20;	
 			
+			uni_legend_g = svg.append("g")
+				.attr("class", "legend");
+				
 			// Add a drop shadow for the univariate legend	
-			svg.append("g")
-				.attr("class", "legend")
-				.append("path")
+			uni_legend_g.append("path")
 			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
 				.attr("d", rectangle( 1 + height, 2 + width ))
 				.attr("class", "landshadow");
-				
+			
 			uni_legend_data = univariate_legend(x, y, height, width, count);
 			
-			uni_legend_svg = svg.append("g")
-				.attr("class", "legend")
-	  			.selectAll("path")
+			// Select (and create) swatch class.
+			// Do this instead of selectAll("path") to avoid binding data to the shadow path
+			uni_legend_svg = uni_legend_g.selectAll(".swatch")
 					.data(uni_legend_data)
 			  	.enter().append("path")
 			  		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
@@ -737,9 +727,7 @@
 				}
 			];
 			
-	  		svg.append("g")
-	  			.attr("class", "legend")
-	  			.selectAll("text")
+	  		uni_legend_g.selectAll("text")
 	  			.data(uni_labels)	
 	  		  .enter().append("text")
 	  		  	.attr("text-anchor", "middle")
@@ -754,33 +742,34 @@
 	  			width = 20,
 	  			height = 9;
 	  			
-	  		// Add a drop shadow for the no data swatch
-			svg.append("g")
+	  		nodata_legend_g = svg.append("g")
 				.attr("class", "legend")
-				.append("path")
+				
+	  		// Add a drop shadow for the no data swatch
+			nodata_legend_g.append("path")
 			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
 				.attr("d", rectangle( 1 + height, 2 + width ))
 				.attr("class", "landshadow");  		
 				
-			svg.append("g")
-				.attr("class", "legend")
-				.selectAll("path")
-					.data(
-						new Array(
-							{
-								PCTSODA: 0,
-								PCTPOP: 0,
-								PCTCOKE: 0,
-								PCTOTHER: 0
-							}
-						)
-					)	
+			nodata_legend_data = new Array(
+				{
+					PCTSODA: 0,
+					PCTPOP: 0,
+					PCTCOKE: 0,
+					PCTOTHER: 0
+				}
+			);
+				
+			// Select (and create) swatch class.
+			// Do this instead of selectAll("path") to avoid binding data to the shadow path
+			nodata_legend_svg = nodata_legend_g.selectAll(".swatch") 
+					.data(nodata_legend_data)	
 				.enter().append("path")
-			  	.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
-				.attr("d", rectangle( 1 + height, 2 + width ))
-				.style("fill", function(d) {
-					return cmyk(d);
-				});
+			  		.attr("transform", "translate(" + ( x + width / 2 ) + "," + y + ")")
+					.attr("d", rectangle( 1 + height, 2 + width ))
+					.style("fill", function(d) {
+						return cmyk(d);
+					});
 			
 			nodata_labels = [
 				{
@@ -790,9 +779,7 @@
 				}
 			];
 			
-	  		svg.append("g")
-	  			.attr("class", "legend")
-	  			.selectAll("text")
+	  		nodata_legend_g.selectAll("text")
 	  			.data(nodata_labels)	
 	  		  .enter().append("text")
 	  		  	.attr("text-anchor", "middle")
