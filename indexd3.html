@@ -690,7 +690,7 @@
 	  			.text(function(d) { return d.label });
 	  		
 	  		// Parameters for the univariate legend	
-	  		var x = 560,
+	  		var x = 550,
 				y = 452,
 				width = 60,
 				height = 10,
@@ -737,7 +737,7 @@
 	  			.text(function(d) { return d.label });
 	  			
 	  		// Parameters for the no data swatch
-	  		var x = 510,
+	  		var x = 490,
 	  			y = 452,
 	  			width = 20,
 	  			height = 9;
@@ -787,6 +787,17 @@
 	  			.attr("y", function(d) { return d.y })
 	  			.attr("font-size", "10px")
 	  			.text(function(d) { return d.label });			
+	  		
+	  		svg.append("g")
+	  			.attr("class", "author")
+			  .append("text")
+	  		  	.attr("text-anchor", "center")
+	  		  	.attr("x", 550)
+	  		  	.attr("y", 495)
+	  			.attr("font-size", "10px")
+	  			.attr("font-style", "italic")
+	  			.text("CC-BY: Alan McConchie, PopVsSoda.com");
+	  				
 	  			
 	  		// Done creating legend	
 
