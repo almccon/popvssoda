@@ -272,7 +272,7 @@
 						<br>
 						<a href="http://www.usps.gov/zip4/">United States Postal Service</a>
 						<br>
-						<a href="http://www.canadapost.ca/tools/pcl/bin/default-e.asp">Canada Post</a>
+						<a href="http://www.canadapost.ca/cpotools/apps/fpc/personal/findByCity">Canada Post</a>
 					</p>
 
 					<fieldset>
@@ -876,9 +876,8 @@
 				// Use the "tipsy" plugin for mouseover info boxes
 				// http://onehackoranother.com/projects/jquery/tipsy/
 				$('path.addhover').tipsy({
-					gravity : 'w',
+					gravity : 's',
 					html : true,
-					offset : -100,
 					title : function(d, i) {
 						var d = this.__data__;
 						if (d.NODATA == true) {
