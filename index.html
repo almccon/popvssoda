@@ -876,8 +876,9 @@
 				// Use the "tipsy" plugin for mouseover info boxes
 				// http://onehackoranother.com/projects/jquery/tipsy/
 				$('path.addhover').tipsy({
-					gravity : 's',
+					gravity : 'w',
 					html : true,
+          offset : -100,
 					title : function(d, i) {
 						var d = this.__data__;
 						if (d.NODATA == true) {
