@@ -152,7 +152,7 @@ mark {background-color: #fcd700; color: #000; font-style: italic; font-weight: b
 /* Pop vs Soda additions begin here */
 
 body {
-	width:800px;
+	width:1600px;
 	margin:0 auto;
 	position:relative;
 }
@@ -219,9 +219,9 @@ header{
 /* Article styles: */
 
 #contentcontainer{
-	width:800px;
+	width:1600px;
 	margin:0 auto;
-	position:relative;
+	position:absolute;
 }
 
 section#map, section#stats, section#about, section#survey, section#references, section#media {

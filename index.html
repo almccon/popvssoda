@@ -18,7 +18,7 @@
                 fill: #fff;
             }
             #map-container {
-                height: 500px;
+                height: 1000px;
                 width: 1500px;
                 text-align: center;
                 position: relative;
@@ -433,7 +433,7 @@
 			}
 
 			var path = d3.geo.path()
-				.projection(d3.geo.albersUsa().translate([400,250]).scale(800));
+				.projection(d3.geo.albersUsa().translate([800,400]).scale(1600));
 
 			var svg = d3.select("#d3map");
 		
@@ -630,10 +630,11 @@
 				}
 				return array;
 			}
-		
+		  var legend_offset_x = 450;
+		  var legend_offset_y = 300;
 			// Parameters for the trivariate legend	
-			var x = 660,
-				y = 400,
+			var x = 660 + legend_offset_x,
+				y = 400 + legend_offset_y,
 				width = 60,
 				count = 10;
 			
@@ -690,8 +691,8 @@
 	  			.text(function(d) { return d.label });
 	  		
 	  		// Parameters for the univariate legend	
-	  		var x = 550,
-				y = 452,
+	  		var x = 550 + legend_offset_x,
+				y = 452 + legend_offset_y,
 				width = 60,
 				height = 10,
 				count = 20;	
@@ -737,8 +738,8 @@
 	  			.text(function(d) { return d.label });
 	  			
 	  		// Parameters for the no data swatch
-	  		var x = 490,
-	  			y = 452,
+	  		var x = 490 + legend_offset_x,
+	  			y = 452 + legend_offset_y,
 	  			width = 20,
 	  			height = 9;
 	  			
@@ -792,8 +793,8 @@
 	  			.attr("class", "author")
 			  .append("text")
 	  		  	.attr("text-anchor", "center")
-	  		  	.attr("x", 550)
-	  		  	.attr("y", 495)
+	  		  	.attr("x", 550 + legend_offset_x)
+	  		  	.attr("y", 495 + legend_offset_y)
 	  			.attr("font-size", "10px")
 	  			.attr("font-style", "italic")
 	  			.text("CC-BY: Alan McConchie, PopVsSoda.com");
