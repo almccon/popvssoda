@@ -65,7 +65,7 @@
 			const shares = {};
 			for (const t of TERMS) shares[t] = counts[t] / total;
 			points.push({
-				x: xy[0], y: xy[1], country: r.country, state: r.state, counts, total,
+				x: xy[0], y: xy[1], lonLat: [+r.lon, +r.lat], country: r.country, state: r.state, counts, total,
 				fill: mix(shares),
 				title: `${r.country === "US" ? "ZIP" : "FSA"} ${r.postal_code}, ${r.state}`,
 			});
@@ -104,17 +104,75 @@
 				hpath(region.shape);
 				hctx.fill();
 			});
-			hitMaps[mode] = hctx.getImageData(0, 0, WIDTH, HEIGHT).data;
+			hctx.fillStyle = "#000"; // lakes aren't land
+			hctx.beginPath();
+			hpath(lakes);
+			hctx.fill();
+			// Decode to region numbers. Anti-aliased edge pixels blend two colors
+			// into the number of some unrelated region, so only trust a pixel whose
+			// four neighbours decode to the same region; edges become 0 (none).
+			const rgba = hctx.getImageData(0, 0, WIDTH, HEIGHT).data;
+			const raw = new Uint16Array(WIDTH * HEIGHT);
+			for (let i = 0; i < raw.length; i++) {
+				raw[i] = rgba[i * 4 + 3] === 255 ? rgba[i * 4] + (rgba[i * 4 + 1] << 8) : 0;
+			}
+			const ids = new Uint16Array(WIDTH * HEIGHT);
+			for (let y = 1; y < HEIGHT - 1; y++) {
+				for (let x = 1; x < WIDTH - 1; x++) {
+					const i = y * WIDTH + x, n = raw[i];
+					if (n && raw[i - 1] === n && raw[i + 1] === n && raw[i - WIDTH] === n && raw[i + WIDTH] === n) ids[i] = n;
+				}
+			}
+			hitMaps[mode] = ids;
 		}
 		const regionAt = (mode, x, y) => {
 			const xi = Math.floor(x), yi = Math.floor(y);
 			if (xi < 0 || yi < 0 || xi >= WIDTH || yi >= HEIGHT) return null;
-			const o = (yi * WIDTH + xi) * 4;
-			const n = hitMaps[mode][o] + (hitMaps[mode][o + 1] << 8);
+			const n = hitMaps[mode][yi * WIDTH + xi];
 			return n ? partitions[mode][n - 1] : null;
 		};
 
 		const currentMode = () => [...modeInputs].find((el) => el.checked).value;
+
+		const EARTH_KM = 6371;
+		const kmBetween = (a, b) => d3.geoDistance(a, b) * EARTH_KM;
+
+		// Lower-48 land pixels (from the state hit map), used to measure the reach cap.
+		const LOWER48_EXCLUDE = new Set(["AK", "HI"]);
+		const lower48Pixels = [];
+		{
+			const data = hitMaps.state;
+			for (let y = 0; y < HEIGHT; y++) {
+				for (let x = 0; x < WIDTH; x++) {
+					const n = data[y * WIDTH + x];
+					const region = n && partitions.state[n - 1];
+					if (region && region.points[0]?.country === "US" && !LOWER48_EXCLUDE.has(region.key)) {
+						lower48Pixels.push(x + 0.5, y + 0.5);
+					}
+				}
+			}
+		}
+
+		// The reach cap: the farthest any lower-48 land pixel is from the point
+		// whose cell it falls in, for the current mode and slider setting. Cells
+		// in Alaska and northern Canada are cut off at this distance, so color
+		// never reaches further from a data point than it does anywhere in the
+		// lower 48.
+		function reachCapKm(mode) {
+			let max = 0;
+			let hint = 0;
+			reachCapKm.lastRegion = null; // triangulations were just rebuilt
+			for (let k = 0; k < lower48Pixels.length; k += 2) {
+				const x = lower48Pixels[k], y = lower48Pixels[k + 1];
+				const region = regionAt(mode, x, y);
+				if (!region || !region.delaunay) continue;
+				hint = region.delaunay.find(x, y, region === reachCapKm.lastRegion ? hint : 0);
+				reachCapKm.lastRegion = region;
+				const d = kmBetween(projection.invert([x, y]), region.shown[hint].lonLat);
+				if (d > max) max = d;
+			}
+			return max;
+		}
 
 		function draw() {
 			const minN = +slider.value;
@@ -129,9 +187,14 @@
 			for (const region of partitions[mode]) {
 				region.shown = region.points.filter((p) => p.total >= minN);
 				merged += region.points.length - region.shown.length;
-				region.delaunay = null;
-				if (!region.shown.length) continue;
-				region.delaunay = d3.Delaunay.from(region.shown, (p) => p.x, (p) => p.y);
+				region.delaunay = region.shown.length
+					? d3.Delaunay.from(region.shown, (p) => p.x, (p) => p.y) : null;
+			}
+			capKm = reachCapKm(mode);
+			const capCircle = d3.geoCircle().radius((capKm / EARTH_KM) * (180 / Math.PI));
+
+			for (const region of partitions[mode]) {
+				if (!region.delaunay) continue;
 				const voronoi = region.delaunay.voronoi([0, 0, WIDTH, HEIGHT]);
 
 				ctx.save();
@@ -140,6 +203,15 @@
 				ctx.clip();
 				for (let i = 0; i < region.shown.length; i++) {
 					const p = region.shown[i];
+					// Only cells with a corner beyond the cap need the extra circular clip.
+					const poly = voronoi.cellPolygon(i);
+					const capped = poly && poly.some((v) => kmBetween(projection.invert(v), p.lonLat) > capKm);
+					if (capped) {
+						ctx.save();
+						ctx.beginPath();
+						path(capCircle.center(p.lonLat)());
+						ctx.clip();
+					}
 					ctx.beginPath();
 					voronoi.renderCell(i, ctx);
 					ctx.fillStyle = p.fill;
@@ -148,6 +220,7 @@
 					ctx.strokeStyle = p.fill;
 					ctx.lineWidth = 0.5;
 					ctx.stroke();
+					if (capped) ctx.restore();
 					cells++;
 					responses += p.total;
 				}
@@ -182,9 +255,12 @@
 			ctx.stroke();
 
 			status.textContent = `${fmt(cells)} cells, ${fmt(responses)} responses` +
-				(minN > 1 ? ` (${fmt(merged)} smaller cells merged into neighbours)` : "");
+				(minN > 1 ? ` (${fmt(merged)} smaller cells merged into neighbours)` : "") +
+				`. Cells reach at most ${fmt(Math.round(capKm))} km from their point, ` +
+				"the farthest any cell reaches in the lower 48 at this setting.";
 		}
 
+		let capKm = Infinity;
 		slider.addEventListener("input", draw);
 		modeInputs.forEach((el) => el.addEventListener("change", draw));
 
@@ -195,6 +271,7 @@
 			const region = regionAt(currentMode(), x, y);
 			if (!region || !region.delaunay) return tooltip.hide();
 			const p = region.shown[region.delaunay.find(x, y)];
+			if (kmBetween(projection.invert([x, y]), p.lonLat) > capKm) return tooltip.hide();
 			tooltip.show(event, breakdownHTML(p.title, p.counts, p.total));
 		});
 		canvas.addEventListener("pointerleave", () => tooltip.hide());
