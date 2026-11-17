@@ -23,14 +23,18 @@ Inputs:
   datadir/reference/fsa/CA.txt
                      GeoNames Canadian FSA coordinates (CC BY 4.0)
                      https://download.geonames.org/export/zip/CA.zip
-  datadir/reference/legacy_zip_points.csv   (optional)
-                     zip,lat,lon fallback for ZIP codes missing from the 2020
-                     gazetteer (e.g. retired codes)
+  datadir/reference/legacy/slimzip.txt, slimpc.txt   (optional)
+                     The project's original circa-1997 point lists, "code lat lon"
+                     with coordinates in hundredths of a degree (+3359 = 33.59).
+                     slimzip.txt covers US ZIP codes; slimpc.txt covers BC postal
+                     codes, averaged here into FSA points. Used only for codes
+                     the current sources lack (mostly retired ZIP codes).
 
 Run from the repo root:  python3 scripts/clean_survey_data.py
 """
 import collections
 import csv
+import math
 import datetime
 import os
 import re
@@ -43,16 +47,32 @@ AUDIT = os.path.join(RAW, "clean")
 ZCTA_FILE = os.path.join(RAW, "reference", "tab20_zcta520_county20_natl.txt")
 GAZETTEER_FILE = os.path.join(RAW, "reference", "2020_Gaz_zcta_national.txt")
 FSA_FILE = os.path.join(RAW, "reference", "fsa", "CA.txt")
-LEGACY_ZIP_FILE = os.path.join(RAW, "reference", "legacy_zip_points.csv")
+LEGACY_ZIP_FILE = os.path.join(RAW, "reference", "legacy", "slimzip.txt")
+LEGACY_PC_FILE = os.path.join(RAW, "reference", "legacy", "slimpc.txt")
+
+
+def read_legacy(path):
+    """Yield (code, lat, lon) from a circa-1997 point list (hundredths of a degree)."""
+    if not os.path.exists(path):
+        return
+    with open(path) as f:
+        for line in f:
+            parts = line.split()
+            if len(parts) == 3:
+                yield parts[0], int(parts[1]) / 100, int(parts[2]) / 100
 
 
 def load_points():
-    """(country, postal_code) -> (lat, lon, source)."""
+    """(country, postal_code) -> (lat, lon, source). Later sources win."""
     pts = {}
-    if os.path.exists(LEGACY_ZIP_FILE):
-        with open(LEGACY_ZIP_FILE, encoding="utf-8-sig") as f:
-            for row in csv.DictReader(f):
-                pts[("US", row["zip"].strip().zfill(5))] = (float(row["lat"]), float(row["lon"]), "legacy")
+    for code, lat, lon in read_legacy(LEGACY_ZIP_FILE):
+        pts[("US", code.zfill(5))] = (lat, lon, "legacy_1997")
+    fsa = collections.defaultdict(list)
+    for code, lat, lon in read_legacy(LEGACY_PC_FILE):
+        fsa[code[:3]].append((lat, lon))
+    for code, ll in fsa.items():
+        pts[("CA", code)] = (round(sum(p[0] for p in ll) / len(ll), 4),
+                             round(sum(p[1] for p in ll) / len(ll), 4), "legacy_1997")
     with open(GAZETTEER_FILE, encoding="utf-8-sig") as f:
         for row in csv.reader(f, delimiter="\t"):
             if row[0] == "GEOID":
@@ -61,7 +81,28 @@ def load_points():
     with open(FSA_FILE, encoding="utf-8") as f:
         for row in csv.reader(f, delimiter="\t"):
             pts[("CA", row[1])] = (float(row[9]), float(row[10]), "geonames_fsa")
+    # A handful of the 1997 points are far off (e.g. a Vermont ZIP placed in
+    # another state). Keep a legacy ZIP point only if it lies near a current
+    # ZIP point sharing its 3-digit prefix.
+    current = collections.defaultdict(list)
+    for (country, code), (lat, lon, src) in pts.items():
+        if src == "census_2020_zcta":
+            current[code[:3]].append((lat, lon))
+    for key, (lat, lon, src) in list(pts.items()):
+        if key[0] == "US" and src == "legacy_1997":
+            peers = current.get(key[1][:3], [])
+            if not any(km_between((lat, lon), q) <= LEGACY_MAX_KM for q in peers):
+                del pts[key]
     return pts
+
+
+LEGACY_MAX_KM = 150
+
+
+def km_between(a, b):
+    la1, lo1, la2, lo2 = map(math.radians, (a[0], a[1], b[0], b[1]))
+    h = math.sin((la2 - la1) / 2) ** 2 + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2
+    return 6371 * 2 * math.asin(math.sqrt(h))
 
 TERMS = {"pop", "soda", "coke", "other"}
 

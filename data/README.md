@@ -19,15 +19,18 @@ code or Canadian forward sortation area (FSA).
 | `postal_code` | 5-digit ZIP code, or 3-character FSA |
 | `county_fips` | US only. Assigned using the 2020 Census ZCTA-to-county relationship file; where a ZIP code spans several counties, it goes to the county with the largest share of its land area. It is blank when the ZIP code isn't in the 2020 census. |
 | `lat`, `lon` | A representative point for the area (WGS84) |
-| `coord_source` | `census_2020_zcta`: the internal point from the Census 2020 ZCTA Gazetteer. `geonames_fsa`: an FSA centroid from GeoNames. `legacy`: an older ZIP point list, used only for codes not in the 2020 gazetteer. Blank: no coordinates found. |
+| `coord_source` | `census_2020_zcta`: the internal point from the Census 2020 ZCTA Gazetteer. `geonames_fsa`: an FSA centroid from GeoNames. `legacy_1997`: the project's original circa-1997 ZIP point list, used only for codes not in the 2020 gazetteer (mostly retired ZIP codes). A legacy point is only used when it lies within 150 km of a current ZIP code with the same 3-digit prefix, which screens out the few that were badly placed. Blank: no coordinates found. |
 | `total`, `pop`, `soda`, `coke`, `other` | Response counts |
 
 The file includes every ZIP code that is valid for the respondent's state,
 including retired and PO-box ZIP codes that aren't in the 2020 census. Responses
 whose ZIP code didn't match their state aren't included.
 
-About 2,300 US ZIP codes (about 3,600 responses, 1%) and 42 FSAs have no
-coordinates. Most are retired or PO-box ZIP codes.
+About 1,500 US ZIP codes (about 2,000 responses, under 1%) and 42 FSAs have no
+coordinates. Most of the ZIP codes are PO-box or unique-organization codes,
+which have no area of their own. The FSAs are a mix of codes that don't exist
+(such as M2I and K2O), retired codes, and rural codes that GeoNames doesn't
+list (such as E0A–E0J in New Brunswick and B0A in Nova Scotia).
 
 Most ZIP codes have only a few responses (the median is 4), so smooth or
 aggregate before mapping rates.
