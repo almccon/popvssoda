@@ -61,6 +61,8 @@ The cleaning script drops the following kinds of rows.
   pasted text that repeats 3 or more times is also dropped.
 - **Bot submissions.** These have a state code that isn't real, or random letters
   in the ZIP code field.
+- **Fake locations.** One respondent gave Santa Claus's postal code, H0H 0H0
+  (the "North Pole").
 - **Test entries and corrupted lines.**
 
 Genuine long comments in the "other" box are kept as "other" votes.

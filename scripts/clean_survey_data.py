@@ -120,6 +120,8 @@ US_STATES = set(STATE_FIPS.values()) | {"GU", "VI", "AS", "MP"}
 # ZIP3 prefixes for territories not covered by the ZCTA file
 TERRITORY_ZIP3 = {"969": {"GU", "MP", "AS"}, "008": {"VI"}, "967": {"AS"}}
 
+# Canada Post's postal code for Santa Claus (H0H 0H0, "the North Pole").
+FAKE_FSA = "H0H"
 PROVINCE_ALIASES = {"NF": "NL", "PQ": "QC"}
 CA_PROVINCES = {"AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"}
 POSTAL_FIRST_LETTER = {
@@ -238,6 +240,8 @@ def resolve_location(state, raw_zip, zcta_county, zcta_states, zip3_states):
         return ("US", st, "", "", "zip_state_mismatch")
 
     if st in CA_PROVINCES:
+        if compact.startswith(FAKE_FSA):
+            return None
         m = re.match(r"^([A-Z]\d[A-Z])(\d[A-Z]\d)?$", compact)
         if m and st in POSTAL_FIRST_LETTER.get(compact[0], ()):
             return ("CA", st, m.group(1), "", "postal_fsa")
