@@ -1,0 +1,66 @@
+/* Extra styles for the experimental views (on top of ../css/style.css). */
+
+body { max-width: 1012px; }
+
+.panel h1 {
+	font-size: 18px;
+	margin: 0 0 0.25em;
+}
+
+.intro { margin-bottom: 12px; }
+
+.chart { position: relative; }
+.chart svg, .chart canvas { display: block; width: 100%; height: auto; touch-action: manipulation; }
+
+.basemap .land { fill: #f7f7f7; stroke: #d6d6d6; stroke-width: 1px; }
+.basemap .states { fill: none; stroke: #ddd; stroke-width: 0.75px; }
+
+.key {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 18px;
+	margin-top: 10px;
+	font-size: 12px;
+}
+
+.key-item { display: inline-flex; align-items: center; gap: 6px; }
+.key .disc, .tooltip .dot {
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+}
+.key .wedge {
+	display: inline-block;
+	width: 14px;
+	height: 10px;
+	border-radius: 2px;
+}
+.tooltip .dot { width: 8px; height: 8px; margin-right: 5px; }
+.tooltip tr.hl td { font-weight: bold; }
+
+.key svg { display: inline-block; vertical-align: middle; overflow: visible; }
+.key svg circle { fill: none; stroke: #777; }
+.key svg text { font-size: 10px; fill: #555; }
+
+.status { color: #777; font-size: 12px; margin-top: 6px; min-height: 1.6em; }
+
+.slider-row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 8px; flex-wrap: wrap; }
+.slider-row input[type=range] { width: 160px; }
+
+.nav { margin-bottom: 1em; font-size: 12px; }
+.nav a + a { margin-left: 1em; }
+
+#color-key { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; }
+
+.slider-row button {
+	font: inherit;
+	font-size: 12px;
+	color: #333;
+	background: #fff;
+	border: 2px solid #ccc;
+	border-radius: 5px;
+	padding: 3px 10px;
+	cursor: pointer;
+}
