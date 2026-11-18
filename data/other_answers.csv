@@ -264,7 +264,6 @@ US,AZ,dew,2
 US,AZ,drpepper,2
 US,AZ,either pop or soda,2
 US,AZ,fizzy,2
-US,AZ,pimp juice,2
 US,AZ,sodie,2
 US,AZ,soft drinks,2
 US,AZ,beverage,1
@@ -297,7 +296,6 @@ US,CA,sody pop,5
 US,CA,beverage,4
 US,CA,carbonated beverage,4
 US,CA,brand name,3
-US,CA,jesus juice,3
 US,CA,soda,3
 US,CA,softdrink,3
 US,CA,beer,2
@@ -338,7 +336,6 @@ US,CA,mountain dew,1
 US,CA,name brand,1
 US,CA,ninja juice,1
 US,CA,nuka cola,1
-US,CA,pimp juice,1
 US,CA,pop,1
 US,CA,purple drank,1
 US,CA,soda and pop,1
@@ -358,7 +355,6 @@ US,CO,pepsi,4
 US,CO,beverage,3
 US,CO,cola,3
 US,CO,beer,2
-US,CO,pimp juice,2
 US,CO,sugar water,2
 US,CO,brand name,1
 US,CO,carbonated beverage,1
@@ -368,7 +364,6 @@ US,CO,cool drink,1
 US,CO,diet,1
 US,CO,faygo,1
 US,CO,fizzy,1
-US,CO,jesus juice,1
 US,CO,liquid refreshment,1
 US,CO,mt dew,1
 US,CO,refreshing beverage,1
@@ -510,7 +505,6 @@ US,IA,cola,1
 US,IA,either pop or soda,1
 US,IA,fizzy,1
 US,IA,fizzy drink,1
-US,IA,jesus juice,1
 US,IA,liter of cola,1
 US,IA,mountain dew,1
 US,IA,phosphate,1
@@ -663,7 +657,6 @@ US,KY,cold drinks,1
 US,KY,dope,1
 US,KY,juice,1
 US,KY,name of drink,1
-US,KY,pimp juice,1
 US,KY,rc,1
 US,KY,soda,1
 US,KY,sodie,1
@@ -772,7 +765,6 @@ US,MI,drink,1
 US,MI,fizzle,1
 US,MI,frosty beverage,1
 US,MI,literacola,1
-US,MI,pimp juice,1
 US,MI,purple drank,1
 US,MI,rc,1
 US,MI,rootbeer,1
@@ -804,8 +796,6 @@ US,MN,drink,1
 US,MN,drinks,1
 US,MN,fizzy drink,1
 US,MN,fountain drink,1
-US,MN,jesus juice,1
-US,MN,pimp juice,1
 US,MN,sasparilla,1
 US,MN,soda water,1
 US,MN,sodey pop,1
@@ -834,7 +824,6 @@ US,MO,dope,1
 US,MO,dr pepper,1
 US,MO,drpepper,1
 US,MO,fizz,1
-US,MO,jesus juice,1
 US,MO,lemonade,1
 US,MO,soda or pop,1
 US,MO,sode,1
@@ -869,7 +858,6 @@ US,MT,dew,1
 US,MT,drpepper,1
 US,MT,mountaindew,1
 US,MT,pepsi,1
-US,MT,pimp juice,1
 US,MT,pop,1
 US,MT,sodapop,1
 US,MT,sugar water,1
@@ -987,7 +975,6 @@ US,NV,soft drink,2
 US,NV,diet,1
 US,NV,drink,1
 US,NV,drinks,1
-US,NV,jesus juice,1
 US,NV,mountain dew,1
 US,NV,soft drinks,1
 US,NV,tasty beverage,1
@@ -1130,7 +1117,6 @@ US,PA,soft drinks,3
 US,PA,tonic,3
 US,PA,drink,2
 US,PA,fizz,2
-US,PA,pimp juice,2
 US,PA,pop,2
 US,PA,beer,1
 US,PA,beverage,1
@@ -1284,7 +1270,6 @@ US,TX,frosty beverage,1
 US,TX,moxie,1
 US,TX,name of drink,1
 US,TX,name of the drink,1
-US,TX,pimp juice,1
 US,TX,root beer,1
 US,TX,sode pop,1
 US,TX,sodie pop,1
@@ -1422,7 +1407,6 @@ US,WI,fizzie,1
 US,WI,fizzy juice,1
 US,WI,fizzy stuff,1
 US,WI,fresca,1
-US,WI,jesus juice,1
 US,WI,pepsi,1
 US,WI,sodee pop,1
 US,WI,sodiepop,1

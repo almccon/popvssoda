@@ -158,7 +158,7 @@ MAX_OTHER_WORDS = 4
 # Only publish typed-in text that at least this many kept responses share; rarer
 # one-offs often contain personal names, so the vote is kept but the text blanked.
 MIN_OTHER_TEXT_COUNT = 3
-OTHER_TEXT_BLOCKLIST = {"taira mcfizzle"}  # a person's name, repeated enough to pass
+OTHER_TEXT_BLOCKLIST = {"taira mcfizzle", "pimp juice", "jesus juice"}  # a name, and two joke answers
 
 NAMED_DUP_WINDOW = datetime.timedelta(hours=24)
 ANON_DUP_WINDOW = datetime.timedelta(minutes=10)
