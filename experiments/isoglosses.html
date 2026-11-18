@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pop vs Soda Isoglosses</title>
+	<link href="../css/style.css" rel="stylesheet">
+	<link href="experiments.css" rel="stylesheet">
+	<style>
+		.iso-band { mix-blend-mode: multiply; }
+		.iso-line { fill: none; stroke-linejoin: round; }
+		.basemap .land { fill: #f4f4f4; stroke: #aaa; stroke-width: 0.75px; }
+		.basemap .lakes { fill: #fff; stroke: #bbb; stroke-width: 0.5px; }
+		.basemap .admin { fill: none; stroke: #fff; stroke-width: 0.75px; }
+		.admin-over { fill: none; stroke: rgba(0,0,0,0.12); stroke-width: 0.5px; }
+		.key .swatch { display: inline-block; width: 22px; height: 10px; }
+		.key input[type=checkbox] { margin: 0 2px 0 0; }
+		.key .line-sample { display: inline-block; width: 22px; border-top-style: solid; border-color: #555; }
+	</style>
+	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
+	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
+	<script src="common.js" defer></script>
+	<script src="isoglosses.js" defer></script>
+</head>
+<body>
+	<nav class="nav">
+		<a href="../index.html">← Main map</a>
+		<a href="zip-voronoi.html">ZIP Voronoi</a>
+		<a href="state-donuts.html">State donuts</a>
+		<a href="county-circles.html">County circles</a>
+	</nav>
+	<section class="panel">
+		<h1>Pop vs Soda isoglosses</h1>
+		<p class="intro">
+			At every spot on the map, add up the responses from nearby ZIP codes and
+			Canadian FSAs, and work out the share for each term. "Nearby" can be a fixed
+			radius, a Gaussian weighting that fades with distance, or an adaptive window
+			that grows until it holds a set number of responses. Filled
+			areas with solid lines show where pop, soda, coke or "other" is the answer of
+			more than 50%, 75% and 90% of nearby respondents; dashed lines mark where a
+			term reaches a quarter or a third, even if it isn't the majority. Use the
+			key to switch terms and levels on and off. Spots with too few responses nearby
+			are left blank. Built from <code>data/postal_counts.csv</code>.
+		</p>
+		<div class="chart" id="chart">
+			<svg id="svg" viewBox="0 0 960 700" role="img"
+				aria-label="Map of the US and Canada with contour lines around areas where more than 50, 75 and 90 percent of nearby respondents say pop, soda or coke"></svg>
+		</div>
+		<div class="slider-row">
+			<span>Window:</span>
+			<label><input type="radio" name="method" value="fixed" checked> fixed radius</label>
+			<label><input type="radio" name="method" value="gaussian"> Gaussian (distance-weighted)</label>
+			<label><input type="radio" name="method" value="adaptive"> adaptive (nearest N responses)</label>
+		</div>
+		<div class="slider-row">
+			<label for="radius" id="radius-name">Window radius</label>
+			<input type="range" id="radius" min="5" max="300" step="5" value="20">
+			<span id="radius-label"></span>
+		</div>
+		<div class="slider-row">
+			<label for="min-n" id="min-n-name">Leave blank where the window has fewer than</label>
+			<input type="range" id="min-n" min="1" max="500" value="10">
+			<span id="min-n-label"></span>
+		</div>
+		<div class="key" id="key"></div>
+		<div class="status" id="status">Loading…</div>
+	</section>
+</body>
+</html>
