@@ -22,7 +22,27 @@ Then open http://localhost:8000.
 
 ## Animations
 
-Recordings of the bubble experiments as they grow in from the south and settle. Each GIF links to a full-size MP4 (1920 px wide, 15 seconds).
+Recordings of the experiments. Each GIF links to a full-size MP4 (1920 px wide).
+
+### Isoglosses
+
+The isogloss map as its window settings step through their range, four steps per second.
+
+**Fixed-radius window, 10 to 300 miles** (blank where fewer than 10 responses; [MP4](experiments/animations/isoglosses-fixed.mp4))
+
+![Isoglosses with a fixed-radius window from 10 to 300 miles](experiments/animations/isoglosses-fixed.gif)
+
+**Gaussian window, σ from 10 to 400 miles** (blank where the weighted count is below 10; [MP4](experiments/animations/isoglosses-gaussian.mp4))
+
+![Isoglosses with a Gaussian window from 10 to 400 miles](experiments/animations/isoglosses-gaussian.gif)
+
+**Adaptive window, 25 to 3,000 responses** (largest window 1,000 miles; [MP4](experiments/animations/isoglosses-adaptive.mp4))
+
+![Isoglosses with an adaptive window from 25 to 3,000 responses](experiments/animations/isoglosses-adaptive.gif)
+
+### Bubbles
+
+The bubble experiments as they grow in from the south and settle (15 seconds each).
 
 **County bubbles, sized by responses** ([MP4](experiments/animations/county-bubbles-responses.mp4))
 
