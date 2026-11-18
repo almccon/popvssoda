@@ -27,7 +27,7 @@
 		<a href="../index.html">← Main map</a>
 		<a href="index.html">All experiments</a>
 		<a href="zip-voronoi.html">ZIP Voronoi</a>
-		<a href="county-circles.html">County circles</a>
+		<a href="county-bubbles.html">County bubbles</a>
 		<a href="state-donuts.html">State donuts</a>
 	</nav>
 	<section class="panel">
@@ -37,10 +37,10 @@
 			Canadian FSAs, and work out the share for each term. "Nearby" can be a fixed
 			radius, a Gaussian weighting that fades with distance, or an adaptive window
 			that grows until it holds a set number of responses. Filled
-			areas with solid lines show where pop, soda, coke or "other" is the answer of
-			more than 50%, 75% and 90% of nearby respondents; dashed lines mark where a
-			term reaches a quarter or a third, even if it isn't the majority. Use the
-			key to switch terms and levels on and off. Spots with too few responses nearby
+			areas with lines show where pop, soda or coke is the answer of more than
+			50%, 75% and 90% of nearby respondents. "Other" rarely reaches a majority, so
+			it gets gray lines only, starting at 10%, 25% and 33%. Use the key to switch
+			terms and levels on and off. Spots with too few responses nearby
 			are left blank. Built from <code>data/postal_counts.csv</code>.
 		</p>
 		<div class="chart" id="chart">
