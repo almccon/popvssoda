@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pop vs Soda Experiments</title>
+	<link href="../css/style.css" rel="stylesheet">
+	<link href="experiments.css" rel="stylesheet">
+	<style>
+		.experiments { list-style: none; padding: 0; margin-top: 12px; }
+		.experiments li { background: #fff; border-radius: 5px; padding: 12px 14px; margin-top: 10px; }
+		.experiments h2 { font-size: 14px; margin: 0 0 0.2em; }
+		.experiments .data { color: #777; font-size: 12px; }
+	</style>
+</head>
+<body>
+	<nav class="nav">
+		<a href="../index.html">← Main map</a>
+	</nav>
+	<section class="panel">
+		<h1>Pop vs Soda experiments</h1>
+		<p class="intro">
+			Work-in-progress ways of mapping the survey results. They're rough, and may
+			change or disappear.
+		</p>
+		<ul class="experiments">
+			<li>
+				<h2><a href="isoglosses.html">Isoglosses</a></h2>
+				<p>
+					Smoothed contour lines around areas where pop, soda, coke or "other"
+					reaches 25%, 33%, 50%, 75% or 90% of nearby responses. You can switch
+					between a fixed-radius, Gaussian or adaptive window and change its size.
+				</p>
+				<p class="data">ZIP codes and Canadian FSAs</p>
+			</li>
+			<li>
+				<h2><a href="zip-voronoi.html">ZIP Voronoi</a></h2>
+				<p>
+					One cell per ZIP code or FSA, colored with the main map's CMY mix. Cells
+					stop at the country (or state and province) border, and don't reach
+					further into empty land than they do anywhere in the lower 48.
+				</p>
+				<p class="data">ZIP codes and Canadian FSAs</p>
+			</li>
+			<li>
+				<h2><a href="county-circles.html">County circles</a></h2>
+				<p>
+					Up to four circles per county, one for each answer, sized by the number
+					of responses and pushed apart so they don't overlap.
+				</p>
+				<p class="data">US counties</p>
+			</li>
+			<li>
+				<h2><a href="state-donuts.html">State donuts</a></h2>
+				<p>
+					One donut per state, sized by the number of responses and split by
+					answer.
+				</p>
+				<p class="data">US states</p>
+			</li>
+		</ul>
+	</section>
+</body>
+</html>

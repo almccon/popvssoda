@@ -1,0 +1,1455 @@
+country,state,answer,count
+,,soft drink,257
+,,tonic,96
+,,fizzy drink,91
+,,soda pop,63
+,,fizzy,29
+,,fizzy drinks,22
+,,pepsi,22
+,,drink,21
+,,softdrink,18
+,,cola,17
+,,cold drink,16
+,,juice,16
+,,soft drinks,16
+,,ginger,12
+,,fizz,10
+,,pop,10
+,,sodapop,8
+,,cool drink,7
+,,lemonade,6
+,,mineral,6
+,,soda water,6
+,,cooldrink,5
+,,sprite,5
+,,coke,4
+,,fizzy juice,4
+,,fris,4
+,,sodie,4
+,,beer,3
+,,brus,3
+,,carbonated beverage,3
+,,frisdrank,3
+,,gaseosa,3
+,,minerals,3
+,,refresco,3
+,,soda,3
+,,sody,3
+,,sody pop,3
+,,soft,3
+,,the brand name,3
+,,water,3
+,,a drink,2
+,,bubble juice,2
+,,carbonated sugar water,2
+,,co cola,2
+,,coca,2
+,,coca cola,2
+,,dope,2
+,,dr pepper,2
+,,fizzy pop,2
+,,limo,2
+,,mixer,2
+,,phosphate,2
+,,sodie pop,2
+,,sweet drink,2
+,,belly wash,1
+,,bellywasher,1
+,,boisson gazeuse,1
+,,brand name,1
+,,caffeine,1
+,,carbonated beverages,1
+,,carbonated soft drink,1
+,,cold drinks,1
+,,colddrink,1
+,,crunk juice,1
+,,dew,1
+,,diet coke,1
+,,dopes,1
+,,drinks,1
+,,fanta,1
+,,faygo,1
+,,fizzy water,1
+,,fountain drink,1
+,,grape drank,1
+,,literacola,1
+,,mountain dew,1
+,,mt dew,1
+,,pepsi cola,1
+,,pop or soda,1
+,,popsoda,1
+,,purple drank,1
+,,sasparilla,1
+,,seltzer,1
+,,sodawater,1
+,,soder,1
+,,sodypop,1
+,,something to drink,1
+,,sweet tea,1
+CA,AB,soft drink,12
+CA,AB,pepsi,3
+CA,AB,sprite,2
+CA,AB,diet,1
+CA,AB,drink,1
+CA,AB,fizz,1
+CA,AB,juice,1
+CA,AB,soda pop,1
+CA,AB,softdrink,1
+CA,BC,soft drink,25
+CA,BC,soda pop,8
+CA,BC,cola,2
+CA,BC,fizzy drink,2
+CA,BC,pepsi,2
+CA,BC,carbonated beverage,1
+CA,BC,jolt,1
+CA,BC,pop,1
+CA,BC,soft drinks,1
+CA,BC,tasty beverage,1
+CA,MB,soft drink,84
+CA,MB,drink,5
+CA,MB,soda pop,5
+CA,MB,soft drinks,4
+CA,MB,cola,3
+CA,MB,carbonated beverages,1
+CA,MB,drinks,1
+CA,MB,juice,1
+CA,MB,sodapop,1
+CA,MB,sode pop,1
+CA,NB,pepsi,2
+CA,NB,sody pop,1
+CA,NL,soft drink,21
+CA,NL,drink,11
+CA,NL,can of drink,4
+CA,NL,pepsi,4
+CA,NL,soft drinks,2
+CA,NL,drinks,1
+CA,NL,soda,1
+CA,NL,soda pop,1
+CA,NS,cola,2
+CA,NS,soda pop,2
+CA,NS,bubbly,1
+CA,NS,pepsi,1
+CA,NT,pepsi,1
+CA,ON,soft drink,113
+CA,ON,soda pop,9
+CA,ON,cola,6
+CA,ON,pepsi,6
+CA,ON,carbonated beverage,4
+CA,ON,soft drinks,4
+CA,ON,softdrink,3
+CA,ON,drink,2
+CA,ON,pop,2
+CA,ON,sodapop,2
+CA,ON,beer,1
+CA,ON,brand name,1
+CA,ON,bubbly,1
+CA,ON,carbonated drink,1
+CA,ON,drinks,1
+CA,ON,fizz,1
+CA,ON,fizzy,1
+CA,ON,fizzy pop,1
+CA,ON,sodie pop,1
+CA,ON,sody pop,1
+CA,ON,soft,1
+CA,ON,sweet drink,1
+CA,PE,pepsi,4
+CA,PE,dew,1
+CA,PE,juice,1
+CA,QC,soft drink,216
+CA,QC,pepsi,14
+CA,QC,soft drinks,5
+CA,QC,softdrink,4
+CA,QC,boisson gazeuse,3
+CA,QC,sodapop,2
+CA,QC,7up,1
+CA,QC,carbonated beverage,1
+CA,QC,cola,1
+CA,QC,drink,1
+CA,QC,frosty beverage,1
+CA,QC,pop,1
+CA,QC,soda pop,1
+CA,SK,soft drink,12
+CA,SK,cola,1
+CA,SK,refreshing beverage,1
+CA,SK,soft drinks,1
+CA,SK,sprite,1
+CA,SK,tonic,1
+CA,YT,pepsi,1
+CA,YT,soft drink,1
+US,AK,soda pop,8
+US,AK,pepsi,5
+US,AK,ginger ale,3
+US,AK,soft drink,3
+US,AK,cola,2
+US,AK,fizzy drink,2
+US,AK,sodapop,2
+US,AK,beverage,1
+US,AK,bubble juice,1
+US,AK,bubbles,1
+US,AK,dope,1
+US,AK,drink,1
+US,AK,fizzy,1
+US,AK,juice,1
+US,AK,soda water,1
+US,AK,soder,1
+US,AK,sodiepop,1
+US,AK,sody pop,1
+US,AK,sprite,1
+US,AK,sugar water,1
+US,AL,soft drink,58
+US,AL,drink,23
+US,AL,soda pop,10
+US,AL,cold drink,9
+US,AL,cocola,7
+US,AL,cola,7
+US,AL,drank,5
+US,AL,soft drinks,5
+US,AL,caffeine,2
+US,AL,co cola,2
+US,AL,coca cola,2
+US,AL,dope,2
+US,AL,dr pepper,2
+US,AL,soda water,2
+US,AL,sodapop,2
+US,AL,sprite,2
+US,AL,7up,1
+US,AL,a drink,1
+US,AL,brand name,1
+US,AL,carbonated beverage,1
+US,AL,carbonated drink,1
+US,AL,carbonated soft drink,1
+US,AL,coke,1
+US,AL,coke cola,1
+US,AL,cold drank,1
+US,AL,diet coke,1
+US,AL,dopes,1
+US,AL,drink or soft drink,1
+US,AL,drinks,1
+US,AL,fizzy,1
+US,AL,fountain drink,1
+US,AL,root beer,1
+US,AL,sodi water,1
+US,AL,sodie water,1
+US,AL,sody pop,1
+US,AL,softdrink,1
+US,AL,specific brand name,1
+US,AL,sugar water,1
+US,AL,tonic,1
+US,AR,soft drink,15
+US,AR,soda pop,11
+US,AR,drink,7
+US,AR,cold drink,5
+US,AR,cola,2
+US,AR,sody pop,2
+US,AR,brand name,1
+US,AR,co cola,1
+US,AR,cold drinks,1
+US,AR,dew,1
+US,AR,dope,1
+US,AR,dr pepper,1
+US,AR,pepsi,1
+US,AR,sodee,1
+US,AR,sodi,1
+US,AR,sodie,1
+US,AR,sodie water,1
+US,AS,brus,1
+US,AZ,soda pop,32
+US,AZ,soft drink,11
+US,AZ,pepsi,9
+US,AZ,ninja juice,5
+US,AZ,sodapop,4
+US,AZ,beer,2
+US,AZ,crunk juice,2
+US,AZ,dew,2
+US,AZ,drpepper,2
+US,AZ,either pop or soda,2
+US,AZ,fizzy,2
+US,AZ,pimp juice,2
+US,AZ,sodie,2
+US,AZ,soft drinks,2
+US,AZ,beverage,1
+US,AZ,bubbley,1
+US,AZ,cola,1
+US,AZ,diet,1
+US,AZ,drank,1
+US,AZ,jolt,1
+US,AZ,mountain dew,1
+US,AZ,soda,1
+US,AZ,softdrink,1
+US,AZ,something to drink,1
+US,AZ,sweet water,1
+US,AZ,tonic,1
+US,AZ,water,1
+US,CA,soft drink,280
+US,CA,soda pop,145
+US,CA,fizzy lifting drink,65
+US,CA,sodapop,44
+US,CA,pepsi,34
+US,CA,cola,24
+US,CA,drink,18
+US,CA,fizzy,16
+US,CA,fizz,14
+US,CA,fizzy drink,14
+US,CA,soft drinks,11
+US,CA,fizzle pop,9
+US,CA,the fizz,9
+US,CA,sody pop,5
+US,CA,beverage,4
+US,CA,carbonated beverage,4
+US,CA,brand name,3
+US,CA,jesus juice,3
+US,CA,soda,3
+US,CA,softdrink,3
+US,CA,beer,2
+US,CA,carbonated soft drink,2
+US,CA,dew,2
+US,CA,drank,2
+US,CA,fizzy pop,2
+US,CA,juice,2
+US,CA,phosphate,2
+US,CA,refresco,2
+US,CA,soder,2
+US,CA,sodie,2
+US,CA,sodie pop,2
+US,CA,tasty beverage,2
+US,CA,water,2
+US,CA,belly wash,1
+US,CA,both soda and pop,1
+US,CA,bubble juice,1
+US,CA,bubble water,1
+US,CA,bubbly,1
+US,CA,carbonated beverages,1
+US,CA,coca cola,1
+US,CA,cold drink,1
+US,CA,cold drinks,1
+US,CA,cool drink,1
+US,CA,cooldrink,1
+US,CA,crunk juice,1
+US,CA,diet,1
+US,CA,diet coke,1
+US,CA,dope,1
+US,CA,dr pepper,1
+US,CA,drinks,1
+US,CA,drpepper,1
+US,CA,fizzy drinks,1
+US,CA,fountain drink,1
+US,CA,gaseosa,1
+US,CA,mountain dew,1
+US,CA,name brand,1
+US,CA,ninja juice,1
+US,CA,nuka cola,1
+US,CA,pimp juice,1
+US,CA,pop,1
+US,CA,purple drank,1
+US,CA,soda and pop,1
+US,CA,soda or pop,1
+US,CA,sodawater,1
+US,CA,sodee,1
+US,CA,sodi,1
+US,CA,sodies,1
+US,CA,sody water,1
+US,CA,sugar water,1
+US,CA,tonic,1
+US,CO,soda pop,37
+US,CO,soft drink,19
+US,CO,sodapop,8
+US,CO,drink,4
+US,CO,pepsi,4
+US,CO,beverage,3
+US,CO,cola,3
+US,CO,beer,2
+US,CO,pimp juice,2
+US,CO,sugar water,2
+US,CO,brand name,1
+US,CO,carbonated beverage,1
+US,CO,coca,1
+US,CO,cold drink,1
+US,CO,cool drink,1
+US,CO,diet,1
+US,CO,faygo,1
+US,CO,fizzy,1
+US,CO,jesus juice,1
+US,CO,liquid refreshment,1
+US,CO,mt dew,1
+US,CO,refreshing beverage,1
+US,CO,sasparilla,1
+US,CO,soda,1
+US,CO,sodee pop,1
+US,CO,soder,1
+US,CO,sodypop,1
+US,CO,soft drinks,1
+US,CO,softdrink,1
+US,CT,tonic,4
+US,CT,soda pop,3
+US,CT,soft drink,3
+US,CT,beverage,2
+US,CT,cola,1
+US,CT,fizz,1
+US,CT,ginger ale,1
+US,CT,pepsi,1
+US,CT,soda,1
+US,CT,sody pop,1
+US,CT,soft drinks,1
+US,DC,soft drink,5
+US,DC,soda pop,4
+US,DC,beer,1
+US,DC,carbonated beverage,1
+US,DC,fizz,1
+US,DC,fizzy drink,1
+US,DC,purple drank,1
+US,DC,sodapop,1
+US,DE,soda pop,2
+US,DE,cola,1
+US,DE,purple drank,1
+US,DE,soft drink,1
+US,DE,tonic,1
+US,FL,soft drink,72
+US,FL,cold drink,23
+US,FL,soda pop,23
+US,FL,drink,15
+US,FL,cola,14
+US,FL,pepsi,12
+US,FL,sodapop,8
+US,FL,fizzpop,4
+US,FL,beer,3
+US,FL,carbonated beverage,3
+US,FL,co cola,2
+US,FL,fizzy drink,2
+US,FL,soda,2
+US,FL,soft drinks,2
+US,FL,tonic,2
+US,FL,7 up,1
+US,FL,belly washer,1
+US,FL,bellywasher,1
+US,FL,brand name,1
+US,FL,bubbles,1
+US,FL,coca cola,1
+US,FL,coke cola,1
+US,FL,col drink,1
+US,FL,cooldrink,1
+US,FL,diet pepsi,1
+US,FL,dr pepper,1
+US,FL,drinks,1
+US,FL,fizz,1
+US,FL,lemonade,1
+US,FL,purple drank,1
+US,FL,rc,1
+US,FL,soder,1
+US,FL,sodie water,1
+US,FL,softdrink,1
+US,FL,specific brand name,1
+US,FL,specific name,1
+US,FL,sugar water,1
+US,FL,sweet water,1
+US,FL,tasty beverage,1
+US,GA,soft drink,87
+US,GA,drink,44
+US,GA,co cola,14
+US,GA,cola,13
+US,GA,cold drink,8
+US,GA,pepsi,7
+US,GA,soft drinks,7
+US,GA,brand name,5
+US,GA,soda pop,4
+US,GA,a drink,3
+US,GA,dope,3
+US,GA,drank,3
+US,GA,sodapop,3
+US,GA,coke,2
+US,GA,dr pepper,2
+US,GA,sprite,2
+US,GA,water,2
+US,GA,belly washer,1
+US,GA,beverage,1
+US,GA,bubbly,1
+US,GA,carbonated beverages,1
+US,GA,cocola,1
+US,GA,coke cola,1
+US,GA,cold drank,1
+US,GA,cold one,1
+US,GA,fizz,1
+US,GA,frosty beverage,1
+US,GA,juice,1
+US,GA,mountain dew,1
+US,GA,name of drink,1
+US,GA,ninja juice,1
+US,GA,pepsi cola,1
+US,GA,pop,1
+US,GA,rootbeer,1
+US,GA,sodey,1
+US,GA,sody water,1
+US,GA,something to drink,1
+US,GA,sugar water,1
+US,GA,sweet drink,1
+US,GA,sweet tea,1
+US,GA,the brand name,1
+US,GA,the fizz,1
+US,GA,tonic,1
+US,GU,soft drink,2
+US,GU,softdrink,2
+US,GU,pepsi,1
+US,HI,soft drink,4
+US,HI,drink,2
+US,HI,sodapop,2
+US,HI,water,2
+US,HI,soda pop,1
+US,IA,soda pop,27
+US,IA,soft drink,6
+US,IA,sodapop,4
+US,IA,carbonated beverage,3
+US,IA,pepsi,3
+US,IA,beer,2
+US,IA,drink,2
+US,IA,pop,2
+US,IA,sodie pop,2
+US,IA,beverage,1
+US,IA,both pop and soda,1
+US,IA,bubble water,1
+US,IA,carbonated soft drink,1
+US,IA,cola,1
+US,IA,either pop or soda,1
+US,IA,fizzy,1
+US,IA,fizzy drink,1
+US,IA,jesus juice,1
+US,IA,liter of cola,1
+US,IA,mountain dew,1
+US,IA,phosphate,1
+US,IA,pop or soda,1
+US,IA,root beer,1
+US,IA,rootbeer,1
+US,IA,sodi,1
+US,IA,sody pop,1
+US,ID,soda pop,17
+US,ID,drink,3
+US,ID,pepsi,2
+US,ID,sodapop,2
+US,ID,soft drink,2
+US,ID,beer,1
+US,ID,cola,1
+US,ID,drinks,1
+US,ID,soft drinks,1
+US,ID,tonic,1
+US,IL,soda pop,129
+US,IL,sodie,45
+US,IL,soft drink,22
+US,IL,sodapop,20
+US,IL,pepsi,13
+US,IL,sodi,12
+US,IL,sody,11
+US,IL,cola,9
+US,IL,drink,6
+US,IL,sodie pop,6
+US,IL,sodee,5
+US,IL,brand name,4
+US,IL,carbonated beverage,4
+US,IL,soft drinks,4
+US,IL,soda water,3
+US,IL,sode,3
+US,IL,sodee pop,3
+US,IL,sody pop,3
+US,IL,beer,2
+US,IL,beverage,2
+US,IL,carbonated drink,2
+US,IL,dew,2
+US,IL,fizzy drink,2
+US,IL,pop,2
+US,IL,root beer,2
+US,IL,sodey,2
+US,IL,water,2
+US,IL,7 up,1
+US,IL,7up,1
+US,IL,both pop and soda,1
+US,IL,bubbles,1
+US,IL,bubbly,1
+US,IL,caffeine,1
+US,IL,carbonated beverages,1
+US,IL,cold drinks,1
+US,IL,diet,1
+US,IL,diet coke,1
+US,IL,dr pepper,1
+US,IL,fizz,1
+US,IL,fountain drink,1
+US,IL,jolt,1
+US,IL,juice,1
+US,IL,moxie,1
+US,IL,name of drink,1
+US,IL,name of the drink,1
+US,IL,pop or soda,1
+US,IL,soda,1
+US,IL,sodawater,1
+US,IL,sodi pop,1
+US,IL,sody water,1
+US,IL,something to drink,1
+US,IL,sprite,1
+US,IL,tonic,1
+US,IN,soft drink,149
+US,IN,soda pop,53
+US,IN,drink,11
+US,IN,cola,8
+US,IN,pepsi,8
+US,IN,sodapop,7
+US,IN,sodie,5
+US,IN,soft drinks,5
+US,IN,beverage,3
+US,IN,diet,3
+US,IN,tonic,2
+US,IN,bellywasher,1
+US,IN,both,1
+US,IN,brand name,1
+US,IN,by name,1
+US,IN,carbonated beverage,1
+US,IN,carbonated drink,1
+US,IN,coke cola,1
+US,IN,dr pepper,1
+US,IN,drinks,1
+US,IN,fizz,1
+US,IN,fizzy,1
+US,IN,fizzy drink,1
+US,IN,juice,1
+US,IN,mountain dew,1
+US,IN,name of drink,1
+US,IN,pop,1
+US,IN,soda or pop,1
+US,IN,soder,1
+US,IN,sodey,1
+US,IN,sodi,1
+US,IN,sodie pop,1
+US,IN,sody,1
+US,IN,sody pop,1
+US,IN,sprite,1
+US,IN,water,1
+US,KS,soda pop,43
+US,KS,soft drink,13
+US,KS,sodapop,10
+US,KS,cola,4
+US,KS,pepsi,3
+US,KS,beer,2
+US,KS,beverage,2
+US,KS,bubble water,2
+US,KS,drink,2
+US,KS,sody,2
+US,KS,both pop and soda,1
+US,KS,brand name,1
+US,KS,carbonated beverage,1
+US,KS,diet,1
+US,KS,fizzy drink,1
+US,KS,fizzy water,1
+US,KS,jolt,1
+US,KS,pop,1
+US,KS,soda,1
+US,KS,sodey pop,1
+US,KS,sodipop,1
+US,KS,sody pop,1
+US,KS,sprite,1
+US,KS,tasty beverage,1
+US,KY,soft drink,187
+US,KY,drink,14
+US,KY,soda pop,11
+US,KY,cold drink,10
+US,KY,pepsi,8
+US,KY,cola,5
+US,KY,soft drinks,4
+US,KY,softdrink,4
+US,KY,ale 8,3
+US,KY,sodapop,2
+US,KY,sody pop,2
+US,KY,beverage,1
+US,KY,bubbly,1
+US,KY,co cola,1
+US,KY,coca cola,1
+US,KY,coke,1
+US,KY,coke or pepsi,1
+US,KY,cold drinks,1
+US,KY,dope,1
+US,KY,juice,1
+US,KY,name of drink,1
+US,KY,pimp juice,1
+US,KY,rc,1
+US,KY,soda,1
+US,KY,sodie,1
+US,LA,soft drink,260
+US,LA,cold drink,172
+US,LA,drink,16
+US,LA,soda pop,7
+US,LA,soda water,7
+US,LA,cold drinks,5
+US,LA,softdrink,5
+US,LA,belly wash,3
+US,LA,soft drinks,3
+US,LA,cold drank,2
+US,LA,colddrink,2
+US,LA,nuka cola,2
+US,LA,beverage,1
+US,LA,col drink,1
+US,LA,dope,1
+US,LA,juice,1
+US,LA,pepsi,1
+US,LA,purple drank,1
+US,LA,sodapop,1
+US,MA,tonic,1687
+US,MA,soft drink,13
+US,MA,pepsi,6
+US,MA,soda pop,6
+US,MA,cola,4
+US,MA,soder,4
+US,MA,fizzy drink,3
+US,MA,soda,2
+US,MA,sodapop,2
+US,MA,soft drinks,2
+US,MA,carbonated sugar water,1
+US,MA,dew,1
+US,MA,fizzie,1
+US,MA,fizzy,1
+US,MA,fizzy drinks,1
+US,MA,fizzy water,1
+US,MA,fresca,1
+US,MA,ginger ale,1
+US,MA,juice,1
+US,MA,mountain dew,1
+US,MA,seltzer,1
+US,MA,sodie,1
+US,MA,softdrink,1
+US,MA,specific name,1
+US,MA,water,1
+US,MD,soft drink,49
+US,MD,soda pop,15
+US,MD,tonic,13
+US,MD,cola,6
+US,MD,sodapop,4
+US,MD,pepsi,3
+US,MD,soft drinks,3
+US,MD,carbonated beverage,2
+US,MD,carbonated sugar water,1
+US,MD,diet,1
+US,MD,drink,1
+US,MD,fizz,1
+US,MD,fizzy drink,1
+US,MD,fizzy water,1
+US,MD,juice,1
+US,MD,name brand,1
+US,MD,soda,1
+US,MD,soder,1
+US,MD,sodipop,1
+US,MD,sody pop,1
+US,MD,water,1
+US,ME,tonic,31
+US,ME,moxie,6
+US,ME,soda pop,4
+US,ME,fizz,2
+US,ME,fizzy drink,2
+US,ME,pepsi,2
+US,ME,sodapop,2
+US,ME,bubbly,1
+US,ME,soda,1
+US,ME,soder,1
+US,ME,sodie pop,1
+US,ME,soft drink,1
+US,MI,soda pop,58
+US,MI,soft drink,22
+US,MI,sodapop,13
+US,MI,pop,7
+US,MI,sodey pap,7
+US,MI,cola,5
+US,MI,pepsi,5
+US,MI,beer,4
+US,MI,carbonated beverage,3
+US,MI,faygo,3
+US,MI,fizz,3
+US,MI,fizzy drink,3
+US,MI,cold drink,2
+US,MI,cold one,2
+US,MI,fizzy,2
+US,MI,grape drank,2
+US,MI,soft drinks,2
+US,MI,tasty beverage,2
+US,MI,7 up,1
+US,MI,beverage,1
+US,MI,both,1
+US,MI,carbonated soft drink,1
+US,MI,diet,1
+US,MI,drank,1
+US,MI,drink,1
+US,MI,fizzle,1
+US,MI,frosty beverage,1
+US,MI,literacola,1
+US,MI,pimp juice,1
+US,MI,purple drank,1
+US,MI,rc,1
+US,MI,rootbeer,1
+US,MI,soda,1
+US,MI,sodie,1
+US,MI,something to drink,1
+US,MI,sugar water,1
+US,MI,water,1
+US,MN,soda pop,41
+US,MN,soft drink,7
+US,MN,sodapop,5
+US,MN,beer,3
+US,MN,beverage,3
+US,MN,dew,3
+US,MN,fizz,3
+US,MN,pepsi,3
+US,MN,carbonated beverage,2
+US,MN,drank,2
+US,MN,phosphate,2
+US,MN,pop,2
+US,MN,tonic,2
+US,MN,bubbly,1
+US,MN,by name,1
+US,MN,coca cola,1
+US,MN,coke,1
+US,MN,cola,1
+US,MN,diet,1
+US,MN,drink,1
+US,MN,drinks,1
+US,MN,fizzy drink,1
+US,MN,fountain drink,1
+US,MN,jesus juice,1
+US,MN,pimp juice,1
+US,MN,sasparilla,1
+US,MN,soda water,1
+US,MN,sodey pop,1
+US,MN,sodie,1
+US,MN,water,1
+US,MO,soda pop,74
+US,MO,sodie,15
+US,MO,soft drink,8
+US,MO,sodapop,7
+US,MO,sodee,7
+US,MO,sody,6
+US,MO,sodie pop,4
+US,MO,cola,3
+US,MO,pepsi,3
+US,MO,sody pop,3
+US,MO,drink,2
+US,MO,soda,2
+US,MO,soder,2
+US,MO,sodi,2
+US,MO,beer,1
+US,MO,beverage,1
+US,MO,both,1
+US,MO,carbonated beverage,1
+US,MO,cold drink,1
+US,MO,dope,1
+US,MO,dr pepper,1
+US,MO,drpepper,1
+US,MO,fizz,1
+US,MO,jesus juice,1
+US,MO,lemonade,1
+US,MO,soda or pop,1
+US,MO,sode,1
+US,MO,sodey,1
+US,MO,sodiepop,1
+US,MO,sodipop,1
+US,MO,soft drinks,1
+US,MS,soft drink,24
+US,MS,drink,22
+US,MS,cold drink,14
+US,MS,soda pop,3
+US,MS,by name,2
+US,MS,drank,2
+US,MS,a drink,1
+US,MS,co cola,1
+US,MS,coca cola,1
+US,MS,cocola,1
+US,MS,coke,1
+US,MS,cola,1
+US,MS,colddrink,1
+US,MS,dope,1
+US,MS,drpepper,1
+US,MS,pepsi,1
+US,MS,sodapop,1
+US,MS,tasty beverage,1
+US,MT,soda pop,8
+US,MT,mountain dew,2
+US,MT,brand name,1
+US,MT,bubbles,1
+US,MT,cola,1
+US,MT,dew,1
+US,MT,drpepper,1
+US,MT,mountaindew,1
+US,MT,pepsi,1
+US,MT,pimp juice,1
+US,MT,pop,1
+US,MT,sodapop,1
+US,MT,sugar water,1
+US,NC,drink,330
+US,NC,soft drink,308
+US,NC,pepsi,50
+US,NC,dope,17
+US,NC,soft drinks,14
+US,NC,drank,12
+US,NC,soda pop,11
+US,NC,co cola,9
+US,NC,cola,8
+US,NC,softdrink,7
+US,NC,cold drink,6
+US,NC,drinks,6
+US,NC,a drink,4
+US,NC,sodapop,4
+US,NC,carbonated beverage,3
+US,NC,coca cola,3
+US,NC,drink or soft drink,3
+US,NC,belly wash,2
+US,NC,coke,2
+US,NC,something to drink,2
+US,NC,beer,1
+US,NC,beverage,1
+US,NC,carbonated beverages,1
+US,NC,carbonated sugar water,1
+US,NC,cocola,1
+US,NC,col drink,1
+US,NC,diet,1
+US,NC,diet coke,1
+US,NC,dopes,1
+US,NC,dr pepper,1
+US,NC,drpepper,1
+US,NC,faygo,1
+US,NC,fizzie,1
+US,NC,fountain drink,1
+US,NC,gaseosa,1
+US,NC,literacola,1
+US,NC,mountain dew,1
+US,NC,mt dew,1
+US,NC,name brand,1
+US,NC,name of the drink,1
+US,NC,pepsi cola,1
+US,NC,rc,1
+US,NC,soft,1
+US,NC,sprite,1
+US,NC,sweet water,1
+US,NC,tasty beverage,1
+US,NC,the brand name,1
+US,ND,soft drink,2
+US,ND,drink,1
+US,ND,literacola,1
+US,ND,soda pop,1
+US,ND,sodapop,1
+US,ND,sodi pop,1
+US,NE,soda pop,24
+US,NE,soft drink,4
+US,NE,pepsi,3
+US,NE,sodapop,3
+US,NE,go juice,2
+US,NE,both,1
+US,NE,carbonated beverages,1
+US,NE,cola,1
+US,NE,fizzle,1
+US,NE,fizzy,1
+US,NE,sodie pop,1
+US,NH,tonic,192
+US,NH,soft drink,3
+US,NH,cola,2
+US,NH,soda pop,2
+US,NH,sodapop,2
+US,NH,soder,2
+US,NH,drink,1
+US,NH,pepsi,1
+US,NJ,pepsi,10
+US,NJ,soda pop,9
+US,NJ,cola,6
+US,NJ,soft drink,4
+US,NJ,sodapop,3
+US,NJ,tonic,3
+US,NJ,soder,2
+US,NJ,bubble juice,1
+US,NJ,bubble water,1
+US,NJ,bubbly,1
+US,NJ,carbonated beverage,1
+US,NJ,coca cola,1
+US,NJ,cool drink,1
+US,NJ,diet coke,1
+US,NJ,fizzpop,1
+US,NJ,fizzy,1
+US,NJ,fizzy drink,1
+US,NJ,mountain dew,1
+US,NJ,nab non alcoholic beverage,1
+US,NJ,root beer,1
+US,NJ,soda water,1
+US,NJ,sprite,1
+US,NM,soda pop,21
+US,NM,soft drink,5
+US,NM,sodapop,3
+US,NM,drink,2
+US,NM,belly wash,1
+US,NM,cola,1
+US,NM,dew,1
+US,NM,go juice,1
+US,NM,pepsi,1
+US,NM,soda,1
+US,NM,soda water,1
+US,NM,softdrink,1
+US,NV,soda pop,16
+US,NV,pepsi,2
+US,NV,soda,2
+US,NV,sodapop,2
+US,NV,soft drink,2
+US,NV,diet,1
+US,NV,drink,1
+US,NV,drinks,1
+US,NV,jesus juice,1
+US,NV,mountain dew,1
+US,NV,soft drinks,1
+US,NV,tasty beverage,1
+US,NY,soft drink,67
+US,NY,soda pop,51
+US,NY,pepsi,20
+US,NY,sodapop,13
+US,NY,cola,8
+US,NY,carbonated beverage,6
+US,NY,soder,5
+US,NY,soft drinks,4
+US,NY,tonic,4
+US,NY,drink,3
+US,NY,fizzy,3
+US,NY,juice,3
+US,NY,sprite,3
+US,NY,beverage,2
+US,NY,diet,2
+US,NY,purple drank,2
+US,NY,soda,2
+US,NY,soda pop together,2
+US,NY,softdrink,2
+US,NY,7 up,1
+US,NY,7up,1
+US,NY,beer,1
+US,NY,cold drink,1
+US,NY,colddrink,1
+US,NY,diet coke,1
+US,NY,fizz,1
+US,NY,fizzle,1
+US,NY,fizzy drink,1
+US,NY,fizzy drinks,1
+US,NY,jolt,1
+US,NY,liter of cola,1
+US,NY,mineral,1
+US,NY,mixer,1
+US,NY,mountaindew,1
+US,NY,pepsi cola,1
+US,NY,pop,1
+US,NY,refreshing beverage,1
+US,NY,soda water,1
+US,NY,sode,1
+US,NY,sodee pop,1
+US,NY,sodey pop,1
+US,NY,sodie pop,1
+US,NY,sugar water,1
+US,NY,sweet drink,1
+US,NY,water,1
+US,OH,soft drink,83
+US,OH,soda pop,72
+US,OH,sodapop,15
+US,OH,cola,12
+US,OH,pepsi,12
+US,OH,drink,7
+US,OH,carbonated beverage,6
+US,OH,pop,5
+US,OH,soft drinks,4
+US,OH,beverage,3
+US,OH,carbonated drink,2
+US,OH,drpepper,2
+US,OH,fizzy drink,2
+US,OH,fizzy stuff,2
+US,OH,frosty beverage,2
+US,OH,root beer,2
+US,OH,sodie pop,2
+US,OH,sprite,2
+US,OH,7up,1
+US,OH,ale 8,1
+US,OH,beer,1
+US,OH,both soda and pop,1
+US,OH,bubbles,1
+US,OH,bubbly,1
+US,OH,cold drink,1
+US,OH,cold one,1
+US,OH,dew,1
+US,OH,diet,1
+US,OH,dr pepper,1
+US,OH,drinks,1
+US,OH,faygo,1
+US,OH,fizz,1
+US,OH,fountain drink,1
+US,OH,go juice,1
+US,OH,grape drank,1
+US,OH,liter of cola,1
+US,OH,mixer,1
+US,OH,mt dew,1
+US,OH,phosphate,1
+US,OH,pop or soda,1
+US,OH,rc,1
+US,OH,soda water,1
+US,OH,softdrink,1
+US,OH,sugar water,1
+US,OH,tonic,1
+US,OK,soda pop,48
+US,OK,soft drink,16
+US,OK,sodapop,5
+US,OK,dr pepper,3
+US,OK,drink,3
+US,OK,cola,2
+US,OK,cold drink,2
+US,OK,soda water,2
+US,OK,sodie,2
+US,OK,sody pop,2
+US,OK,beverage,1
+US,OK,carbonated beverage,1
+US,OK,drpepper,1
+US,OK,pepsi,1
+US,OK,sodie pop,1
+US,OK,sodypop,1
+US,OK,something to drink,1
+US,OK,tonic,1
+US,OR,soda pop,64
+US,OR,soft drink,14
+US,OR,sodapop,12
+US,OR,cola,6
+US,OR,pepsi,5
+US,OR,drink,4
+US,OR,beer,1
+US,OR,carbonated beverage,1
+US,OR,cold drink,1
+US,OR,faygo,1
+US,OR,fizzy,1
+US,OR,fizzy lifting drink,1
+US,OR,jolt,1
+US,OR,juice,1
+US,OR,pepsi cola,1
+US,OR,popsoda,1
+US,OR,purple drank,1
+US,OR,sodey,1
+US,OR,sodie water,1
+US,OR,tonic,1
+US,PA,soft drink,63
+US,PA,soda pop,44
+US,PA,pepsi,13
+US,PA,sodapop,12
+US,PA,cola,9
+US,PA,carbonated beverage,5
+US,PA,sodie pop,4
+US,PA,soft drinks,3
+US,PA,tonic,3
+US,PA,drink,2
+US,PA,fizz,2
+US,PA,pimp juice,2
+US,PA,pop,2
+US,PA,beer,1
+US,PA,beverage,1
+US,PA,bubbly,1
+US,PA,carbonated sugar water,1
+US,PA,co cola,1
+US,PA,coca cola,1
+US,PA,fizzy lifting drink,1
+US,PA,fountain drink,1
+US,PA,frisdrank,1
+US,PA,phosphate,1
+US,PA,seltzer,1
+US,PA,soda,1
+US,PA,sode pop,1
+US,PA,sody pop,1
+US,PA,sodypop,1
+US,PA,softdrink,1
+US,PA,something to drink,1
+US,PA,water,1
+US,PR,refresco,11
+US,PR,beer,1
+US,PR,coca,1
+US,PR,coca cola,1
+US,PR,cola,1
+US,PR,diet,1
+US,PR,fizzy juice,1
+US,PR,gaseosa,1
+US,PR,soda pop,1
+US,RI,tonic,6
+US,RI,pepsi,2
+US,RI,caffeine,1
+US,RI,drank,1
+US,RI,soda pop,1
+US,RI,sodapop,1
+US,RI,soft drink,1
+US,SC,soft drink,85
+US,SC,drink,36
+US,SC,pepsi,25
+US,SC,cola,6
+US,SC,dope,6
+US,SC,soda pop,5
+US,SC,co cola,3
+US,SC,cold drink,3
+US,SC,a drink,2
+US,SC,belly wash,1
+US,SC,beverage,1
+US,SC,by name,1
+US,SC,carbonated beverage,1
+US,SC,carbonated drink,1
+US,SC,cocola,1
+US,SC,drank,1
+US,SC,fizzy,1
+US,SC,phosphate,1
+US,SC,soda,1
+US,SC,soda water,1
+US,SC,sodapop,1
+US,SC,soft drinks,1
+US,SC,tonic,1
+US,SD,soda pop,5
+US,SD,sodapop,5
+US,SD,sody pop,2
+US,SD,soft drink,2
+US,SD,bubble juice,1
+US,SD,carbonated beverage,1
+US,SD,crunk juice,1
+US,SD,drpepper,1
+US,SD,fizz,1
+US,SD,sasparilla,1
+US,SD,sodie,1
+US,TN,soft drink,82
+US,TN,cold drink,49
+US,TN,dope,28
+US,TN,drink,24
+US,TN,soda pop,8
+US,TN,cola,6
+US,TN,pepsi,5
+US,TN,belly washer,3
+US,TN,co cola,3
+US,TN,cocola,3
+US,TN,cold drinks,3
+US,TN,dr pepper,3
+US,TN,sodapop,3
+US,TN,soft drinks,3
+US,TN,beverage,2
+US,TN,carbonated soft drink,2
+US,TN,dopes,2
+US,TN,a drink,1
+US,TN,beer,1
+US,TN,bellywasher,1
+US,TN,bubbly,1
+US,TN,carbonated beverage,1
+US,TN,coke,1
+US,TN,cold drank,1
+US,TN,drank,1
+US,TN,drinks,1
+US,TN,gaseosa,1
+US,TN,juice,1
+US,TN,liquid refreshment,1
+US,TN,mineral,1
+US,TN,sodie pop,1
+US,TN,sodypop,1
+US,TN,specific name,1
+US,TX,soft drink,192
+US,TX,soda water,108
+US,TX,soda pop,74
+US,TX,sodawater,49
+US,TX,cold drink,45
+US,TX,drink,26
+US,TX,dr pepper,23
+US,TX,cola,11
+US,TX,soft drinks,11
+US,TX,fizzy drink,6
+US,TX,sodapop,6
+US,TX,sody water,6
+US,TX,fizzy,5
+US,TX,pepsi,5
+US,TX,coke,4
+US,TX,drpepper,4
+US,TX,sodie water,4
+US,TX,beverage,3
+US,TX,brand name,3
+US,TX,carbonated beverage,3
+US,TX,drinks,3
+US,TX,fizz,3
+US,TX,sodie,3
+US,TX,sody pop,3
+US,TX,beer,2
+US,TX,cocola,2
+US,TX,cold drinks,2
+US,TX,fanta,2
+US,TX,fizzy lifting drink,2
+US,TX,fizzy water,2
+US,TX,soda,2
+US,TX,sodee pop,2
+US,TX,sodi water,2
+US,TX,something to drink,2
+US,TX,sprite,2
+US,TX,tonic,2
+US,TX,belly wash,1
+US,TX,bellywasher,1
+US,TX,bubbles,1
+US,TX,carbonated drink,1
+US,TX,co cola,1
+US,TX,coke cola,1
+US,TX,coke or pepsi,1
+US,TX,colddrink,1
+US,TX,diet coke,1
+US,TX,drank,1
+US,TX,faygo,1
+US,TX,frosty beverage,1
+US,TX,moxie,1
+US,TX,name of drink,1
+US,TX,name of the drink,1
+US,TX,pimp juice,1
+US,TX,root beer,1
+US,TX,sode pop,1
+US,TX,sodie pop,1
+US,TX,specific name,1
+US,TX,sugar water,1
+US,UT,soda pop,40
+US,UT,drink,10
+US,UT,sodapop,7
+US,UT,soft drink,7
+US,UT,pepsi,6
+US,UT,tonic,4
+US,UT,carbonated beverage,3
+US,UT,soda water,3
+US,UT,a drink,2
+US,UT,bubbley,2
+US,UT,fizzy drink,2
+US,UT,7up,1
+US,UT,beverage,1
+US,UT,carbonated sugar water,1
+US,UT,cola,1
+US,UT,drank,1
+US,UT,fizzy drinks,1
+US,UT,fresca,1
+US,UT,refresco,1
+US,UT,softdrink,1
+US,UT,sprite,1
+US,VA,soft drink,160
+US,VA,drink,76
+US,VA,soda pop,26
+US,VA,soft drinks,11
+US,VA,cola,10
+US,VA,pepsi,8
+US,VA,tonic,6
+US,VA,nab non alcoholic beverage,5
+US,VA,sodapop,5
+US,VA,carbonated beverage,3
+US,VA,cocola,3
+US,VA,sodie,3
+US,VA,sody pop,3
+US,VA,a drink,2
+US,VA,diet coke,2
+US,VA,dope,2
+US,VA,drank,2
+US,VA,drinks,2
+US,VA,soda,2
+US,VA,beer,1
+US,VA,brand name,1
+US,VA,bubbley,1
+US,VA,caffeine,1
+US,VA,carbonated sugar water,1
+US,VA,coke or pepsi,1
+US,VA,cold drinks,1
+US,VA,dopes,1
+US,VA,dr pepper,1
+US,VA,drink or soft drink,1
+US,VA,fizz,1
+US,VA,mountain dew,1
+US,VA,mountaindew,1
+US,VA,name of the drink,1
+US,VA,soda pop together,1
+US,VA,soda water,1
+US,VA,sodi pop,1
+US,VA,sody,1
+US,VA,softdrink,1
+US,VA,specific brand name,1
+US,VA,sweet tea,1
+US,VI,soda pop,1
+US,VT,tonic,3
+US,VT,sodapop,2
+US,VT,beer,1
+US,VT,cocola,1
+US,VT,liter of cola,1
+US,VT,pepsi,1
+US,WA,soda pop,86
+US,WA,soft drink,23
+US,WA,sodapop,13
+US,WA,pepsi,8
+US,WA,cola,7
+US,WA,drink,5
+US,WA,beverage,3
+US,WA,brand name,3
+US,WA,dew,3
+US,WA,beer,2
+US,WA,carbonated soft drink,2
+US,WA,diet pepsi,2
+US,WA,drank,2
+US,WA,juice,2
+US,WA,liquid refreshment,2
+US,WA,mountain dew,2
+US,WA,pop,2
+US,WA,sody pop,2
+US,WA,both,1
+US,WA,carbonated drink,1
+US,WA,diet,1
+US,WA,fizzy,1
+US,WA,fizzy drink,1
+US,WA,limo,1
+US,WA,name of drink,1
+US,WA,phosphate,1
+US,WA,rootbeer,1
+US,WA,sasparilla,1
+US,WA,soda,1
+US,WA,soda and pop,1
+US,WA,soda water,1
+US,WA,sodee pop,1
+US,WA,soder,1
+US,WA,sodie pop,1
+US,WA,sodiepop,1
+US,WA,soft drinks,1
+US,WA,softdrink,1
+US,WA,something to drink,1
+US,WA,tonic,1
+US,WA,water,1
+US,WI,soda pop,53
+US,WI,sodapop,16
+US,WI,beer,6
+US,WI,soda water,5
+US,WI,soda,4
+US,WI,sodie,4
+US,WI,pop,3
+US,WI,beverage,2
+US,WI,cola,2
+US,WI,cold drink,2
+US,WI,faygo,2
+US,WI,fizz,2
+US,WI,sodies,2
+US,WI,soft drink,2
+US,WI,both pop and soda,1
+US,WI,both soda and pop,1
+US,WI,crunk juice,1
+US,WI,diet,1
+US,WI,diet pepsi,1
+US,WI,drink,1
+US,WI,fizzie,1
+US,WI,fizzy juice,1
+US,WI,fizzy stuff,1
+US,WI,fresca,1
+US,WI,jesus juice,1
+US,WI,pepsi,1
+US,WI,sodee pop,1
+US,WI,sodiepop,1
+US,WI,sodypop,1
+US,WI,sweet water,1
+US,WI,tonic,1
+US,WV,soda pop,17
+US,WV,cola,8
+US,WV,soft drink,8
+US,WV,tonic,4
+US,WV,carbonated beverage,3
+US,WV,beverage,2
+US,WV,drink,2
+US,WV,brand name,1
+US,WV,coca cola,1
+US,WV,dope,1
+US,WV,dr pepper,1
+US,WV,pepsi,1
+US,WV,pop,1
+US,WV,popsoda,1
+US,WV,rc,1
+US,WV,soda and pop,1
+US,WV,sodapop,1
+US,WV,sprite,1
+US,WY,mountain dew,18
+US,WY,soda pop,6
+US,WY,carbonated beverage,1
+US,WY,fizzy drink,1
+US,WY,sodapop,1
+US,WY,soft drink,1
