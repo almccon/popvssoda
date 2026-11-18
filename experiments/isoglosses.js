@@ -3,7 +3,8 @@
 // For every cell of a grid laid over the map, gather the responses "near"
 // that cell and work out each term's share; then contour those shares at
 // 50 / 75 / 90% (and, for "other", which rarely reaches a majority, also at
-// 10 / 25 / 33%). Three ways of deciding what "near" means:
+// 10 / 25 / 33%, shown as lines over a dot pattern that thickens at each
+// level; where "other" does pass 50% it gets gray bands like the others). Three ways of deciding what "near" means:
 //
 //   fixed     every response within a fixed radius counts equally
 //   gaussian  every response counts, weighted by a Gaussian of its distance
@@ -34,6 +35,13 @@
 	const LINE_WIDTH = { 0.5: 0.6, 0.75: 1.1, 0.9: 1.8 };
 	const OTHER_LINE_WIDTH = { 0.1: 0.6, 0.25: 1.1, [1 / 3]: 1.6, 0.5: 2.1, 0.75: 2.6, 0.9: 3.1 };
 	const isMinor = (level) => OTHER_MINOR_LEVELS.includes(level);
+	// Dots for other's minor levels, on a triangular grid. A triangular grid
+	// splits into three interleaved triangular sub-grids; each level gets one,
+	// so the nested areas read sparse / denser / densest, and inside the 33%
+	// line the three together make the full grid with dots DOT_GAP px apart.
+	const DOT_GAP = 3;
+	const DOT_R = 0.7;
+	const DOT_OPACITY = 0.6;
 	const levelLabel = (l) => `${Math.round(l * 100)}%`;
 
 	// Per-method slider wording, ranges ([min, max, step]) and defaults, applied
@@ -85,12 +93,13 @@
 	};
 
 	// Key doubles as the visibility toggles.
-	const otherSample = `<svg width="24" height="10">${OTHER_MINOR_LEVELS.map((l, i) =>
-		`<line x1="0" x2="24" y1="${2 + i * 3}" y2="${2 + i * 3}" stroke="${LINE.other}" stroke-width="${OTHER_LINE_WIDTH[l]}"/>`).join("")}</svg>`;
+	const otherSample = `<svg width="24" height="10">` +
+		[0, 1, 2, 3, 4, 5, 6].map((i) => `<circle cx="${3 + i * 3}" cy="${i % 2 ? 6.5 : 3.5}" r="${DOT_R + 0.1}" fill="${LINE.other}" opacity="${DOT_OPACITY}"/>`).join("") +
+		`<rect x="0" y="0" width="24" height="10" fill="none" stroke="${LINE.other}" stroke-width="0.8"/></svg>`;
 	document.getElementById("key").innerHTML =
 		TERMS.map((t) => t === "other"
 			? `<label class="key-item"><input type="checkbox" data-term="other" checked>${otherSample}` +
-				`Other (lines at ${OTHER_LEVELS.map(levelLabel).join(", ")})</label>`
+				`Other (dots and lines at ${OTHER_MINOR_LEVELS.map(levelLabel).join(", ")}; filled above 50%)</label>`
 			: `<label class="key-item"><input type="checkbox" data-term="${t}" checked>` +
 				`<span class="swatch" style="background:${FILL[t]};opacity:0.66"></span>${LABEL[t]}</label>`
 		).join("") +
@@ -149,12 +158,35 @@
 			.attr("clip-rule", "evenodd") // land minus lakes
 			.attr("d", path(land) + path(lakes));
 
+		// Sub-grid spacing is DOT_GAP * sqrt(3), in horizontal rows; the three
+		// sub-grids are shifted 0, 1 and 2 * DOT_GAP straight down.
+		const subGap = DOT_GAP * Math.sqrt(3);
+		const tileW = subGap, tileH = subGap * Math.sqrt(3); // two rows
+		OTHER_MINOR_LEVELS.forEach((l, k) => {
+			const pattern = defs.append("pattern")
+				.attr("id", `other-dots-${k}`)
+				.attr("patternUnits", "userSpaceOnUse")
+				.attr("width", tileW).attr("height", tileH);
+			for (const [x0, y0] of [[0, 0], [tileW / 2, tileH / 2]]) {
+				const y = (y0 + k * DOT_GAP) % tileH;
+				// Repeat across the tile edges so dots on a seam aren't cut in half.
+				for (const dx of [-tileW, 0, tileW]) {
+					for (const dy of [-tileH, 0, tileH]) {
+						pattern.append("circle")
+							.attr("cx", x0 + dx).attr("cy", y + dy).attr("r", DOT_R)
+							.attr("fill", LINE.other).attr("fill-opacity", DOT_OPACITY);
+					}
+				}
+			}
+		});
+
 		const base = svg.append("g").attr("class", "basemap");
 		base.append("path").attr("class", "land").attr("d", path(land));
 		base.append("path").attr("class", "admin").attr("d", path(admin1));
 		base.append("path").attr("class", "lakes").attr("d", path(lakes));
 
 		const bands = svg.append("g").attr("clip-path", "url(#land-clip)");
+		const dots = svg.append("g").attr("clip-path", "url(#land-clip)");
 		const lines = svg.append("g").attr("clip-path", "url(#land-clip)");
 		// State / province lines again on top, faintly, so they read through the bands.
 		svg.append("path").attr("class", "admin-over").attr("d", path(admin1));
@@ -289,10 +321,15 @@
 			});
 			// The level boxes cover 50 / 75 / 90%; other's lower lines go with "Other".
 			const shown = layers.filter((d) => termOn[d.term] && (isMinor(d.level) || levelOn[d.level]));
-			bands.selectAll("path").data(shown.filter((d) => d.term !== "other")).join("path")
+			// Bands at 50%+ for every term, "other" included; other's lower
+			// levels get dots instead.
+			bands.selectAll("path").data(shown.filter((d) => !isMinor(d.level))).join("path")
 				.attr("class", "iso-band")
 				.attr("fill", (d) => FILL[d.term])
 				.attr("fill-opacity", BAND_OPACITY)
+				.attr("d", (d) => d.d);
+			dots.selectAll("path").data(shown.filter((d) => isMinor(d.level))).join("path")
+				.attr("fill", (d) => `url(#other-dots-${OTHER_MINOR_LEVELS.indexOf(d.level)})`)
 				.attr("d", (d) => d.d);
 			lines.selectAll("path").data(shown).join("path")
 				.attr("class", "iso-line")
