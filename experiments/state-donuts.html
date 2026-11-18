@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pop vs Soda State Donuts</title>
+	<link href="../css/style.css" rel="stylesheet">
+	<link href="experiments.css" rel="stylesheet">
+	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
+	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
+	<script src="common.js" defer></script>
+	<script src="state-donuts.js" defer></script>
+</head>
+<body>
+	<nav class="nav">
+		<a href="../index.html">← Main map</a>
+		<a href="county-circles.html">County circles</a>
+	</nav>
+	<section class="panel">
+		<h1>Pop vs Soda by state</h1>
+		<p class="intro">
+			Each state is a donut sized by its number of responses, split into the share
+			answering pop, soda, coke or something else. Donuts are nudged apart so they
+			don't overlap, so each sits near (not exactly on) its state.
+		</p>
+		<div class="chart" id="chart">
+			<svg id="svg" viewBox="0 0 960 600" role="img"
+				aria-label="Donut chart for each US state showing the share of responses for pop, soda, coke and other, sized by number of responses"></svg>
+		</div>
+		<div class="key">
+			<span id="color-key"></span>
+			<span class="key-item" id="size-key"></span>
+		</div>
+	</section>
+</body>
+</html>

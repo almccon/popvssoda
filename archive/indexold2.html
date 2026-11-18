@@ -23,15 +23,15 @@ function cb () {temp=navigator.userAgent;
 if((parseInt(temp.substring(8,9))>2)&&(temp.substring(0,7)=="Mozilla")){return true;}}
 if(cb()==true){
 AllMap = new Image(583,265);
-AllMap.src = "images/smalldrawn.gif";
+AllMap.src = "../images/smalldrawn.gif";
 PopMap = new Image(583,265);
-PopMap.src = "images/smalldrawnpop.gif";
+PopMap.src = "../images/smalldrawnpop.gif";
 SodaMap = new Image(583,265);
-SodaMap.src = "images/smalldrawnsoda.gif";
+SodaMap.src = "../images/smalldrawnsoda.gif";
 CokeMap = new Image(583,265);
-CokeMap.src = "images/smalldrawncoke.gif";
+CokeMap.src = "../images/smalldrawncoke.gif";
 OtherMap = new Image(583,265);
-OtherMap.src = "images/smalldrawnother.gif";
+OtherMap.src = "../images/smalldrawnother.gif";
 }
 dm = "Document Done.";
 // stop hiding -->
@@ -46,15 +46,15 @@ dm = "Document Done.";
 <!--
 
 <applet code="pop3.class" width=520 height=260>
-<img width=583 height=265 alt="Pop vs. Soda display applet" src="images/smalldrawn.gif">
+<img width=583 height=265 alt="Pop vs. Soda display applet" src="../images/smalldrawn.gif">
 </applet>
 <font size=-1>
 <br>
 If your browser does not support Java 1.1, you may view the map 
 as a gif (may not be up to date): 
 <br>
-<a href="images/smalldrawn.gif">Small version (583 x 265, 16K)</a>.
-<a href="images/bigdrawn.gif">Large version (1435 x 660, 39K)</a>.
+<a href="../images/smalldrawn.gif">Small version (583 x 265, 16K)</a>.
+<a href="../images/bigdrawn.gif">Large version (1435 x 660, 39K)</a>.
 <br>
 For the most current map, please use the Java version.
 </font>
@@ -63,25 +63,25 @@ For the most current map, please use the Java version.
 
 
 <br>
-<img border=0 width=583 height=265 alt="Pop vs. Soda map" src="images/smalldrawn.gif" NAME="SmallMap">
+<img border=0 width=583 height=265 alt="Pop vs. Soda map" src="../images/smalldrawn.gif" NAME="SmallMap">
 
 <br>
 
 <table border="1" cellpadding="3">
 <tr align="center">
-    <td><a href="images/smalldrawn.gif"
+    <td><a href="../images/smalldrawn.gif"
         onMouseOver="if(cb()==true){SmallMap.src=AllMap.src;} return true"
         >show all</a></td>
-    <td><a href="images/smalldrawnpop.gif"
+    <td><a href="../images/smalldrawnpop.gif"
         onMouseOver="if(cb()==true){SmallMap.src=PopMap.src;} return true"
         >pop</a></td>
-    <td><a href="images/smalldrawnsoda.gif"
+    <td><a href="../images/smalldrawnsoda.gif"
         onMouseOver="if(cb()==true){SmallMap.src=SodaMap.src;} return true"
         >soda</a></td>
-    <td><a href="images/smalldrawncoke.gif"
+    <td><a href="../images/smalldrawncoke.gif"
         onMouseOver="if(cb()==true){SmallMap.src=CokeMap.src;} return true"
         >coke</a></td>
-    <td><a href="images/smalldrawnother.gif"
+    <td><a href="../images/smalldrawnother.gif"
         onMouseOver="if(cb()==true){SmallMap.src=OtherMap.src;} return true"
         >other</a></td>
 </tr>
@@ -92,7 +92,7 @@ For the most current map, please use the Java version.
 <td width="200">
 
 <br>
-<a href="images/bigdrawn.gif">
+<a href="../images/bigdrawn.gif">
 Click here to view a large non-interactive map.
 </a>
 <br>
@@ -113,7 +113,7 @@ View the Pop vs. Soda statistics.
 <td width="400">
 
 <a href="countystats/total-county.html">
-<img border=0 width=220 height=140 alt="County map" src="images/total-county-small.gif">
+<img border=0 width=220 height=140 alt="County map" src="../images/total-county-small.gif">
 </a>
 <br>
 View an 
