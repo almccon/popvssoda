@@ -37,10 +37,29 @@ aggregate before mapping rates.
 
 ## `county_counts.csv`
 
-This file has response totals by US county FIPS code, with the columns `total`,
-`pop`, `soda`, `coke` and `other`. Only responses whose ZIP code is in the 2020
-census and matches their state are counted. The county assignment is the same
-as in `postal_counts.csv`.
+This file has response totals by US county FIPS code, with the county's 2020
+Census name (`county_name`) and the columns `total`, `pop`, `soda`, `coke` and
+`other`. Only responses whose ZIP code is in the 2020 census and matches their
+state are counted. The county assignment is the same as in `postal_counts.csv`.
+
+## `state_counts.csv`
+
+This file has response totals by state, province or territory (`country`,
+`state`, then the same count columns). Every kept response counts toward the
+state the respondent chose, including those without a usable ZIP code, so these
+totals are larger than the sums of the other files. The row with a blank
+country and state counts responses that gave no location.
+
+## `other_answers.csv`
+
+This file lists what people typed in when they chose "other", by state
+(`country`, `state`, `answer`, `count`). Answers are lowercased with punctuation
+removed, so similar spellings group together. Only answers given at least 3
+times in the whole survey are included, because rarer ones can contain
+people's names. Long comments and spam aren't included either.
+
+These two files are used to build the statistics pages in `statistics/`
+(`python3 scripts/build_statistics.py`).
 
 ## What was removed
 

@@ -6,6 +6,8 @@ Reads the private raw files in datadir/ (gitignored) and writes:
   data/postal_counts.csv        responses aggregated by US ZIP / Canadian FSA,
                                 with centroid coordinates
   data/county_counts.csv        responses aggregated by US county FIPS
+  data/state_counts.csv         responses aggregated by state / province
+  data/other_answers.csv        the words typed in for "other", by state
   datadir/clean/responses.csv   one row per kept response, anonymized (no names/
                                 emails/IPs/cities) but kept local, not published
   datadir/clean/audit.csv       PRIVATE: every raw line number with the reason
@@ -156,7 +158,7 @@ MAX_OTHER_WORDS = 4
 # Only publish typed-in text that at least this many kept responses share; rarer
 # one-offs often contain personal names, so the vote is kept but the text blanked.
 MIN_OTHER_TEXT_COUNT = 3
-OTHER_TEXT_BLOCKLIST = {"taira mcfizzle"}  # a person's name, repeated enough to pass
+OTHER_TEXT_BLOCKLIST = {"taira mcfizzle", "pimp juice", "jesus juice"}  # a name, and two joke answers
 
 NAMED_DUP_WINDOW = datetime.timedelta(hours=24)
 ANON_DUP_WINDOW = datetime.timedelta(minutes=10)
@@ -216,6 +218,15 @@ def load_zcta():
     for p, sts in TERRITORY_ZIP3.items():
         zip3[p] |= sts
     return {z: c for z, (c, _) in best.items()}, states, zip3
+
+
+def load_county_names():
+    """County FIPS -> name ("Baldwin County") from the relationship file."""
+    names = {}
+    with open(ZCTA_FILE, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f, delimiter="|"):
+            names[row["GEOID_COUNTY_20"]] = row["NAMELSAD_COUNTY_20"]
+    return names
 
 
 def resolve_location(state, raw_zip, zcta_county, zcta_states, zip3_states):
@@ -380,12 +391,36 @@ def main():
     for r in kept:
         if r["county"]:
             counts[r["county"]][r["term"]] += 1
+    county_names = load_county_names()
     with open(os.path.join(OUT, "county_counts.csv"), "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["county_fips", "total", "pop", "soda", "coke", "other"])
+        w.writerow(["county_fips", "county_name", "total", "pop", "soda", "coke", "other"])
         for fips in sorted(counts):
             c = counts[fips]
-            w.writerow([fips, sum(c.values()), c["pop"], c["soda"], c["coke"], c["other"]])
+            w.writerow([fips, county_names.get(fips, ""), sum(c.values()), c["pop"], c["soda"], c["coke"], c["other"]])
+
+    # Every kept response counts toward its state, whatever its ZIP code. Rows
+    # with no state at all are totalled under a blank country and state.
+    states = collections.defaultdict(collections.Counter)
+    for r in kept:
+        states[(r["country"], r["st"])][r["term"]] += 1
+    with open(os.path.join(OUT, "state_counts.csv"), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["country", "state", "total", "pop", "soda", "coke", "other"])
+        for key in sorted(states):
+            c = states[key]
+            w.writerow([*key, sum(c.values()), c["pop"], c["soda"], c["coke"], c["other"]])
+
+    # Typed-in "other" answers, already normalized and spam-filtered, and only
+    # those given at least MIN_OTHER_TEXT_COUNT times overall.
+    answers = collections.Counter(
+        (r["country"], r["st"], r["other_text"]) for r in kept if r["other_text"]
+    )
+    with open(os.path.join(OUT, "other_answers.csv"), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["country", "state", "answer", "count"])
+        for key, n in sorted(answers.items(), key=lambda kv: (kv[0][0], kv[0][1], -kv[1], kv[0][2])):
+            w.writerow([*key, n])
 
     # Finest spatial unit we have: US ZIP code / Canadian FSA. A ZIP code whose
     # state disagrees with the respondent's has no postal_code, so it isn't included.
