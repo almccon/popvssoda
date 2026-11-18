@@ -92,6 +92,62 @@ window.PVS = (function () {
 		};
 	}
 
+	// Projection for the maps that show the US and Canada together: a conic
+	// conformal framed on the contiguous US, southern Canada and Alaska, with
+	// Hawaii moved into the empty Pacific southwest of California. Hawaii keeps
+	// the same scale as the mainland; it's only shifted. Like d3.geoAlbersUsa,
+	// it's a composite: points and inverses go to whichever part they belong
+	// to, and paths are drawn through both, each part clipped to its own area.
+	//
+	// Returns the projection plus `inInsetPx(x, y)` and `inInsetLonLat(lon, lat)`,
+	// which say whether a pixel or a location belongs to the Hawaii inset.
+	function northAmericaProjection(width, height) {
+		const main = d3.geoConicConformal()
+			.rotate([100, 0]).parallels([30, 60])
+			.fitExtent([[8, 8], [width - 8, height - 8]], {
+				type: "MultiPoint",
+				coordinates: [[-162, 58], [-156.8, 71.3], [-52.6, 47.5], [-80.5, 24.5], [-97.2, 25.8],
+					[-117, 32.5], [-124.7, 48.4], [-95, 62]],
+			});
+
+		const HAWAII = [[-161, 18.5], [-154.5, 22.5]]; // lon/lat box around the islands
+		const HAWAII_CENTER = [-157.3, 20.4];
+		const HAWAII_AT = [-127, 27.5]; // where its center goes on the main map
+		const hawaii = d3.geoConicConformal()
+			.rotate([157, 0]).parallels([30, 60]).scale(main.scale()).translate(main.translate());
+		const [hx, hy] = hawaii(HAWAII_CENTER);
+		const [tx, ty] = main(HAWAII_AT);
+		const [ox, oy] = hawaii.translate();
+		hawaii.translate([ox + tx - hx, oy + ty - hy]);
+		// Pixel box for the inset: the islands' extent plus a margin.
+		const corners = [HAWAII[0], HAWAII[1], [HAWAII[0][0], HAWAII[1][1]], [HAWAII[1][0], HAWAII[0][1]]].map(hawaii);
+		const pad = 12;
+		const box = [
+			[d3.min(corners, (c) => c[0]) - pad, d3.min(corners, (c) => c[1]) - pad],
+			[d3.max(corners, (c) => c[0]) + pad, d3.max(corners, (c) => c[1]) + pad],
+		];
+		hawaii.clipExtent(box);
+
+		const inInsetLonLat = (lon, lat) =>
+			lon >= HAWAII[0][0] && lon <= HAWAII[1][0] && lat >= HAWAII[0][1] && lat <= HAWAII[1][1];
+		const inInsetPx = (x, y) => x >= box[0][0] && x <= box[1][0] && y >= box[0][1] && y <= box[1][1];
+
+		const projection = ([lon, lat]) => (inInsetLonLat(lon, lat) ? hawaii : main)([lon, lat]);
+		projection.invert = ([x, y]) => (inInsetPx(x, y) ? hawaii : main).invert([x, y]);
+		projection.stream = (out) => {
+			// The real Hawaii lies off the main frame, so the main part only
+			// needs clipping to the canvas.
+			const streams = [main.stream(out), hawaii.stream(out)];
+			const each = (fn) => (...args) => streams.forEach((st) => st[fn](...args));
+			return {
+				point: each("point"), sphere: each("sphere"), lineStart: each("lineStart"),
+				lineEnd: each("lineEnd"), polygonStart: each("polygonStart"), polygonEnd: each("polygonEnd"),
+			};
+		};
+		projection.insetBox = box;
+		return { projection, inInsetPx, inInsetLonLat };
+	}
+
 	// Color key: one swatch + name per term.
 	function colorKeyHTML(shape) {
 		return TERMS.map((t) =>
@@ -99,5 +155,5 @@ window.PVS = (function () {
 		).join("");
 	}
 
-	return { TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, breakdownHTML, makeTooltip, colorKeyHTML };
+	return { TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, breakdownHTML, makeTooltip, colorKeyHTML, northAmericaProjection };
 })();

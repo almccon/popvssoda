@@ -109,14 +109,11 @@
 		const naGeoms = world.objects.countries.geometries.filter((g) => NA_IDS.includes(g.id));
 		const land = topojson.merge(world, naGeoms);
 
-		// Same frame as the Voronoi page.
-		const projection = d3.geoConicConformal()
-			.rotate([100, 0]).parallels([30, 60])
-			.fitExtent([[8, 8], [WIDTH - 8, HEIGHT - 8]], {
-				type: "MultiPoint",
-				coordinates: [[-162, 58], [-156.8, 71.3], [-52.6, 47.5], [-80.5, 24.5], [-97.2, 25.8],
-					[-117, 32.5], [-124.7, 48.4], [-95, 62]],
-			});
+		// Same frame as the Voronoi page, with Hawaii moved in close to the
+		// mainland. Hawaii's responses and the mainland's never mix: each point
+		// and grid cell has a zone (1 = the Hawaii inset), and windows only
+		// gather points from their own zone.
+		const { projection, inInsetPx, inInsetLonLat } = window.PVS.northAmericaProjection(WIDTH, HEIGHT);
 		const path = d3.geoPath(projection);
 
 		// The projection is conformal, so a circle on the ground is (locally) a
@@ -130,7 +127,7 @@
 			const xy = projection([+r.lon, +r.lat]);
 			if (!xy || xy[0] < 0 || xy[0] > WIDTH || xy[1] < 0 || xy[1] > HEIGHT) continue;
 			points.push({
-				x: xy[0], y: xy[1], kmPerPx: kmPerPxAt(xy[0], xy[1]),
+				x: xy[0], y: xy[1], kmPerPx: kmPerPxAt(xy[0], xy[1]), zone: inInsetLonLat(+r.lon, +r.lat) ? 1 : 0,
 				total: +r.total, pop: +r.pop, soda: +r.soda, coke: +r.coke,
 			});
 		}
@@ -167,8 +164,12 @@
 		// where cell (i, j) is centred on pixel ((i + 0.5) * step, (j + 0.5) * step).
 		function newGrid(step) {
 			const w = Math.ceil(WIDTH / step), h = Math.ceil(HEIGHT / step), n = w * h;
+			const zone = new Uint8Array(n);
+			for (let j = 0; j < h; j++) {
+				for (let i = 0; i < w; i++) zone[j * w + i] = inInsetPx((i + 0.5) * step, (j + 0.5) * step) ? 1 : 0;
+			}
 			return {
-				step, w, h,
+				step, w, h, zone,
 				total: new Float32Array(n), pop: new Float32Array(n),
 				soda: new Float32Array(n), coke: new Float32Array(n),
 			};
@@ -201,8 +202,9 @@
 						const dx = x + 0.5 - px;
 						const d2 = dx * dx + dy * dy;
 						if (d2 > reach2) continue;
-						const wgt = gaussian ? Math.exp(-d2 * inv2s2) : 1;
 						const i = y * g.w + x;
+						if (g.zone[i] !== p.zone) continue;
+						const wgt = gaussian ? Math.exp(-d2 * inv2s2) : 1;
 						g.total[i] += wgt * p.total;
 						g.pop[i] += wgt * p.pop;
 						g.soda[i] += wgt * p.soda;
@@ -233,6 +235,7 @@
 				for (let i = 0; i < g.w; i++) {
 					const cx = (i + 0.5) * g.step;
 					const kmPerPx = kmPerPxAt(cx, cy);
+					const zone = g.zone[j * g.w + i];
 					const maxPx = maxKm / kmPerPx;
 					const nBins = Math.min(maxBins, Math.ceil(maxPx / BIN) + 1);
 					hTot.fill(0, 0, nBins); hPop.fill(0, 0, nBins);
@@ -246,6 +249,7 @@
 							for (let xx = bx - ring; xx <= bx + ring; xx += edgeRow ? 1 : 2 * ring || 1) {
 								if (xx < 0 || xx >= BW) continue;
 								for (const p of buckets[yy * BW + xx]) {
+									if (p.zone !== zone) continue;
 									const d = Math.hypot(p.x - cx, p.y - cy);
 									if (d > maxPx) continue;
 									const b = Math.floor(d / BIN);

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pop vs Soda Hex Bubbles</title>
+	<link href="../css/style.css" rel="stylesheet">
+	<link href="experiments.css" rel="stylesheet">
+	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
+	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
+	<script src="common.js" defer></script>
+	<script src="hex-bubbles.js" defer></script>
+</head>
+<body>
+	<nav class="nav">
+		<a href="../index.html">← Main map</a>
+		<a href="index.html">All experiments</a>
+		<a href="isoglosses.html">Isoglosses</a>
+		<a href="zip-voronoi.html">ZIP Voronoi</a>
+		<a href="county-bubbles.html">County bubbles</a>
+		<a href="state-donuts.html">State donuts</a>
+	</nav>
+	<section class="panel">
+		<h1>Pop vs Soda hex bubbles</h1>
+		<p class="intro">
+			The US ZIP codes and Canadian FSAs are first gathered into hexagons of equal
+			size. Each hexagon then gets up to four circles: pop, soda, coke and other,
+			each with area proportional to the number of people there who gave that
+			answer. The circles start at the hexagon's center and push each other apart,
+			bubbling up from the south as they grow. Built from
+			<code>data/postal_counts.csv</code>.
+		</p>
+		<div class="chart" id="chart">
+			<canvas id="canvas" role="img"
+				aria-label="Map of the US and Canada drawn as circles, up to four per hexagon, sized by the number of pop, soda, coke and other responses"></canvas>
+		</div>
+		<div class="status" id="status">Loading…</div>
+		<div class="key">
+			<span id="color-key"></span>
+			<span class="key-item" id="size-key"></span>
+		</div>
+		<div class="slider-row">
+			<label for="hex">Hexagon size</label>
+			<input type="range" id="hex" min="4" max="24" step="1" value="7">
+			<span id="hex-value"></span>
+			<label><input type="checkbox" id="show-hexes"> show hexagons</label>
+		</div>
+		<div class="slider-row">
+			<label for="size">Circle size</label>
+			<input type="range" id="size" min="0.25" max="2" step="0.05" value="1">
+			<span id="size-value"></span>
+			<button type="button" id="replay">Replay</button>
+		</div>
+	</section>
+</body>
+</html>

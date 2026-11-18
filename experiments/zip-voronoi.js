@@ -42,16 +42,9 @@
 		const land = topojson.merge(world, naGeoms);
 		const borders = topojson.mesh(world, { type: "GeometryCollection", geometries: naGeoms }, (a, b) => a !== b);
 
-		// Frame where the responses are: the contiguous US, southern Canada and
-		// Alaska. Fit to a few corner points rather than the land so the Arctic
-		// islands don't dominate. Hawaii and the territories are left out.
-		const projection = d3.geoConicConformal()
-			.rotate([100, 0]).parallels([30, 60])
-			.fitExtent([[8, 8], [WIDTH - 8, HEIGHT - 8]], {
-				type: "MultiPoint",
-				coordinates: [[-162, 58], [-156.8, 71.3], [-52.6, 47.5], [-80.5, 24.5], [-97.2, 25.8],
-					[-117, 32.5], [-124.7, 48.4], [-95, 62]],
-			});
+		// The contiguous US, southern Canada and Alaska, with Hawaii moved in
+		// close to the mainland (see common.js). The territories are left out.
+		const { projection } = window.PVS.northAmericaProjection(WIDTH, HEIGHT);
 		const path = d3.geoPath(projection, ctx);
 
 		const points = [];
