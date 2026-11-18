@@ -1,6 +1,8 @@
-// County circles: four circles per county (pop / soda / coke / other), area
+// County bubbles: four circles per county (pop / soda / coke / other), area
 // proportional to the number of responses, spread apart with a force layout.
 // Drawn on canvas: there are ~9,000 circles and they move while settling.
+// The circles grow from nothing while the layout runs, starting in the south
+// and rising northward like bubbles in a glass.
 
 (function () {
 	"use strict";
@@ -8,6 +10,17 @@
 	const { TERMS, COLOR, fmt, loadData, breakdownHTML, makeTooltip, colorKeyHTML } = PVS;
 	const WIDTH = 960, HEIGHT = 600;
 	const PADDING = 0.4; // px between touching circles
+
+	// Each circle grows from zero to full size over GROW_MS. When it starts
+	// depends on its county's latitude: the southernmost start at once, the
+	// northernmost after STAGGER_MS, when the southern ones are full grown.
+	// The stagger spans the lower 48 (Hawaii starts with the far south,
+	// Alaska with the far north), so the wave moves steadily up the map.
+	const GROW_MS = 5000;
+	const STAGGER_MS = 5000;
+	const SOUTH_LAT = 25, NORTH_LAT = 49;
+	const grow = d3.easeQuadOut;
+	const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 	// Each term starts a hair away from the county center in its own
 	// direction, so the layout is deterministic and the four circles
@@ -47,8 +60,11 @@
 			if (!f) continue;
 			const [hx, hy] = path.centroid(f);
 			if (!isFinite(hx)) continue;
+			const lat = d3.geoCentroid(f)[1];
+			const delay = reducedMotion ? 0
+				: STAGGER_MS * Math.min(1, Math.max(0, (lat - SOUTH_LAT) / (NORTH_LAT - SOUTH_LAT)));
 			for (const t of TERMS) {
-				if (c.counts[t] > 0) nodes.push({ county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy });
+				if (c.counts[t] > 0) nodes.push({ county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay });
 			}
 		}
 
@@ -70,7 +86,7 @@
 			for (const t of TERMS) {
 				ctx.beginPath();
 				for (const d of nodes) {
-					if (d.term !== t) continue;
+					if (d.term !== t || d.r <= 0) continue;
 					ctx.moveTo(d.x + d.r, d.y);
 					ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
 				}
@@ -94,14 +110,39 @@
 			}
 		}
 
+		// Grow every circle to its size at `elapsed` ms. Returns true once all are full size.
+		let startTime = 0;
+		function growCircles(elapsed) {
+			let done = true;
+			for (const d of nodes) {
+				const k = Math.min(1, Math.max(0, (elapsed - d.delay) / GROW_MS));
+				if (k < 1) done = false;
+				d.r = d.fullR * (reducedMotion ? 1 : grow(k));
+			}
+			simulation.force("collide").radius((d) => d.r + PADDING); // re-read radii
+			return done;
+		}
+
+		let growing = false;
 		const simulation = d3.forceSimulation()
 			.force("x", d3.forceX((d) => d.homeX).strength(0.08))
 			.force("y", d3.forceY((d) => d.homeY).strength(0.08))
 			.force("collide", d3.forceCollide((d) => d.r + PADDING).iterations(2))
 			.alphaDecay(0.03)
 			.on("tick", () => {
+				if (growing) {
+					const elapsed = performance.now() - startTime;
+					if (growCircles(elapsed)) {
+						// Everything is full size: stop holding the layout warm
+						// and let it settle.
+						growing = false;
+						simulation.alphaTarget(0);
+					}
+					statusEl.textContent = `Bubbling up… ${Math.round(Math.min(1, elapsed / (GROW_MS + STAGGER_MS)) * 100)}%`;
+				} else {
+					statusEl.textContent = `Settling… ${Math.round((1 - simulation.alpha()) * 100)}%`;
+				}
 				draw();
-				statusEl.textContent = `Settling… ${Math.round((1 - simulation.alpha()) * 100)}%`;
 			})
 			.on("end", () => {
 				statusEl.textContent = `${fmt(nodes.length)} circles for ${fmt(d3.sum(nodes, (d) => d.n))} responses. ` +
@@ -110,15 +151,19 @@
 
 		function start() {
 			for (const d of nodes) {
-				d.r = scale * Math.sqrt(d.n);
+				d.fullR = scale * Math.sqrt(d.n);
 				const [ox, oy] = START_OFFSET[d.term];
 				d.x = d.homeX + ox;
 				d.y = d.homeY + oy;
 				d.vx = d.vy = 0;
 			}
 			simulation.nodes(nodes);
-			simulation.force("collide").radius((d) => d.r + PADDING); // re-read radii
-			simulation.alpha(1).restart();
+			startTime = performance.now();
+			growing = !reducedMotion;
+			growCircles(reducedMotion ? Infinity : 0);
+			// Keep the layout running while the circles grow, so neighbours
+			// make room for each other as they swell.
+			simulation.alphaTarget(growing ? 0.3 : 0).alpha(1).restart();
 			updateSizeKey();
 		}
 
