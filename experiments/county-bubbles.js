@@ -7,7 +7,12 @@
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, fmt, loadData, breakdownHTML, makeTooltip, colorKeyHTML } = PVS;
+	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip } = PVS;
+	// Same colors as the 90% areas on the isogloss map: the CMY fills as they
+	// look after three stacked 30% bands over the land (and a gray for
+	// "other"), outlined in the darker line colors from common.js.
+	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
+	const OUTLINE = COLOR;
 	const WIDTH = 960, HEIGHT = 600;
 	const PADDING = 0.4; // px between touching circles
 
@@ -35,7 +40,10 @@
 	const slider = document.getElementById("size");
 	const sliderValue = document.getElementById("size-value");
 	const tooltip = makeTooltip(document.getElementById("chart"));
-	document.getElementById("color-key").innerHTML = colorKeyHTML("disc");
+	document.getElementById("color-key").innerHTML = TERMS.map((t) =>
+		`<span class="key-item"><span class="disc" style="background:${FILL[t]}` +
+		`${OUTLINE[t] ? `;box-shadow:inset 0 0 0 1px ${OUTLINE[t]}` : ""}"></span>${LABEL[t]}</span>`
+	).join("");
 
 	function sizeCanvas() {
 		const dpr = window.devicePixelRatio || 1;
@@ -45,7 +53,11 @@
 	}
 	sizeCanvas();
 
-	loadData("../").then((data) => {
+	const sizeInputs = document.querySelectorAll("input[name=size-by]");
+	const sizeBy = () => [...sizeInputs].find((el) => el.checked).value;
+
+	Promise.all([loadData("../"), d3.csv("../data/county_population_2010.csv")]).then(([data, popRows]) => {
+		const population = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
 		const projection = d3.geoAlbersUsa().fitExtent([[10, 10], [WIDTH - 10, HEIGHT - 10]], data.land);
 		const path = d3.geoPath(projection);
 		const landPath = new Path2D(path(data.land));
@@ -61,12 +73,23 @@
 			const [hx, hy] = path.centroid(f);
 			if (!isFinite(hx)) continue;
 			const lat = d3.geoCentroid(f)[1];
+			c.population = population.get(c.id) || 0;
 			const delay = reducedMotion ? 0
 				: STAGGER_MS * Math.min(1, Math.max(0, (lat - SOUTH_LAT) / (NORTH_LAT - SOUTH_LAT)));
 			for (const t of TERMS) {
-				if (c.counts[t] > 0) nodes.push({ county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay });
+				// `people`: the county's population split in proportion to its answers.
+				if (c.counts[t] > 0) nodes.push({
+					county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay,
+					people: c.population * c.counts[t] / c.total,
+				});
 			}
 		}
+
+		// In population mode, people are scaled by the ratio of responses to
+		// population over the mapped counties, so both modes put about the same
+		// total area on the map and share the size slider.
+		const PEOPLE_PER_RESPONSE = d3.sum(nodes, (d) => d.people) / d3.sum(nodes, (d) => d.n);
+		const sizeValue = (d) => (sizeBy() === "population" ? d.people / PEOPLE_PER_RESPONSE : d.n);
 
 		let scale = +slider.value; // px of radius per sqrt(response)
 		let hovered = null;        // county record under the pointer
@@ -91,8 +114,13 @@
 					ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
 				}
 				ctx.globalAlpha = hovered ? 0.35 : 1;
-				ctx.fillStyle = COLOR[t];
+				ctx.fillStyle = FILL[t];
 				ctx.fill();
+				if (OUTLINE[t]) {
+					ctx.lineWidth = 0.75;
+					ctx.strokeStyle = OUTLINE[t];
+					ctx.stroke();
+				}
 			}
 			ctx.globalAlpha = 1;
 
@@ -101,7 +129,7 @@
 					if (d.county !== hovered) continue;
 					ctx.beginPath();
 					ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
-					ctx.fillStyle = COLOR[d.term];
+					ctx.fillStyle = FILL[d.term];
 					ctx.fill();
 					ctx.lineWidth = 1.5;
 					ctx.strokeStyle = "#222";
@@ -145,13 +173,16 @@
 				draw();
 			})
 			.on("end", () => {
-				statusEl.textContent = `${fmt(nodes.length)} circles for ${fmt(d3.sum(nodes, (d) => d.n))} responses. ` +
+				statusEl.textContent = `${fmt(nodes.length)} circles for ${fmt(d3.sum(nodes, (d) => d.n))} responses` +
+					(sizeBy() === "population"
+						? `, sized by ${fmt(Math.round(d3.sum(nodes, (d) => d.people)))} people (2010 census). `
+						: ". ") +
 					"Hover over (or tap) a circle for its county.";
 			});
 
 		function start() {
 			for (const d of nodes) {
-				d.fullR = scale * Math.sqrt(d.n);
+				d.fullR = scale * Math.sqrt(sizeValue(d));
 				const [ox, oy] = START_OFFSET[d.term];
 				d.x = d.homeX + ox;
 				d.y = d.homeY + oy;
@@ -169,13 +200,15 @@
 
 		function updateSizeKey() {
 			sliderValue.textContent = scale.toFixed(2);
-			const sizes = [100, 1000, 5000];
-			const big = scale * Math.sqrt(sizes[sizes.length - 1]);
+			const byPeople = sizeBy() === "population";
+			const sizes = byPeople ? [100000, 1000000, 5000000] : [100, 1000, 5000];
+			const unit = byPeople ? 1 / PEOPLE_PER_RESPONSE : 1;
+			const big = scale * Math.sqrt(sizes[sizes.length - 1] * unit);
 			const key = d3.select("#size-key").html("");
-			const svg = key.append("svg").attr("width", big * 2 + 50).attr("height", big * 2 + 4);
+			const svg = key.append("svg").attr("width", big * 2 + (byPeople ? 76 : 50)).attr("height", big * 2 + 4);
 			const g = svg.append("g").attr("transform", `translate(${big + 2},${big * 2 + 2})`);
 			for (const v of sizes) {
-				const r = scale * Math.sqrt(v);
+				const r = scale * Math.sqrt(v * unit);
 				g.append("circle").attr("cy", -r).attr("r", r);
 				g.append("line")
 					.attr("x1", 0).attr("x2", big + 6)
@@ -183,7 +216,7 @@
 					.attr("stroke", "#bbb").attr("stroke-dasharray", "2,2");
 				g.append("text").attr("x", big + 8).attr("y", -2 * r).attr("dy", "0.35em").text(fmt(v));
 			}
-			key.append("span").text("responses");
+			key.append("span").text(byPeople ? "people" : "responses");
 		}
 
 		// ---- Hover ------------------------------------------------------------
@@ -209,7 +242,11 @@
 				hovered = county;
 				draw();
 			}
-			if (d) tooltip.show(event, breakdownHTML(county.name, county.counts, county.total, d.term));
+			if (d) {
+				const title = county.population
+					? `${county.name} (population ${fmt(county.population)})` : county.name;
+				tooltip.show(event, breakdownHTML(title, county.counts, county.total, d.term));
+			}
 			else tooltip.hide();
 		}
 
@@ -233,6 +270,7 @@
 			updateSizeKey();
 		});
 		slider.addEventListener("change", start);
+		sizeInputs.forEach((el) => el.addEventListener("change", start));
 		document.getElementById("replay").addEventListener("click", start);
 
 		start();

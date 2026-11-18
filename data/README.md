@@ -58,7 +58,16 @@ removed, so similar spellings group together. Only answers given at least 3
 times in the whole survey are included, because rarer ones can contain
 people's names. Long comments and spam aren't included either.
 
-These two files are used to build the statistics pages in `statistics/`
+## `county_population_2010.csv`
+
+This isn't survey data: it's the 2010 Census population of each county
+(`county_fips`, `name`, `population_2010`), used to size the circles on the
+county bubbles experiment. 2010 falls in the middle of the survey's run, and
+its county codes match the older map in `d3/us.json`. Three Alaska areas that
+were split up in 2007–08 get the sum of the areas that replaced them. It's
+built by `scripts/fetch_county_population.py`.
+
+`state_counts.csv` and `other_answers.csv` are used to build the statistics pages in `statistics/`
 (`python3 scripts/build_statistics.py`).
 
 ## What was removed
@@ -89,7 +98,8 @@ Genuine long comments in the "other" box are kept as "other" votes.
 ## Sources
 
 - U.S. Census Bureau, 2020 ZCTA-to-county relationship file and 2020 ZCTA
-  Gazetteer (public domain).
+  Gazetteer, and 2010 census county populations from the 2000–2010
+  intercensal estimates (public domain).
 - Canadian FSA coordinates from [GeoNames](https://www.geonames.org/), licensed
   under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 

@@ -27,16 +27,23 @@
 			start at the county's center and push each other apart, so crowded metro
 			areas spread out into clusters while sparse regions keep lots of space.
 			They bubble up from the south, each growing to full size over 5 seconds
-			while the layout makes room.
+			while the layout makes room. Size the circles by the number of responses,
+			or by the county's population (2010 census) split between the four
+			circles in proportion to how people there answered.
 		</p>
 		<div class="chart" id="chart">
 			<canvas id="canvas" role="img"
-				aria-label="Map of US counties drawn as circles, one per answer, sized by number of responses"></canvas>
+				aria-label="Map of US counties drawn as circles, one per answer, sized by number of responses or by county population"></canvas>
 		</div>
 		<div class="status" id="status">Loading…</div>
 		<div class="key">
 			<span id="color-key"></span>
 			<span class="key-item" id="size-key"></span>
+		</div>
+		<div class="slider-row">
+			<span>Size circles by</span>
+			<label><input type="radio" name="size-by" value="responses" checked> number of responses</label>
+			<label><input type="radio" name="size-by" value="population"> county population</label>
 		</div>
 		<div class="slider-row">
 			<label for="size">Circle size</label>
