@@ -2,7 +2,8 @@
 //
 // For every cell of a grid laid over the map, gather the responses "near"
 // that cell and work out each term's share; then contour those shares at
-// 50 / 75 / 90%. Three ways of deciding what "near" means:
+// 50 / 75 / 90% (and, for "other", which rarely reaches a majority, also at
+// 10 / 25 / 33%). Three ways of deciding what "near" means:
 //
 //   fixed     every response within a fixed radius counts equally
 //   gaussian  every response counts, weighted by a Gaussian of its distance
@@ -18,20 +19,21 @@
 	const KM_PER_MILE = 1.609344;
 	const EARTH_KM = 6371;
 	const NA_IDS = ["840", "124"]; // USA, Canada in world-atlas
-	// Majority levels get filled bands and solid lines. Minority levels (a
-	// quarter / a third of nearby respondents) are dashed lines only, since
-	// they overlap other terms' areas.
-	const FILLED_LEVELS = [0.5, 0.75, 0.9];
-	const DASHED_LEVELS = [0.25, 1 / 3];
-	const LEVELS = [...DASHED_LEVELS, ...FILLED_LEVELS];
+	// Pop, soda and coke get filled bands and lines at the majority levels.
+	// "Other" rarely reaches a majority, so it is drawn as gray lines only,
+	// starting much lower; its 10 / 25 / 33% lines always show with it.
+	const LEVELS = [0.5, 0.75, 0.9];
+	const OTHER_MINOR_LEVELS = [0.1, 0.25, 1 / 3];
+	const OTHER_LEVELS = [...OTHER_MINOR_LEVELS, ...LEVELS];
 	const TERMS = ["pop", "soda", "coke", "other"];
 	// Pure CMY for the fills (multiplied together like inks) and a neutral gray
 	// for "other"; darker relatives from common.js for the lines.
 	const FILL = { pop: "#ffff00", soda: "#00ffff", coke: "#ff00ff", other: "#9a9a9a" };
 	const LINE = window.PVS.COLOR;
 	const BAND_OPACITY = 0.3; // nested bands stack: ~30% / 51% / 66%
-	const LINE_WIDTH = { 0.25: 1, [1 / 3]: 1.3, 0.5: 0.6, 0.75: 1.1, 0.9: 1.8 };
-	const DASH = { 0.25: "1.5 2.5", [1 / 3]: "5 3" };
+	const LINE_WIDTH = { 0.5: 0.6, 0.75: 1.1, 0.9: 1.8 };
+	const OTHER_LINE_WIDTH = { 0.1: 0.6, 0.25: 1.1, [1 / 3]: 1.6, 0.5: 2.1, 0.75: 2.6, 0.9: 3.1 };
+	const isMinor = (level) => OTHER_MINOR_LEVELS.includes(level);
 	const levelLabel = (l) => `${Math.round(l * 100)}%`;
 
 	// Per-method slider wording, ranges ([min, max, step]) and defaults, applied
@@ -46,7 +48,7 @@
 			minLabel: "Leave blank where the weighted count is below", minRange: [1, 200, 1], min: 10,
 		},
 		adaptive: {
-			radiusLabel: "Largest window allowed", radiusRange: [25, 750, 25], radius: 300,
+			radiusLabel: "Largest window allowed", radiusRange: [25, 1000, 25], radius: 300,
 			minLabel: "Grow each window until it holds", minRange: [25, 3000, 25], min: 500,
 		},
 	};
@@ -83,18 +85,19 @@
 	};
 
 	// Key doubles as the visibility toggles.
+	const otherSample = `<svg width="24" height="10">${OTHER_MINOR_LEVELS.map((l, i) =>
+		`<line x1="0" x2="24" y1="${2 + i * 3}" y2="${2 + i * 3}" stroke="${LINE.other}" stroke-width="${OTHER_LINE_WIDTH[l]}"/>`).join("")}</svg>`;
 	document.getElementById("key").innerHTML =
-		TERMS.map((t) =>
-			`<label class="key-item"><input type="checkbox" data-term="${t}" checked>` +
-			`<span class="swatch" style="background:${FILL[t]};opacity:0.66"></span>${LABEL[t]}</label>`
+		TERMS.map((t) => t === "other"
+			? `<label class="key-item"><input type="checkbox" data-term="other" checked>${otherSample}` +
+				`Other (lines at ${OTHER_LEVELS.map(levelLabel).join(", ")})</label>`
+			: `<label class="key-item"><input type="checkbox" data-term="${t}" checked>` +
+				`<span class="swatch" style="background:${FILL[t]};opacity:0.66"></span>${LABEL[t]}</label>`
 		).join("") +
-		LEVELS.map((l) => {
-			const dashed = DASH[l] !== undefined;
-			const sample = dashed
-				? `<svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#555" stroke-width="${LINE_WIDTH[l]}" stroke-dasharray="${DASH[l]}"/></svg>`
-				: `<span class="line-sample" style="border-top-width:${LINE_WIDTH[l] + 0.4}px"></span>`;
-			return `<label class="key-item"><input type="checkbox" data-level="${l}" checked>${sample}&gt;${levelLabel(l)}</label>`;
-		}).join("");
+		LEVELS.map((l) =>
+			`<label class="key-item"><input type="checkbox" data-level="${l}" checked>` +
+			`<span class="line-sample" style="border-top-width:${LINE_WIDTH[l] + 0.4}px"></span>&gt;${levelLabel(l)}</label>`
+		).join("");
 	const keyBoxes = document.querySelectorAll("#key input[type=checkbox]");
 
 	Promise.all([
@@ -280,8 +283,9 @@
 				if (el.dataset.term) termOn[el.dataset.term] = el.checked;
 				else levelOn[el.dataset.level] = el.checked;
 			});
-			const shown = layers.filter((d) => termOn[d.term] && levelOn[d.level]);
-			bands.selectAll("path").data(shown.filter((d) => DASH[d.level] === undefined)).join("path")
+			// The level boxes cover 50 / 75 / 90%; other's lower lines go with "Other".
+			const shown = layers.filter((d) => termOn[d.term] && (isMinor(d.level) || levelOn[d.level]));
+			bands.selectAll("path").data(shown.filter((d) => d.term !== "other")).join("path")
 				.attr("class", "iso-band")
 				.attr("fill", (d) => FILL[d.term])
 				.attr("fill-opacity", BAND_OPACITY)
@@ -289,12 +293,12 @@
 			lines.selectAll("path").data(shown).join("path")
 				.attr("class", "iso-line")
 				.attr("stroke", (d) => LINE[d.term])
-				.attr("stroke-width", (d) => LINE_WIDTH[d.level])
-				.attr("stroke-dasharray", (d) => DASH[d.level] ?? null)
+				.attr("stroke-width", (d) => (d.term === "other" ? OTHER_LINE_WIDTH : LINE_WIDTH)[d.level])
 				.attr("d", (d) => d.d);
 		}
 		keyBoxes.forEach((el) => el.addEventListener("change", render));
 		const contours = d3.contours().thresholds(LEVELS);
+		const otherContours = d3.contours().thresholds(OTHER_LEVELS);
 
 		function redraw() {
 			const t0 = performance.now();
@@ -311,6 +315,7 @@
 			const shares = new Float64Array(n);
 			layers = [];
 			contours.size([grid.w, grid.h]);
+			otherContours.size([grid.w, grid.h]);
 			const gridPath = d3.geoPath(d3.geoIdentity().scale(grid.step));
 			for (const term of TERMS) {
 				const g = grid[term];
@@ -318,7 +323,7 @@
 					const t = grid.total[i];
 					shares[i] = t >= threshold ? g[i] / t : -1; // too few responses: below every level
 				}
-				for (const c of contours(shares)) {
+				for (const c of (term === "other" ? otherContours : contours)(shares)) {
 					if (c.coordinates.length) layers.push({ term, level: c.value, d: gridPath(c) });
 				}
 			}
