@@ -11,12 +11,8 @@
 	const HEIGHT = 700;
 	const NA_IDS = { US: "840", CA: "124" }; // world-atlas (Natural Earth) country ids
 
-	// Same mix as the main map's "cmy" palette (js/map.js): each main term
-	// adds to two RGB channels, so any "other" share darkens the cell.
-	const mix = (p) => {
-		const c = (v) => Math.round(Math.min(1, v) * 255);
-		return `rgb(${c(p.pop + p.coke)},${c(p.soda + p.pop)},${c(p.coke + p.soda)})`;
-	};
+	// Same mix as the main map's "cmy" palette (see common.js).
+	const { mix } = window.PVS;
 
 	const canvas = document.getElementById("canvas");
 	const chart = document.getElementById("chart");

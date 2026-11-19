@@ -1,144 +1,211 @@
-// State donut cartogram (Dorling-style): one donut per state, area
-// proportional to the number of responses, slices for each term.
+// State and province donut cartogram (Dorling-style): one donut per state,
+// province or territory, area proportional to the number of responses, slices
+// for each term. Counts come from data/state_counts.csv, which includes every
+// response that named a state or province, with or without a usable ZIP code.
+// Each donut starts at the center of its state's responses.
 
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, STATE_ABBR, fmt, loadData, breakdownHTML, makeTooltip, colorKeyHTML } = PVS;
-	const WIDTH = 960, HEIGHT = 600;
-	const MAX_RADIUS = 52;      // radius of the state with the most responses
+	const { TERMS, COLOR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, northAmericaProjection } = PVS;
+	const WIDTH = 960, HEIGHT = 680;
+	const MAX_RADIUS = 52;      // radius of the place with the most responses
 	const HOLE = 0.5;           // inner radius as a fraction of outer radius
 	const GAP = 1.5;            // minimum space between donuts, px
 
 	const svg = d3.select("#svg");
 	const tooltip = makeTooltip(document.getElementById("chart"));
+	const statusEl = document.getElementById("status");
 	document.getElementById("color-key").innerHTML = colorKeyHTML("wedge");
+	const regionInputs = document.querySelectorAll("input[name=region]");
+	const region = () => [...regionInputs].find((el) => el.checked).value;
 
-	loadData("../").then((data) => {
-		const projection = d3.geoAlbersUsa().fitExtent([[10, 10], [WIDTH - 10, HEIGHT - 10]], data.land);
-		const path = d3.geoPath(projection);
+	Promise.all([
+		d3.json("../vendor/world-atlas-2.0.2-countries-50m.json"),
+		d3.json("../vendor/naturalearth-5.1.2-admin1-50m-us-canada.geojson"),
+		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
+		d3.csv("../data/state_counts.csv"),
+		d3.csv("../data/postal_counts.csv"),
+	]).then(([world, admin1, lakes, rows, postal]) => {
+		const countryLand = (id) => topojson.feature(world,
+			{ type: "GeometryCollection", geometries: world.objects.countries.geometries.filter((g) => g.id === id) });
+		const land = { US: countryLand("840"), CA: countryLand("124") };
+		const featureByCode = new Map(admin1.features.map((f) => [`${f.properties.country}-${f.properties.postal}`, f]));
 
-		// Sum county counts into states.
-		const states = d3.rollups(
-			data.counties,
-			(cs) => {
-				const counts = {};
-				for (const t of TERMS) counts[t] = d3.sum(cs, (c) => c.counts[t]);
-				return { counts, total: d3.sum(TERMS, (t) => counts[t]), name: cs[0].stateName };
-			},
-			(c) => c.state
-		).map(([fips, s]) => ({ fips, abbr: STATE_ABBR[fips], ...s }));
-
-		const featureById = new Map(data.stateFeatures.map((f) => [+f.id, f]));
-		for (const s of states) {
-			const f = featureById.get(+s.fips);
-			[s.homeX, s.homeY] = f ? path.centroid(f) : [NaN, NaN];
-		}
-		const nodes = states.filter((s) => s.total > 0 && isFinite(s.homeX));
-
-		const radius = d3.scaleSqrt()
-			.domain([0, d3.max(nodes, (s) => s.total)])
-			.range([0, MAX_RADIUS]);
-		for (const s of nodes) {
-			s.r = radius(s.total);
-			s.x = s.homeX;
-			s.y = s.homeY;
-		}
-
-		// Push donuts apart while pulling each towards its state's centroid.
-		d3.forceSimulation(nodes)
-			.force("x", d3.forceX((d) => d.homeX).strength(0.15))
-			.force("y", d3.forceY((d) => d.homeY).strength(0.15))
-			.force("collide", d3.forceCollide((d) => d.r + GAP).iterations(4))
-			.stop()
-			.tick(400);
-
-		// Faint basemap for orientation.
-		const base = svg.append("g").attr("class", "basemap");
-		base.append("path").attr("class", "land").attr("d", path(data.land));
-		base.append("path").attr("class", "states").attr("d", path(data.stateMesh));
-
-		// Thin leader lines from centroid to donut, where a donut moved.
-		svg.append("g")
-			.selectAll("line")
-			.data(nodes.filter((d) => Math.hypot(d.x - d.homeX, d.y - d.homeY) > d.r * 0.6))
-			.join("line")
-			.attr("x1", (d) => d.homeX).attr("y1", (d) => d.homeY)
-			.attr("x2", (d) => d.x).attr("y2", (d) => d.y)
-			.attr("stroke", "#bbb")
-			.attr("stroke-width", 0.75);
-
-		const pie = d3.pie().sort(null).value((t) => t.value);
-		const arc = d3.arc();
-
-		const donuts = svg.append("g")
-			.selectAll("g")
-			.data(nodes)
-			.join("g")
-			.attr("transform", (d) => `translate(${d.x},${d.y})`)
-			.style("cursor", "default");
-
-		donuts.selectAll("path")
-			.data((d) => pie(TERMS.map((t) => ({ term: t, value: d.counts[t] })))
-				.map((p) => Object.assign(p, {
-					outerRadius: d.r,
-					innerRadius: d.r * HOLE,
-					// a fixed ~1px gap between slices, whatever the donut size
-					padAngle: Math.min(0.04, 1.2 / d.r),
-				})))
-			.join("path")
-			.attr("d", arc)
-			.attr("fill", (p) => COLOR[p.data.term]);
-
-		// Transparent disc so the hole is hoverable too.
-		donuts.append("circle")
-			.attr("r", (d) => d.r)
-			.attr("fill", "transparent");
-
-		donuts.filter((d) => d.r >= 15)
-			.append("text")
-			.attr("text-anchor", "middle")
-			.attr("dy", "0.35em")
-			.attr("font-size", (d) => Math.min(13, d.r * 0.42))
-			.attr("font-weight", "bold")
-			.attr("fill", "#333")
-			.attr("pointer-events", "none")
-			.text((d) => d.abbr);
-
-		donuts
-			.on("pointermove pointerdown", (event, d) => {
-				donuts.attr("opacity", (o) => (o === d ? 1 : 0.35));
-				tooltip.show(event, breakdownHTML(d.name, d.counts, d.total));
-			})
-			.on("pointerleave", (event) => {
-				if (event.pointerType === "mouse") {
-					donuts.attr("opacity", 1);
-					tooltip.hide();
-				}
+		// One record per state / province with a shape on the map (so not
+		// Puerto Rico, Guam, military addresses and so on).
+		const places = [];
+		for (const r of rows) {
+			const f = featureByCode.get(`${r.country}-${r.state}`);
+			if (!f || !+r.total) continue;
+			const counts = {};
+			for (const t of TERMS) counts[t] = +r[t];
+			places.push({
+				country: r.country, abbr: r.state, name: f.properties.name, feature: f,
+				counts, total: +r.total,
+				points: postal.filter((p) => p.country === r.country && p.state === r.state && p.lat && +p.total),
 			});
+		}
+
+		// Each view is sized to its own biggest donut, so Canada on its own
+		// isn't a map of specks. The size key follows.
+		const radius = d3.scaleSqrt().range([0, MAX_RADIUS]);
+
+		function projectionFor(which) {
+			const pad = [[10, 10], [WIDTH - 10, HEIGHT - 10]];
+			if (which === "US") return d3.geoAlbersUsa().fitExtent(pad, land.US);
+			if (which === "CA") return d3.geoConicConformal().rotate([96, 0]).parallels([49, 77]).fitExtent(pad, land.CA);
+			return northAmericaProjection(WIDTH, HEIGHT).projection;
+		}
+
+		function render() {
+			const which = region();
+			const shown = places.filter((p) => which === "both" || p.country === which);
+			const projection = projectionFor(which);
+			const path = d3.geoPath(projection);
+
+			radius.domain([0, d3.max(shown, (p) => p.total)]);
+			updateSizeKey();
+			for (const p of shown) {
+				// Home: the center of the state's responses (each ZIP code or FSA
+				// weighted by its responses), which for big northern provinces is
+				// far from the middle of their land. Falls back to the centroid.
+				let sx = 0, sy = 0, sw = 0;
+				for (const q of p.points) {
+					const xy = projection([+q.lon, +q.lat]);
+					if (!xy) continue;
+					sx += xy[0] * q.total; sy += xy[1] * q.total; sw += +q.total;
+				}
+				[p.homeX, p.homeY] = sw ? [sx / sw, sy / sw] : path.centroid(p.feature);
+				p.r = radius(p.total);
+				p.x = p.homeX;
+				p.y = p.homeY;
+				p.vx = p.vy = 0;
+			}
+			const nodes = shown.filter((p) => isFinite(p.homeX));
+
+			// Push donuts apart while pulling each towards its centroid.
+			d3.forceSimulation(nodes)
+				.force("x", d3.forceX((d) => d.homeX).strength(0.15))
+				.force("y", d3.forceY((d) => d.homeY).strength(0.15))
+				.force("collide", d3.forceCollide((d) => d.r + GAP).iterations(4))
+				.stop()
+				.tick(400);
+
+			svg.selectAll("*").remove();
+			tooltip.hide();
+
+			// Faint basemap for orientation.
+			const countries = which === "both" ? ["US", "CA"] : [which];
+			const base = svg.append("g").attr("class", "basemap");
+			for (const c of countries) base.append("path").attr("class", "land").attr("d", path(land[c]));
+			base.append("path").attr("class", "lake").attr("d", path(lakes));
+			base.append("path").attr("class", "states").attr("d", path({
+				type: "FeatureCollection",
+				features: admin1.features.filter((f) => countries.includes(f.properties.country)),
+			}));
+
+			// Thin leader lines from centroid to donut, where a donut moved.
+			svg.append("g")
+				.selectAll("line")
+				.data(nodes.filter((d) => Math.hypot(d.x - d.homeX, d.y - d.homeY) > d.r * 0.6))
+				.join("line")
+				.attr("x1", (d) => d.homeX).attr("y1", (d) => d.homeY)
+				.attr("x2", (d) => d.x).attr("y2", (d) => d.y)
+				.attr("stroke", "#bbb")
+				.attr("stroke-width", 0.75);
+
+			const pie = d3.pie().sort(null).value((t) => t.value);
+			const arc = d3.arc();
+
+			const donuts = svg.append("g")
+				.attr("class", "donuts")
+				.selectAll("g")
+				.data(nodes)
+				.join("g")
+				.attr("transform", (d) => `translate(${d.x},${d.y})`)
+				.style("cursor", "default");
+
+			donuts.selectAll("path")
+				.data((d) => pie(TERMS.map((t) => ({ term: t, value: d.counts[t] })))
+					.map((p) => Object.assign(p, {
+						outerRadius: d.r,
+						innerRadius: d.r * HOLE,
+						// a fixed ~1px gap between slices, whatever the donut size
+						padAngle: Math.min(0.04, 1.2 / d.r),
+					})))
+				.join("path")
+				.attr("d", arc)
+				.attr("fill", (p) => COLOR[p.data.term]);
+
+			// Transparent disc so the hole is hoverable too.
+			donuts.append("circle")
+				.attr("r", (d) => d.r)
+				.attr("fill", "transparent");
+
+			donuts.filter((d) => d.r >= 15)
+				.append("text")
+				.attr("text-anchor", "middle")
+				.attr("dy", "0.35em")
+				.attr("font-size", (d) => Math.min(13, d.r * 0.42))
+				.attr("font-weight", "bold")
+				.attr("fill", "#333")
+				.attr("pointer-events", "none")
+				.text((d) => d.abbr);
+
+			donuts
+				.on("pointermove pointerdown", (event, d) => {
+					donuts.attr("opacity", (o) => (o === d ? 1 : 0.35));
+					tooltip.show(event, breakdownHTML(d.name, d.counts, d.total));
+				})
+				.on("pointerleave", (event) => {
+					if (event.pointerType === "mouse") {
+						donuts.attr("opacity", 1);
+						tooltip.hide();
+					}
+				});
+
+			const n = d3.sum(nodes, (d) => d.total);
+			const states = nodes.filter((d) => d.country === "US").length;
+			const provs = nodes.filter((d) => d.country === "CA").length;
+			statusEl.textContent = `${fmt(n)} responses: ` + [
+				states && `${states} states (with DC)`,
+				provs && `${provs} provinces and territories`,
+			].filter(Boolean).join(" and ") + ". Hover over (or tap) a donut for its numbers.";
+		}
+
 		document.addEventListener("pointerdown", (event) => {
-			if (!event.target.closest("#svg g g")) {
-				donuts.attr("opacity", 1);
+			if (!event.target.closest(".donuts g")) {
+				svg.selectAll(".donuts g").attr("opacity", 1);
 				tooltip.hide();
 			}
 		});
+		regionInputs.forEach((el) => el.addEventListener("change", render));
 
-		// Size key.
-		const sizes = [1000, 5000, 20000].filter((v) => v <= radius.domain()[1]);
-		const big = radius(sizes[sizes.length - 1]);
-		const keySvg = d3.select("#size-key").append("svg")
-			.attr("width", big * 2 + 70)
-			.attr("height", big * 2 + 4);
-		const k = keySvg.append("g").attr("transform", `translate(${big + 2},${big * 2 + 2})`);
-		for (const v of sizes) {
-			const r = radius(v);
-			k.append("circle").attr("cy", -r).attr("r", r);
-			k.append("line")
-				.attr("x1", 0).attr("x2", big + 8)
-				.attr("y1", -2 * r).attr("y2", -2 * r)
-				.attr("stroke", "#bbb").attr("stroke-dasharray", "2,2");
-			k.append("text").attr("x", big + 10).attr("y", -2 * r).attr("dy", "0.35em").text(fmt(v));
+		function updateSizeKey() {
+			const top = radius.domain()[1];
+			const sizes = [100, 500, 1000, 5000, 20000].filter((v) => v <= top).slice(-3);
+			const big = radius(sizes[sizes.length - 1]);
+			const key = d3.select("#size-key").html("");
+			const k = key.append("svg")
+				.attr("width", big * 2 + 70)
+				.attr("height", big * 2 + 4)
+				.append("g").attr("transform", `translate(${big + 2},${big * 2 + 2})`);
+			for (const v of sizes) {
+				const r = radius(v);
+				k.append("circle").attr("cy", -r).attr("r", r);
+				k.append("line")
+					.attr("x1", 0).attr("x2", big + 8)
+					.attr("y1", -2 * r).attr("y2", -2 * r)
+					.attr("stroke", "#bbb").attr("stroke-dasharray", "2,2");
+				k.append("text").attr("x", big + 10).attr("y", -2 * r).attr("dy", "0.35em").text(fmt(v));
+			}
+			key.append("span").text("responses");
 		}
-		d3.select("#size-key").append("span").text("responses");
+
+		render();
+	}).catch((err) => {
+		statusEl.textContent = "Couldn't load data: " + err.message;
+		throw err;
 	});
 })();

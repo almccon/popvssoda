@@ -148,6 +148,257 @@ window.PVS = (function () {
 		return { projection, inInsetPx, inInsetLonLat };
 	}
 
+	// The main map's "cmy" mix (js/map.js) for a set of shares {pop, soda,
+	// coke, other}: each main term adds to two RGB channels (pop yellow, soda
+	// cyan, coke magenta), so any "other" share darkens the color.
+	const mix = (p) => {
+		const c = (v) => Math.round(Math.min(1, v) * 255);
+		return `rgb(${c(p.pop + p.coke)},${c(p.soda + p.pop)},${c(p.coke + p.soda)})`;
+	};
+	const mixCounts = (counts, total) => {
+		const shares = {};
+		for (const t of TERMS) shares[t] = total ? counts[t] / total : 0;
+		return mix(shares);
+	};
+
+	// Key for the mixed colors: the three pure colors, two blends, and "other".
+	function mixKeyHTML() {
+		const item = (shares, label) =>
+			`<span class="key-item"><span class="disc" style="background:${mix({ pop: 0, soda: 0, coke: 0, other: 0, ...shares })};` +
+			`box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></span>${label}</span>`;
+		return item({ pop: 1 }, "Pop") + item({ soda: 1 }, "Soda") + item({ coke: 1 }, "Coke") +
+			item({ pop: 0.5, soda: 0.5 }, "Pop and soda") + item({ soda: 0.5, coke: 0.5 }, "Soda and coke") +
+			item({ pop: 0.5, other: 0.5 }, "Darker: more \"other\"");
+	}
+
+	// Swelling state outlines for the bubble maps. Each state starts as its own
+	// border. As the bubbles grow and push each other around, every corner of
+	// the border moves by a weighted average of how far that state's nearest
+	// bubbles have moved from home, so the border follows its bubbles; corners
+	// far from any bubble stay put. The outline is the edge of that moved
+	// border merged with the state's own bubbles (each padded by `pad` px), so
+	// it always encloses them. Neighbouring bubbles of the same state less than
+	// `link` px apart are joined by a bridge (the hull of the two circles), and
+	// the gap between three joined bubbles is filled (from a Delaunay
+	// triangulation), so a cluster of bubbles gets one outline, not one each.
+	//
+	// `shapes`: [{ key, feature }]; `projection`: the map's projection; `nodes`:
+	// bubbles with { stateKey, homeX, homeY, x, y, r }; `size`: { width, height,
+	// dpr } of the canvas. Returns { draw(ctx) }, which draws every state's
+	// outline; call it before drawing the bubbles.
+	function swellingOutlines(shapes, projection, nodes, size, opts = {}) {
+		const { pad = 1.5, link = 12, k = 8, reach = 40, soften = 10, color = "#555", lineWidth = 1.2 } = opts;
+		const { width, height, dpr } = size;
+		const byState = d3.group(nodes, (d) => d.stateKey);
+		const states = [];
+		for (const { key, feature } of shapes) {
+			const own = byState.get(key) || [];
+			// Record the projected rings by drawing the path into a recorder.
+			const rings = [];
+			let ring = null;
+			d3.geoPath(projection, {
+				moveTo(x, y) { ring = [[x, y]]; rings.push(ring); },
+				lineTo(x, y) { ring.push([x, y]); },
+				closePath() {},
+				arc() {},
+			})(feature);
+			// For each corner: its k nearest bubbles (by home position) and weights.
+			const W0 = k / (reach * reach);
+			const verts = rings.map((r) => r.map(([x, y]) => {
+				const best = []; // [dist2, node], kept sorted, at most k long
+				for (const d of own) {
+					const dist2 = (d.homeX - x) ** 2 + (d.homeY - y) ** 2;
+					if (best.length === k && dist2 >= best[k - 1][0]) continue;
+					let i = Math.min(best.length, k - 1);
+					while (i > 0 && best[i - 1][0] > dist2) { best[i] = best[i - 1]; i--; }
+					best[i] = [dist2, d];
+				}
+				const near = best.map(([dist2, d]) => ({ d, w: 1 / (dist2 + soften * soften) }));
+				return { x, y, near, wsum: W0 + d3.sum(near, (n) => n.w) };
+			}));
+			states.push({ key, verts, own });
+		}
+
+		// Two scratch canvases. For each state: A = border plus padded bubbles;
+		// B = A shrunk by the line width; the outline is A minus B.
+		const scratch = () => {
+			const c = document.createElement("canvas");
+			c.width = width * dpr;
+			c.height = height * dpr;
+			const x = c.getContext("2d");
+			x.setTransform(dpr, 0, 0, dpr, 0, 0);
+			return x;
+		};
+		const ringCtx = scratch(), innerCtx = scratch();
+
+		// Each state's circles, bridges and triangles are each filled as one
+		// path. Every shape in a path is traced in the same direction, so with
+		// the nonzero rule overlaps add up rather than cancel.
+		function fillCircles(c, list, grow) {
+			c.beginPath();
+			for (const d of list) {
+				const r = d.r + grow;
+				if (!(r > 0)) continue;
+				c.moveTo(d.x + r, d.y);
+				c.arc(d.x, d.y, r, 0, 2 * Math.PI);
+			}
+			c.fill();
+		}
+		// The hull of two circles (between their outer tangent lines).
+		function fillBridges(c, list, grow) {
+			c.beginPath();
+			for (const [a, b] of list) {
+				const ra = Math.max(0, a.r + grow), rb = Math.max(0, b.r + grow);
+				const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+				if (d <= Math.abs(ra - rb)) continue; // one circle inside the other
+				const t = Math.atan2(dy, dx), f = Math.acos((ra - rb) / d);
+				c.moveTo(a.x + ra * Math.cos(t + f), a.y + ra * Math.sin(t + f));
+				c.lineTo(b.x + rb * Math.cos(t + f), b.y + rb * Math.sin(t + f));
+				c.lineTo(b.x + rb * Math.cos(t - f), b.y + rb * Math.sin(t - f));
+				c.lineTo(a.x + ra * Math.cos(t - f), a.y + ra * Math.sin(t - f));
+				c.closePath();
+			}
+			c.fill();
+		}
+
+		function draw(ctx) {
+			for (const s of states) {
+				let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+				const border = new Path2D();
+				for (const r of s.verts) {
+					r.forEach((v, i) => {
+						let dx = 0, dy = 0;
+						for (const { d, w } of v.near) {
+							dx += w * (d.x - d.homeX);
+							dy += w * (d.y - d.homeY);
+						}
+						const x = v.x + dx / v.wsum, y = v.y + dy / v.wsum;
+						if (x < x0) x0 = x; if (x > x1) x1 = x;
+						if (y < y0) y0 = y; if (y > y1) y1 = y;
+						if (i) border.lineTo(x, y); else border.moveTo(x, y);
+					});
+					border.closePath();
+				}
+				const live = s.own.filter((d) => d.r > 0);
+				for (const d of live) {
+					const R = d.r + pad;
+					if (d.x - R < x0) x0 = d.x - R; if (d.x + R > x1) x1 = d.x + R;
+					if (d.y - R < y0) y0 = d.y - R; if (d.y + R > y1) y1 = d.y + R;
+				}
+				if (!(x1 > x0)) continue;
+				// Links between neighbouring bubbles, and triangles of three linked bubbles.
+				const bridges = [], gaps = [];
+				if (live.length >= 2) {
+					const { triangles, halfedges } = d3.Delaunay.from(live, (d) => d.x, (d) => d.y);
+					const other = (e) => live[triangles[e % 3 === 2 ? e - 2 : e + 1]];
+					const dist = (e) => {
+						const a = live[triangles[e]], b = other(e);
+						return Math.hypot(a.x - b.x, a.y - b.y) - a.r - b.r - 2 * pad;
+					};
+					const linked = (e) => dist(e) < link;
+					for (let e = 0; e < triangles.length; e++) {
+						if (halfedges[e] > e) continue; // each edge once
+						// Bubbles whose padded circles already overlap need no bridge.
+						const gap = dist(e);
+						if (gap > 0 && gap < link) bridges.push([live[triangles[e]], other(e)]);
+					}
+					for (let t = 0; t < triangles.length; t += 3) {
+						if (linked(t) && linked(t + 1) && linked(t + 2)) {
+							gaps.push([live[triangles[t]], live[triangles[t + 1]], live[triangles[t + 2]]]);
+						}
+					}
+				}
+				// The triangles are the same for both passes: build them once.
+				let gapPath = null;
+				if (gaps.length) {
+					gapPath = new Path2D();
+					for (const [a, b, d] of gaps) {
+						gapPath.moveTo(a.x, a.y);
+						gapPath.lineTo(b.x, b.y);
+						gapPath.lineTo(d.x, d.y);
+						gapPath.closePath();
+					}
+				}
+				const fillGaps = (c) => { if (gapPath) c.fill(gapPath); };
+				// Work only inside the state's box (whole device pixels).
+				const bx = Math.max(0, Math.floor(x0 - 2)), by = Math.max(0, Math.floor(y0 - 2));
+				const bw = Math.min(width, Math.ceil(x1 + 2)) - bx, bh = Math.min(height, Math.ceil(y1 + 2)) - by;
+				if (bw <= 0 || bh <= 0) continue;
+				for (const c of [ringCtx, innerCtx]) {
+					c.globalCompositeOperation = "source-over";
+					c.clearRect(bx, by, bw, bh);
+				}
+				// B: the border shrunk by the line width, plus the shrunk bubbles.
+				innerCtx.fillStyle = "#000";
+				innerCtx.fill(border);
+				innerCtx.globalCompositeOperation = "destination-out";
+				innerCtx.lineWidth = lineWidth * 2;
+				innerCtx.lineJoin = "round";
+				innerCtx.stroke(border);
+				innerCtx.globalCompositeOperation = "source-over";
+				fillCircles(innerCtx, live, pad - lineWidth);
+				fillBridges(innerCtx, bridges, pad - lineWidth);
+				fillGaps(innerCtx);
+				// A, then cut B out of it.
+				ringCtx.fillStyle = color;
+				ringCtx.fill(border);
+				fillCircles(ringCtx, live, pad);
+				fillBridges(ringCtx, bridges, pad);
+				fillGaps(ringCtx);
+				ringCtx.globalCompositeOperation = "destination-out";
+				ringCtx.drawImage(innerCtx.canvas, bx * dpr, by * dpr, bw * dpr, bh * dpr, bx, by, bw, bh);
+				ctx.drawImage(ringCtx.canvas, bx * dpr, by * dpr, bw * dpr, bh * dpr, bx, by, bw, bh);
+			}
+		}
+		return { draw };
+	}
+
+	// A force that keeps bubbles from different states at least `gap` px
+	// apart (on top of the usual collision force), so each state's outline
+	// has room between its bubbles and its neighbours'.
+	function separateStates(gap, strength = 0.7) {
+		let nodes = [];
+		// Like d3.forceCollide: each quadtree cell remembers its biggest
+		// radius, so the search around a bubble skips cells too far to matter.
+		const prepare = (quad) => {
+			if (quad.data) { quad.r = quad.data.r; return; }
+			quad.r = 0;
+			for (let i = 0; i < 4; i++) if (quad[i] && quad[i].r > quad.r) quad.r = quad[i].r;
+		};
+		function force() {
+			const tree = d3.quadtree(nodes, (d) => d.x + d.vx, (d) => d.y + d.vy).visitAfter(prepare);
+			for (const a of nodes) {
+				if (!(a.r > 0)) continue;
+				const ax = a.x + a.vx, ay = a.y + a.vy;
+				tree.visit((q, x0, y0, x1, y1) => {
+					const reach = a.r + q.r + gap;
+					if (!q.length) {
+						do {
+							const b = q.data;
+							if (b.index > a.index && b.stateKey !== a.stateKey && b.r > 0) {
+								let dx = ax - (b.x + b.vx), dy = ay - (b.y + b.vy);
+								const min = a.r + b.r + gap;
+								let d2 = dx * dx + dy * dy;
+								if (d2 < min * min) {
+									if (d2 === 0) { dx = 1e-3 * (a.index % 2 ? 1 : -1); dy = 1e-3; d2 = dx * dx + dy * dy; }
+									const dist = Math.sqrt(d2);
+									const l = ((min - dist) / dist) * strength;
+									const wa = b.r * b.r / (a.r * a.r + b.r * b.r);
+									a.vx += dx * l * wa; a.vy += dy * l * wa;
+									b.vx -= dx * l * (1 - wa); b.vy -= dy * l * (1 - wa);
+								}
+							}
+						} while ((q = q.next));
+						return;
+					}
+					return x0 > ax + reach || x1 < ax - reach || y0 > ay + reach || y1 < ay - reach;
+				});
+			}
+		}
+		force.initialize = (n) => { nodes = n; };
+		return force;
+	}
+
 	// Color key: one swatch + name per term.
 	function colorKeyHTML(shape) {
 		return TERMS.map((t) =>
@@ -155,5 +406,8 @@ window.PVS = (function () {
 		).join("");
 	}
 
-	return { TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, breakdownHTML, makeTooltip, colorKeyHTML, northAmericaProjection };
+	return {
+		TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, breakdownHTML, makeTooltip, colorKeyHTML,
+		northAmericaProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
+	};
 })();

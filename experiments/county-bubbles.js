@@ -1,5 +1,7 @@
 // County bubbles: four circles per county (pop / soda / coke / other), area
 // proportional to the number of responses, spread apart with a force layout.
+// Or one circle per county, colored with the main map's CMY mix. Optionally
+// each state is outlined, its border swelling to hold its own bubbles.
 // Drawn on canvas: there are ~9,000 circles and they move while settling.
 // The circles grow from nothing while the layout runs, starting in the south
 // and rising northward like bubbles in a glass.
@@ -7,7 +9,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip } = PVS;
+	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, mixKeyHTML, swellingOutlines, separateStates } = PVS;
 	// Same colors as the 90% areas on the isogloss map: the CMY fills as they
 	// look after three stacked 30% bands over the land (and a gray for
 	// "other"), outlined in the darker line colors from common.js.
@@ -15,6 +17,7 @@
 	const OUTLINE = COLOR;
 	const WIDTH = 960, HEIGHT = 600;
 	const PADDING = 0.4; // px between touching circles
+	const STATE_GAP = 5; // px between circles from different states, with outlines on
 
 	// Each circle grows from zero to full size over GROW_MS. When it starts
 	// depends on its county's latitude: the southernmost start at once, the
@@ -40,7 +43,8 @@
 	const slider = document.getElementById("size");
 	const sliderValue = document.getElementById("size-value");
 	const tooltip = makeTooltip(document.getElementById("chart"));
-	document.getElementById("color-key").innerHTML = TERMS.map((t) =>
+	const BLEND_OUTLINE = "rgba(0,0,0,0.45)";
+	const termKeyHTML = TERMS.map((t) =>
 		`<span class="key-item"><span class="disc" style="background:${FILL[t]}` +
 		`${OUTLINE[t] ? `;box-shadow:inset 0 0 0 1px ${OUTLINE[t]}` : ""}"></span>${LABEL[t]}</span>`
 	).join("");
@@ -55,6 +59,9 @@
 
 	const sizeInputs = document.querySelectorAll("input[name=size-by]");
 	const sizeBy = () => [...sizeInputs].find((el) => el.checked).value;
+	const circleInputs = document.querySelectorAll("input[name=circles]");
+	const blended = () => [...circleInputs].find((el) => el.checked).value === "blend";
+	const outlinesInput = document.getElementById("outlines");
 
 	Promise.all([loadData("../"), d3.csv("../data/county_population_2010.csv")]).then(([data, popRows]) => {
 		const population = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
@@ -65,8 +72,9 @@
 
 		const featureById = new Map(data.countyFeatures.map((f) => [+f.id, f]));
 
-		// One node per (county, term) with at least one response.
-		const nodes = [];
+		// One node per (county, term) with at least one response, or (blended)
+		// one node per county.
+		const perAnswer = [], perCounty = [];
 		for (const c of data.counties) {
 			const f = featureById.get(c.id);
 			if (!f) continue;
@@ -76,19 +84,29 @@
 			c.population = population.get(c.id) || 0;
 			const delay = reducedMotion ? 0
 				: STAGGER_MS * Math.min(1, Math.max(0, (lat - SOUTH_LAT) / (NORTH_LAT - SOUTH_LAT)));
+			const stateKey = +c.state;
 			for (const t of TERMS) {
 				// `people`: the county's population split in proportion to its answers.
-				if (c.counts[t] > 0) nodes.push({
-					county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay,
+				if (c.counts[t] > 0) perAnswer.push({
+					county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay, stateKey,
 					people: c.population * c.counts[t] / c.total,
+					fill: FILL[t], stroke: OUTLINE[t], offset: START_OFFSET[t],
 				});
 			}
+			if (c.total > 0) perCounty.push({
+				county: c, term: null, n: c.total, homeX: hx, homeY: hy, delay, stateKey,
+				people: c.population,
+				fill: mixCounts(c.counts, c.total), stroke: BLEND_OUTLINE, offset: [0, 0],
+			});
 		}
+		let nodes = perAnswer;
+		let outlines = null;
+		const stateShapes = data.stateFeatures.map((f) => ({ key: +f.id, feature: f }));
 
 		// In population mode, people are scaled by the ratio of responses to
 		// population over the mapped counties, so both modes put about the same
 		// total area on the map and share the size slider.
-		const PEOPLE_PER_RESPONSE = d3.sum(nodes, (d) => d.people) / d3.sum(nodes, (d) => d.n);
+		const PEOPLE_PER_RESPONSE = d3.sum(perAnswer, (d) => d.people) / d3.sum(perAnswer, (d) => d.n);
 		const sizeValue = (d) => (sizeBy() === "population" ? d.people / PEOPLE_PER_RESPONSE : d.n);
 
 		let scale = +slider.value; // px of radius per sqrt(response)
@@ -101,23 +119,43 @@
 			ctx.strokeStyle = "#d6d6d6";
 			ctx.lineWidth = 1;
 			ctx.stroke(landPath);
-			ctx.strokeStyle = "#ddd";
-			ctx.lineWidth = 0.75;
-			ctx.stroke(statePath);
+			if (outlines) {
+				// Under the bubbles: each state's outline runs just outside its own
+				// bubbles, in the gap kept between states, and any stretch of border
+				// that wanders under other bubbles is hidden.
+				outlines.draw(ctx);
+			} else {
+				ctx.strokeStyle = "#ddd";
+				ctx.lineWidth = 0.75;
+				ctx.stroke(statePath);
+			}
 
-			// Batch circles by color: far fewer state changes than per-circle.
-			for (const t of TERMS) {
-				ctx.beginPath();
+			ctx.globalAlpha = hovered ? 0.35 : 1;
+			ctx.lineWidth = 0.75;
+			if (blended()) {
+				// Every county has its own color.
 				for (const d of nodes) {
-					if (d.term !== t || d.r <= 0) continue;
-					ctx.moveTo(d.x + d.r, d.y);
+					if (d.r <= 0) continue;
+					ctx.beginPath();
 					ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
+					ctx.fillStyle = d.fill;
+					ctx.fill();
+					if (d.r > 1.5) {
+						ctx.strokeStyle = d.stroke;
+						ctx.stroke();
+					}
 				}
-				ctx.globalAlpha = hovered ? 0.35 : 1;
-				ctx.fillStyle = FILL[t];
-				ctx.fill();
-				if (OUTLINE[t]) {
-					ctx.lineWidth = 0.75;
+			} else {
+				// Batch circles by color: far fewer state changes than per-circle.
+				for (const t of TERMS) {
+					ctx.beginPath();
+					for (const d of nodes) {
+						if (d.term !== t || d.r <= 0) continue;
+						ctx.moveTo(d.x + d.r, d.y);
+						ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
+					}
+					ctx.fillStyle = FILL[t];
+					ctx.fill();
 					ctx.strokeStyle = OUTLINE[t];
 					ctx.stroke();
 				}
@@ -129,7 +167,7 @@
 					if (d.county !== hovered) continue;
 					ctx.beginPath();
 					ctx.arc(d.x, d.y, d.r, 0, 2 * Math.PI);
-					ctx.fillStyle = FILL[d.term];
+					ctx.fillStyle = d.fill;
 					ctx.fill();
 					ctx.lineWidth = 1.5;
 					ctx.strokeStyle = "#222";
@@ -170,6 +208,7 @@
 				} else {
 					statusEl.textContent = `Settling… ${Math.round((1 - simulation.alpha()) * 100)}%`;
 				}
+				keepOnCanvas();
 				draw();
 			})
 			.on("end", () => {
@@ -180,15 +219,32 @@
 					"Hover over (or tap) a circle for its county.";
 			});
 
+		// Stop bubbles from being pushed off the edge of the map.
+		function keepOnCanvas() {
+			for (const d of nodes) {
+				d.x = Math.max(d.r, Math.min(WIDTH - d.r, d.x));
+				d.y = Math.max(d.r, Math.min(HEIGHT - d.r, d.y));
+			}
+		}
+
 		function start() {
+			nodes = blended() ? perCounty : perAnswer;
+			hovered = null;
+			document.getElementById("color-key").innerHTML = blended() ? mixKeyHTML() : termKeyHTML;
+			// A blended circle holds a whole county, so at the same slider
+			// setting it has the area of that county's four separate circles.
 			for (const d of nodes) {
 				d.fullR = scale * Math.sqrt(sizeValue(d));
-				const [ox, oy] = START_OFFSET[d.term];
+				const [ox, oy] = d.offset;
 				d.x = d.homeX + ox;
 				d.y = d.homeY + oy;
 				d.vx = d.vy = 0;
 			}
 			simulation.nodes(nodes);
+			outlines = outlinesInput.checked
+				? swellingOutlines(stateShapes, projection, nodes, { width: WIDTH, height: HEIGHT, dpr: window.devicePixelRatio || 1 })
+				: null;
+			simulation.force("states", outlines ? separateStates(STATE_GAP) : null);
 			startTime = performance.now();
 			growing = !reducedMotion;
 			growCircles(reducedMotion ? Infinity : 0);
@@ -271,6 +327,8 @@
 		});
 		slider.addEventListener("change", start);
 		sizeInputs.forEach((el) => el.addEventListener("change", start));
+		circleInputs.forEach((el) => el.addEventListener("change", start));
+		outlinesInput.addEventListener("change", start);
 		document.getElementById("replay").addEventListener("click", start);
 
 		start();

@@ -9,7 +9,7 @@ The Pop vs Soda Page is a linguistic survey created by [Alan McConchie](https://
 - `vendor/`: vendored copies of [D3](https://d3js.org) v7.9.0 and [topojson-client](https://github.com/topojson/topojson-client) v3.1.0.
 - `d3/us.json`: US county, state and land boundaries (TopoJSON).
 - `d3/pvscounty_fips.tsv`: survey responses aggregated by county (joined on the `id` column, the county FIPS code).
-- `experiments/`: work-in-progress alternative views of the survey data (isoglosses, ZIP Voronoi, hex bubbles, county bubbles, state donuts). See `experiments/index.html`.
+- `experiments/`: work-in-progress alternative views of the survey data (isoglosses, ZIP Voronoi, ZIP circles, hex bubbles, county bubbles, state and province donuts). See `experiments/index.html`.
 - `statistics/`, `countystats/`: static statistics pages (by state and province, and by county), at the same addresses as the old site's. Built by `scripts/build_statistics.py`.
 - `archive/`: earlier versions of the page.
 
@@ -60,3 +60,19 @@ The bubble experiments as they grow in from the south and settle (15 seconds eac
 **Hex bubbles, with the hexagons outlined** ([MP4](experiments/animations/hex-bubbles-outlined.mp4))
 
 ![Hex bubbles with hexagon outlines](experiments/animations/hex-bubbles-outlined.gif)
+
+### Swelling state outlines
+
+The same bubbles with each state (and province) outlined. Each outline starts as the state's border and swells and shifts with its own bubbles, so you can still see which state each bubble came from.
+
+**County bubbles with state outlines** ([MP4](experiments/animations/county-bubbles-outlines.mp4))
+
+![County bubbles with swelling state outlines](experiments/animations/county-bubbles-outlines.gif)
+
+**County bubbles, one per county in the CMY mix, with state outlines** ([MP4](experiments/animations/county-bubbles-blended-outlines.mp4))
+
+![Blended county bubbles with swelling state outlines](experiments/animations/county-bubbles-blended-outlines.gif)
+
+**Hex bubbles with state and province outlines** ([MP4](experiments/animations/hex-bubbles-state-outlines.mp4))
+
+![Hex bubbles with swelling state and province outlines](experiments/animations/hex-bubbles-state-outlines.gif)

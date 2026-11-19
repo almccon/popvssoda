@@ -17,6 +17,7 @@
 		<a href="index.html">All experiments</a>
 		<a href="isoglosses.html">Isoglosses</a>
 		<a href="zip-voronoi.html">ZIP Voronoi</a>
+		<a href="zip-circles.html">ZIP circles</a>
 		<a href="county-bubbles.html">County bubbles</a>
 		<a href="state-donuts.html">State donuts</a>
 	</nav>
@@ -27,7 +28,9 @@
 			size. Each hexagon then gets up to four circles: pop, soda, coke and other,
 			each with area proportional to the number of people there who gave that
 			answer. The circles start at the hexagon's center and push each other apart,
-			bubbling up from the south as they grow. Built from
+			bubbling up from the south as they grow. With outlines on, hexagons are
+			split at state and province lines, and each state starts as its border,
+			which swells and shifts with its bubbles. Built from
 			<code>data/postal_counts.csv</code>.
 		</p>
 		<div class="chart" id="chart">
@@ -44,6 +47,7 @@
 			<input type="range" id="hex" min="4" max="24" step="1" value="7">
 			<span id="hex-value"></span>
 			<label><input type="checkbox" id="show-hexes"> show hexagons</label>
+			<label><input type="checkbox" id="outlines"> state and province outlines</label>
 		</div>
 		<div class="slider-row">
 			<label for="size">Circle size</label>

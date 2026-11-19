@@ -17,11 +17,12 @@
 		<a href="index.html">All experiments</a>
 		<a href="isoglosses.html">Isoglosses</a>
 		<a href="zip-voronoi.html">ZIP Voronoi</a>
+		<a href="zip-circles.html">ZIP circles</a>
 		<a href="hex-bubbles.html">Hex bubbles</a>
 		<a href="state-donuts.html">State donuts</a>
 	</nav>
 	<section class="panel">
-		<h1>Pop vs Soda county bubbles, one per answer</h1>
+		<h1>Pop vs Soda county bubbles</h1>
 		<p class="intro">
 			Each county gets up to four circles: pop, soda, coke and other, each with
 			area proportional to the number of people who gave that answer. The circles
@@ -30,7 +31,11 @@
 			They bubble up from the south, each growing to full size over 5 seconds
 			while the layout makes room. Size the circles by the number of responses,
 			or by the county's population (2010 census) split between the four
-			circles in proportion to how people there answered.
+			circles in proportion to how people there answered. Or draw one circle per
+			county, colored like the main map: yellow for pop, cyan for soda, magenta
+			for coke, mixed in proportion and darker for "other". With state outlines
+			on, each state starts as its border, which swells and shifts with the
+			bubbles so you can still tell which state each came from.
 		</p>
 		<div class="chart" id="chart">
 			<canvas id="canvas" role="img"
@@ -40,6 +45,12 @@
 		<div class="key">
 			<span id="color-key"></span>
 			<span class="key-item" id="size-key"></span>
+		</div>
+		<div class="slider-row">
+			<span>Circles</span>
+			<label><input type="radio" name="circles" value="answers" checked> one per answer</label>
+			<label><input type="radio" name="circles" value="blend"> one per county, colors mixed</label>
+			<label><input type="checkbox" id="outlines"> state outlines</label>
 		</div>
 		<div class="slider-row">
 			<span>Size circles by</span>
