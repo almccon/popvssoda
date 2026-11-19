@@ -42,6 +42,47 @@ Census name (`county_name`) and the columns `total`, `pop`, `soda`, `coke` and
 `other`. Only responses whose ZIP code is in the 2020 census and matches their
 state are counted. The county assignment is the same as in `postal_counts.csv`.
 
+## `census_division_counts.csv`
+
+This file has response totals for Canada's 293 census divisions, the Canadian
+equivalent of US counties: counties, regional county municipalities (Quebec),
+regional districts (BC), and numbered statistical divisions on the Prairies and
+in Newfoundland. The columns are `cduid` (Statistics Canada's 4-digit code),
+`province`, `cd_name`, `cd_type`, then `total`, `pop`, `soda`, `coke` and
+`other`. Every division is listed, including the 75 with no responses.
+`scripts/build_canada_divisions.py` builds it from `postal_counts.csv`.
+
+The survey only has the first 3 characters of Canadian postal codes (the FSA),
+and FSAs don't nest inside census divisions. Each FSA goes to the division that
+holds the largest share of its land area, using Statistics Canada's 2021
+boundaries, the same rule used for US ZIP codes and counties. An FSA missing
+from the 2021 boundaries falls back to the division containing its point. 43
+FSAs (56 responses) can't be placed either way, mostly retired codes such as
+New Brunswick's E0A–E0J.
+
+The divisions are much thinner than US counties: the median has 10 responses,
+and half have fewer. Quebec is thinnest, with about 650 responses over 98
+divisions.
+
+The map shapes are in `d3/canada.json`, a TopoJSON file with two objects:
+`census_divisions` (id `cduid`, plus `province` and `name`) and `provinces`
+(merged from the divisions). The build script writes a slimmed GeoJSON that
+[mapshaper](https://github.com/mbloch/mapshaper) turns into it:
+
+```
+npx -y mapshaper@0.6.102 -i datadir/reference/statcan/cd_for_topojson.geojson name=census_divisions \
+  -simplify 4% weighted keep-shapes -filter-islands min-area=20km2 -clean \
+  -dissolve province copy-fields=province + name=provinces \
+  -o target=census_divisions,provinces format=topojson quantization=1e5 d3/canada.json
+```
+
+## `fsa_census_division.csv`
+
+This file has the FSA-to-census-division assignment behind
+`census_division_counts.csv`: `postal_code`, `province`, `cduid`, `share` (the
+fraction of the FSA's land in that division), `n_divisions` (how many divisions
+the FSA touches) and `source` (`fsa_boundary_2021` or `fsa_point`).
+
 ## `state_counts.csv`
 
 This file has response totals by state, province or territory (`country`,
@@ -102,6 +143,10 @@ Genuine long comments in the "other" box are kept as "other" votes.
   intercensal estimates (public domain).
 - Canadian FSA coordinates from [GeoNames](https://www.geonames.org/), licensed
   under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- Statistics Canada, 2021 Census cartographic boundary files for census
+  divisions and FSAs, under the
+  [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada).
+  `scripts/fetch_canada_boundaries.py` downloads them.
 
 ## Notes
 

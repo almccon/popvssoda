@@ -1,0 +1,294 @@
+cduid,province,cd_name,cd_type,total,pop,soda,coke,other
+1001,NL,Division No. 1,Census division,93,45,11,10,27
+1002,NL,Division No. 2,Census division,4,4,0,0,0
+1003,NL,Division No. 3,Census division,11,5,3,1,2
+1004,NL,Division No. 4,Census division,5,5,0,0,0
+1005,NL,Division No. 5,Census division,20,15,1,1,3
+1006,NL,Division No. 6,Census division,34,18,0,5,11
+1007,NL,Division No. 7,Census division,4,4,0,0,0
+1008,NL,Division No. 8,Census division,2,2,0,0,0
+1009,NL,Division No. 9,Census division,0,0,0,0,0
+1010,NL,Division No. 10,Census division,20,15,1,1,3
+1011,NL,Division No. 11,Census division,0,0,0,0,0
+1101,PE,Kings,County,27,19,3,0,5
+1102,PE,Queens,County,58,55,2,1,0
+1103,PE,Prince,County,32,30,2,0,0
+1201,NS,Shelburne,County,0,0,0,0,0
+1202,NS,Yarmouth,County,11,9,2,0,0
+1203,NS,Digby,County,27,27,0,0,0
+1204,NS,Queens,County,11,11,0,0,0
+1205,NS,Annapolis,County,15,14,0,0,1
+1206,NS,Lunenburg,County,22,21,1,0,0
+1207,NS,Kings,County,66,54,7,1,4
+1208,NS,Hants,County,21,21,0,0,0
+1209,NS,Halifax,County,433,401,21,7,4
+1210,NS,Colchester,County,34,32,2,0,0
+1211,NS,Cumberland,County,20,20,0,0,0
+1212,NS,Pictou,County,39,37,1,0,1
+1213,NS,Guysborough,County,8,7,1,0,0
+1214,NS,Antigonish,County,17,16,1,0,0
+1215,NS,Inverness,County,19,19,0,0,0
+1216,NS,Richmond,County,1,1,0,0,0
+1217,NS,Cape Breton,County,83,80,3,0,0
+1218,NS,Victoria,County,1,1,0,0,0
+1301,NB,Saint John,County,93,92,1,0,0
+1302,NB,Charlotte,County,10,10,0,0,0
+1303,NB,Sunbury,County,31,28,3,0,0
+1304,NB,Queens,County,2,1,0,1,0
+1305,NB,Kings,County,57,56,1,0,0
+1306,NB,Albert,County,24,21,2,0,1
+1307,NB,Westmorland,County,107,99,5,2,1
+1308,NB,Kent,County,8,8,0,0,0
+1309,NB,Northumberland,County,21,21,0,0,0
+1310,NB,York,County,99,92,4,3,0
+1311,NB,Carleton,County,14,13,0,1,0
+1312,NB,Victoria,County,2,2,0,0,0
+1313,NB,Madawaska,County,6,2,0,4,0
+1314,NB,Restigouche,County,12,12,0,0,0
+1315,NB,Gloucester,County,12,10,0,2,0
+2401,QC,Communauté maritime des Îles-de-la-Madeleine,Territory equivalent,0,0,0,0,0
+2402,QC,Le Rocher-Percé,Regional county municipality,0,0,0,0,0
+2403,QC,La Côte-de-Gaspé,Regional county municipality,2,0,0,0,2
+2404,QC,La Haute-Gaspésie,Regional county municipality,0,0,0,0,0
+2405,QC,Bonaventure,Regional county municipality,1,1,0,0,0
+2406,QC,Avignon,Regional county municipality,0,0,0,0,0
+2407,QC,La Matapédia,Regional county municipality,0,0,0,0,0
+2408,QC,La Matanie,Regional county municipality,0,0,0,0,0
+2409,QC,La Mitis,Regional county municipality,0,0,0,0,0
+2410,QC,Rimouski-Neigette,Regional county municipality,3,1,0,2,0
+2411,QC,Les Basques,Regional county municipality,0,0,0,0,0
+2412,QC,Rivière-du-Loup,Regional county municipality,0,0,0,0,0
+2413,QC,Témiscouata,Regional county municipality,0,0,0,0,0
+2414,QC,Kamouraska,Regional county municipality,0,0,0,0,0
+2415,QC,Charlevoix-Est,Regional county municipality,0,0,0,0,0
+2416,QC,Charlevoix,Regional county municipality,0,0,0,0,0
+2417,QC,L'Islet,Regional county municipality,0,0,0,0,0
+2418,QC,Montmagny,Regional county municipality,0,0,0,0,0
+2419,QC,Bellechasse,Regional county municipality,0,0,0,0,0
+2420,QC,L'Île-d'Orléans,Regional county municipality,0,0,0,0,0
+2421,QC,La Côte-de-Beaupré,Regional county municipality,2,2,0,0,0
+2422,QC,La Jacques-Cartier,Regional county municipality,0,0,0,0,0
+2423,QC,Québec,Territory equivalent,21,6,5,6,4
+2425,QC,Lévis,Territory equivalent,3,1,0,1,1
+2426,QC,La Nouvelle-Beauce,Regional county municipality,0,0,0,0,0
+2427,QC,Robert-Cliche,Regional county municipality,0,0,0,0,0
+2428,QC,Les Etchemins,Regional county municipality,0,0,0,0,0
+2429,QC,Beauce-Sartigan,Regional county municipality,1,0,1,0,0
+2430,QC,Le Granit,Regional county municipality,0,0,0,0,0
+2431,QC,Les Appalaches,Regional county municipality,0,0,0,0,0
+2432,QC,L'Érable,Regional county municipality,0,0,0,0,0
+2433,QC,Lotbinière,Regional county municipality,0,0,0,0,0
+2434,QC,Portneuf,Regional county municipality,0,0,0,0,0
+2435,QC,Mékinac,Regional county municipality,0,0,0,0,0
+2436,QC,Shawinigan,Territory equivalent,1,0,1,0,0
+2437,QC,Francheville,Census division,2,0,2,0,0
+2438,QC,Bécancour,Regional county municipality,0,0,0,0,0
+2439,QC,Arthabaska,Regional county municipality,2,0,0,1,1
+2440,QC,Les Sources,Regional county municipality,0,0,0,0,0
+2441,QC,Le Haut-Saint-François,Regional county municipality,5,0,0,0,5
+2442,QC,Le Val-Saint-François,Regional county municipality,0,0,0,0,0
+2443,QC,Sherbrooke,Territory equivalent,9,2,2,1,4
+2444,QC,Coaticook,Regional county municipality,1,0,0,0,1
+2445,QC,Memphrémagog,Regional county municipality,0,0,0,0,0
+2446,QC,Brome-Missisquoi,Regional county municipality,6,1,0,1,4
+2447,QC,La Haute-Yamaska,Regional county municipality,0,0,0,0,0
+2448,QC,Acton,Regional county municipality,0,0,0,0,0
+2449,QC,Drummond,Regional county municipality,1,0,1,0,0
+2450,QC,Nicolet-Yamaska,Regional county municipality,0,0,0,0,0
+2451,QC,Maskinongé,Regional county municipality,0,0,0,0,0
+2452,QC,D'Autray,Regional county municipality,0,0,0,0,0
+2453,QC,Pierre-De Saurel,Regional county municipality,0,0,0,0,0
+2454,QC,Les Maskoutains,Regional county municipality,3,0,1,1,1
+2455,QC,Rouville,Regional county municipality,0,0,0,0,0
+2456,QC,Le Haut-Richelieu,Regional county municipality,3,0,1,2,0
+2457,QC,La Vallée-du-Richelieu,Regional county municipality,5,1,0,1,3
+2458,QC,Longueuil,Territory equivalent,52,5,13,15,19
+2459,QC,Marguerite-D'Youville,Regional county municipality,0,0,0,0,0
+2460,QC,L'Assomption,Regional county municipality,4,1,1,0,2
+2461,QC,Joliette,Regional county municipality,1,0,1,0,0
+2462,QC,Matawinie,Regional county municipality,1,0,0,1,0
+2463,QC,Montcalm,Regional county municipality,0,0,0,0,0
+2464,QC,Les Moulins,Regional county municipality,3,1,1,0,1
+2465,QC,Laval,Territory equivalent,23,2,5,9,7
+2466,QC,Montréal,Territory equivalent,407,68,88,81,170
+2467,QC,Roussillon,Regional county municipality,10,1,4,4,1
+2468,QC,Les Jardins-de-Napierville,Regional county municipality,3,1,1,0,1
+2469,QC,Le Haut-Saint-Laurent,Regional county municipality,3,0,1,1,1
+2470,QC,Beauharnois-Salaberry,Regional county municipality,1,0,0,0,1
+2471,QC,Vaudreuil-Soulanges,Regional county municipality,17,3,7,2,5
+2472,QC,Deux-Montagnes,Regional county municipality,2,0,1,0,1
+2473,QC,Thérèse-De Blainville,Regional county municipality,3,2,0,0,1
+2474,QC,Mirabel,Territory equivalent,2,0,1,1,0
+2475,QC,La Rivière-du-Nord,Regional county municipality,1,0,0,1,0
+2476,QC,Argenteuil,Regional county municipality,3,0,0,1,2
+2477,QC,Les Pays-d'en-Haut,Regional county municipality,3,0,1,2,0
+2478,QC,Les Laurentides,Regional county municipality,1,0,0,0,1
+2479,QC,Antoine-Labelle,Regional county municipality,0,0,0,0,0
+2480,QC,Papineau,Regional county municipality,1,0,0,0,1
+2481,QC,Gatineau,Territory equivalent,20,10,2,3,5
+2482,QC,Les Collines-de-l'Outaouais,Regional county municipality,1,1,0,0,0
+2483,QC,La Vallée-de-la-Gatineau,Regional county municipality,0,0,0,0,0
+2484,QC,Pontiac,Regional county municipality,6,5,0,0,1
+2485,QC,Témiscamingue,Regional county municipality,0,0,0,0,0
+2486,QC,Rouyn-Noranda,Territory equivalent,0,0,0,0,0
+2487,QC,Abitibi-Ouest,Regional county municipality,0,0,0,0,0
+2488,QC,Abitibi,Regional county municipality,0,0,0,0,0
+2489,QC,La Vallée-de-l'Or,Regional county municipality,0,0,0,0,0
+2490,QC,La Tuque,Territory equivalent,0,0,0,0,0
+2491,QC,Le Domaine-du-Roy,Regional county municipality,0,0,0,0,0
+2492,QC,Maria-Chapdelaine,Regional county municipality,1,0,0,1,0
+2493,QC,Lac-Saint-Jean-Est,Regional county municipality,1,0,0,0,1
+2494,QC,Le Saguenay-et-son-Fjord,Census division,8,2,2,3,1
+2495,QC,La Haute-Côte-Nord,Regional county municipality,0,0,0,0,0
+2496,QC,Manicouagan,Regional county municipality,0,0,0,0,0
+2497,QC,Sept-Rivières--Caniapiscau,Census division,4,3,0,0,1
+2498,QC,Minganie--Le Golfe-du-Saint-Laurent,Census division,0,0,0,0,0
+2499,QC,Nord-du-Québec,Census division,2,1,1,0,0
+3501,ON,"Stormont, Dundas and Glengarry",United counties,35,25,1,2,7
+3502,ON,Prescott and Russell,United counties,17,12,1,2,2
+3506,ON,Ottawa,Census division,577,452,26,36,63
+3507,ON,Leeds and Grenville,United counties,41,35,2,2,2
+3509,ON,Lanark,County,16,11,0,1,4
+3510,ON,Frontenac,County,108,92,7,3,6
+3511,ON,Lennox and Addington,County,5,5,0,0,0
+3512,ON,Hastings,County,79,77,1,0,1
+3513,ON,Prince Edward,Census division,0,0,0,0,0
+3514,ON,Northumberland,County,32,32,0,0,0
+3515,ON,Peterborough,County,93,89,1,1,2
+3516,ON,Kawartha Lakes,Census division,13,10,3,0,0
+3518,ON,Durham,Regional municipality,257,245,7,3,2
+3519,ON,York,Regional municipality,349,316,9,16,8
+3520,ON,Toronto,Census division,1555,1428,51,43,33
+3521,ON,Peel,Regional municipality,400,367,11,17,5
+3522,ON,Dufferin,County,19,16,1,1,1
+3523,ON,Wellington,County,146,137,7,2,0
+3524,ON,Halton,Regional municipality,295,269,8,10,8
+3525,ON,Hamilton,Census division,278,267,6,3,2
+3526,ON,Niagara,Regional municipality,261,256,2,2,1
+3528,ON,Haldimand-Norfolk,Census division,55,53,1,1,0
+3529,ON,Brant,Census division,63,62,1,0,0
+3530,ON,Waterloo,Regional municipality,321,294,10,10,7
+3531,ON,Perth,County,40,37,1,1,1
+3532,ON,Oxford,County,44,43,0,1,0
+3534,ON,Elgin,County,51,49,1,1,0
+3536,ON,Chatham-Kent,Census division,66,65,1,0,0
+3537,ON,Essex,County,214,208,5,1,0
+3538,ON,Lambton,County,91,84,2,4,1
+3539,ON,Middlesex,County,315,294,6,9,6
+3540,ON,Huron,County,6,6,0,0,0
+3541,ON,Bruce,County,71,70,0,1,0
+3542,ON,Grey,County,46,46,0,0,0
+3543,ON,Simcoe,County,189,182,1,4,2
+3544,ON,Muskoka,District municipality,16,15,1,0,0
+3546,ON,Haliburton,County,9,8,1,0,0
+3547,ON,Renfrew,County,46,41,1,2,2
+3548,ON,Nipissing,District,55,53,2,0,0
+3549,ON,Parry Sound,District,12,12,0,0,0
+3551,ON,Manitoulin,District,11,9,1,0,1
+3552,ON,Sudbury,District,63,58,1,2,2
+3553,ON,Greater Sudbury / Grand Sudbury,Census division,51,50,0,0,1
+3554,ON,Timiskaming,District,25,25,0,0,0
+3556,ON,Cochrane,District,44,40,1,1,2
+3557,ON,Algoma,District,73,68,1,4,0
+3558,ON,Thunder Bay,District,125,119,2,2,2
+3559,ON,Rainy River,District,12,11,0,1,0
+3560,ON,Kenora,District,31,30,1,0,0
+4601,MB,Division No. 1,Census division,24,20,0,1,3
+4602,MB,Division No. 2,Census division,6,5,0,1,0
+4603,MB,Division No. 3,Census division,22,16,0,2,4
+4604,MB,Division No. 4,Census division,0,0,0,0,0
+4605,MB,Division No. 5,Census division,4,3,1,0,0
+4606,MB,Division No. 6,Census division,0,0,0,0,0
+4607,MB,Division No. 7,Census division,38,24,2,5,7
+4608,MB,Division No. 8,Census division,0,0,0,0,0
+4609,MB,Division No. 9,Census division,9,6,0,1,2
+4610,MB,Division No. 10,Census division,1,1,0,0,0
+4611,MB,Division No. 11,Census division,342,219,16,28,79
+4612,MB,Division No. 12,Census division,0,0,0,0,0
+4613,MB,Division No. 13,Census division,13,6,2,1,4
+4614,MB,Division No. 14,Census division,9,5,0,3,1
+4615,MB,Division No. 15,Census division,9,6,0,0,3
+4616,MB,Division No. 16,Census division,0,0,0,0,0
+4617,MB,Division No. 17,Census division,7,7,0,0,0
+4618,MB,Division No. 18,Census division,0,0,0,0,0
+4619,MB,Division No. 19,Census division,23,19,0,1,3
+4620,MB,Division No. 20,Census division,0,0,0,0,0
+4621,MB,Division No. 21,Census division,5,3,0,1,1
+4622,MB,Division No. 22,Census division,8,7,1,0,0
+4623,MB,Division No. 23,Census division,10,8,0,1,1
+4701,SK,Division No. 1,Census division,11,9,1,1,0
+4702,SK,Division No. 2,Census division,13,12,1,0,0
+4703,SK,Division No. 3,Census division,11,8,1,2,0
+4704,SK,Division No. 4,Census division,14,14,0,0,0
+4705,SK,Division No. 5,Census division,0,0,0,0,0
+4706,SK,Division No. 6,Census division,180,156,7,9,8
+4707,SK,Division No. 7,Census division,18,18,0,0,0
+4708,SK,Division No. 8,Census division,8,8,0,0,0
+4709,SK,Division No. 9,Census division,25,21,0,1,3
+4710,SK,Division No. 10,Census division,0,0,0,0,0
+4711,SK,Division No. 11,Census division,182,165,8,6,3
+4712,SK,Division No. 12,Census division,0,0,0,0,0
+4713,SK,Division No. 13,Census division,15,15,0,0,0
+4714,SK,Division No. 14,Census division,19,18,0,0,1
+4715,SK,Division No. 15,Census division,56,54,0,1,1
+4716,SK,Division No. 16,Census division,7,7,0,0,0
+4717,SK,Division No. 17,Census division,8,7,0,1,0
+4718,SK,Division No. 18,Census division,18,15,0,0,3
+4801,AB,Division No. 1,Census division,33,32,1,0,0
+4802,AB,Division No. 2,Census division,96,89,3,1,3
+4803,AB,Division No. 3,Census division,0,0,0,0,0
+4804,AB,Division No. 4,Census division,14,14,0,0,0
+4805,AB,Division No. 5,Census division,7,5,1,0,1
+4806,AB,Division No. 6,Census division,861,802,24,25,10
+4807,AB,Division No. 7,Census division,19,19,0,0,0
+4808,AB,Division No. 8,Census division,51,44,3,4,0
+4809,AB,Division No. 9,Census division,28,28,0,0,0
+4810,AB,Division No. 10,Census division,50,48,0,1,1
+4811,AB,Division No. 11,Census division,833,783,22,17,11
+4812,AB,Division No. 12,Census division,22,21,0,1,0
+4813,AB,Division No. 13,Census division,11,11,0,0,0
+4814,AB,Division No. 14,Census division,23,23,0,0,0
+4815,AB,Division No. 15,Census division,27,25,2,0,0
+4816,AB,Division No. 16,Census division,25,24,1,0,0
+4817,AB,Division No. 17,Census division,38,37,1,0,0
+4818,AB,Division No. 18,Census division,0,0,0,0,0
+4819,AB,Division No. 19,Census division,28,26,0,1,1
+5901,BC,East Kootenay,Regional district,31,30,1,0,0
+5903,BC,Central Kootenay,Regional district,36,33,0,0,3
+5905,BC,Kootenay Boundary,Regional district,34,29,2,1,2
+5907,BC,Okanagan-Similkameen,Regional district,23,23,0,0,0
+5909,BC,Fraser Valley,Regional district,119,106,8,2,3
+5915,BC,Greater Vancouver,Regional district,1438,1320,63,28,27
+5917,BC,Capital,Regional district,322,298,17,2,5
+5919,BC,Cowichan Valley,Regional district,24,24,0,0,0
+5921,BC,Nanaimo,Regional district,63,58,4,0,1
+5923,BC,Alberni-Clayoquot,Regional district,42,41,1,0,0
+5924,BC,Strathcona,Regional district,15,13,1,0,1
+5926,BC,Comox Valley,Regional district,34,31,1,0,2
+5927,BC,Powell River,Regional district,14,13,0,1,0
+5929,BC,Sunshine Coast,Regional district,0,0,0,0,0
+5931,BC,Squamish-Lillooet,Regional district,1,1,0,0,0
+5933,BC,Thompson-Nicola,Regional district,107,101,4,1,1
+5935,BC,Central Okanagan,Regional district,90,86,2,1,1
+5937,BC,North Okanagan,Regional district,35,29,5,1,0
+5939,BC,Columbia-Shuswap,Regional district,20,20,0,0,0
+5941,BC,Cariboo,Regional district,27,24,0,3,0
+5943,BC,Mount Waddington,Regional district,26,24,1,1,0
+5945,BC,Central Coast,Regional district,6,6,0,0,0
+5947,BC,Skeena-Queen Charlotte,Regional district,11,11,0,0,0
+5949,BC,Kitimat-Stikine,Regional district,22,22,0,0,0
+5951,BC,Bulkley-Nechako,Regional district,22,21,1,0,0
+5953,BC,Fraser-Fort George,Regional district,62,57,5,0,0
+5955,BC,Peace River,Regional district,12,11,1,0,0
+5957,BC,Stikine,Region,11,11,0,0,0
+5959,BC,Northern Rockies,Regional district,0,0,0,0,0
+6001,YT,Yukon,Territory,27,27,0,0,0
+6101,NT,Region 1,Region,10,9,0,0,1
+6102,NT,Region 2,Region,0,0,0,0,0
+6103,NT,Region 3,Region,0,0,0,0,0
+6104,NT,Region 4,Region,0,0,0,0,0
+6105,NT,Region 5,Region,0,0,0,0,0
+6106,NT,Region 6,Region,9,9,0,0,0
+6204,NU,Qikiqtaaluk,Region,2,1,1,0,0
+6205,NU,Kivalliq,Region,2,2,0,0,0
+6208,NU,Kitikmeot,Region,0,0,0,0,0
