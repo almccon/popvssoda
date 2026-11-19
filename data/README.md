@@ -67,7 +67,7 @@ its county codes match the older map in `d3/us.json`. Three Alaska areas that
 were split up in 2007–08 get the sum of the areas that replaced them. It's
 built by `scripts/fetch_county_population.py`.
 
-`state_counts.csv` and `other_answers.csv` are used to build the statistics pages in `statistics/`
+`state_counts.csv`, `county_counts.csv` and `other_answers.csv` are used to build the statistics pages in `statistics/` and the county pages in `countystats/`
 (`python3 scripts/build_statistics.py`).
 
 ## What was removed

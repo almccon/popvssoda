@@ -10,6 +10,9 @@ USA.html, CAN.html, TOTAL.html (every "other" answer) and XX.html (responses
 with no location). The file names match the pre-2026 pages so old links keep
 working; index.html is a copy of ALL.html.
 
+Also writes countystats/XX-stats.html for each US state and DC, matching the
+old county pages' addresses, and countystats/index.html listing them.
+
 Run from the repo root:  python3 scripts/build_statistics.py
 """
 import collections
@@ -20,6 +23,7 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 OUT = os.path.join(ROOT, "statistics")
+COUNTY_OUT = os.path.join(ROOT, "countystats")
 
 TERMS = ["pop", "soda", "coke", "other"]
 LABEL = {"pop": "Pop", "soda": "Soda", "coke": "Coke", "other": "Other"}
@@ -121,15 +125,18 @@ def key():
         f'<span><span class="dot {t}"></span>{LABEL[t]}</span>' for t in TERMS) + "</p>"
 
 
-def page(filename, title, body, canonical=None):
+def page(filename, title, body, canonical=None, out_dir=OUT):
+    # Pages outside statistics/ (the county pages) link back into it.
+    sp = "" if out_dir == OUT else "../statistics/"
     head_extra = f'\n\t<link rel="canonical" href="{canonical}">' if canonical else ""
     nav = [
         ("../index.html", "← Main map"),
-        ("ALL.html", "All states and provinces"),
-        ("USA.html", "United States"),
-        ("CAN.html", "Canada"),
-        ("TOTAL.html", "“Other” answers"),
-        ("XX.html", "No location"),
+        (sp + "ALL.html", "All states and provinces"),
+        (sp + "USA.html", "United States"),
+        (sp + "CAN.html", "Canada"),
+        ("../countystats/" if out_dir == OUT else "index.html", "Counties"),
+        (sp + "TOTAL.html", "“Other” answers"),
+        (sp + "XX.html", "No location"),
     ]
     current = ' aria-current="page"'
     nav_html = "\n".join(
@@ -142,8 +149,8 @@ def page(filename, title, body, canonical=None):
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{esc(title)} – Pop vs Soda statistics</title>{head_extra}
 	<link href="../css/style.css" rel="stylesheet">
-	<link href="statistics.css" rel="stylesheet">
-	<script src="statistics.js" defer></script>
+	<link href="{sp}statistics.css" rel="stylesheet">
+	<script src="{sp}statistics.js" defer></script>
 </head>
 <body>
 	<header>
@@ -164,7 +171,7 @@ def page(filename, title, body, canonical=None):
 </body>
 </html>
 """
-    with open(os.path.join(OUT, filename), "w") as f:
+    with open(os.path.join(out_dir, filename), "w") as f:
         f.write(doc)
 
 
@@ -178,11 +185,13 @@ def table_head(first):
             f'<th class="bar-col">Mix</th></tr></thead>')
 
 
-def table_row(name, counts, href=None, cls=""):
+def table_row(name, counts, href=None, cls="", with_counts=False):
+    """with_counts: show each term's count under its share (the county pages)."""
     link = f'<a href="{href}">{esc(name)}</a>' if href else esc(name)
     cells = "".join(
         f'<td class="num" data-value="{counts.share(t):.6f}" title="{fmt(counts.c[t])} responses">'
-        f'{pct(counts.c[t], counts.total)}</td>' for t in TERMS)
+        f'{pct(counts.c[t], counts.total)}'
+        f'{f"<small>{fmt(counts.c[t])}</small>" if with_counts else ""}</td>' for t in TERMS)
     cls_attr = f' class="{cls}"' if cls else ""
     return (f'<tr{cls_attr}><th scope="row" data-value="{esc(name)}">{link}</th>'
             f'<td class="num" data-value="{counts.total}">{fmt(counts.total)}</td>{cells}'
@@ -378,10 +387,55 @@ def main():
 			<p>Responses are placed in a county by ZIP code. Where a ZIP code spans several counties,
 			it goes to the one with the most of its land. {fmt(in_counties)} of the {fmt(c.total)}
 			responses gave a ZIP code that could be placed. Counties with only a few responses can
-			swing a long way by chance.</p>
+			swing a long way by chance.
+			<a href="../countystats/{code}-stats.html">See the counts for each county</a>.</p>
 			{"".join(table)}
 		</section>""")
         page(PAGE[code], name, "\n".join(b for b in body if b))
+
+    # County pages: countystats/XX-stats.html, the old addresses.
+    os.makedirs(COUNTY_OUT, exist_ok=True)
+    county_index = []
+    for code, name in sorted(US_STATES.items(), key=lambda kv: kv[1]):
+        if not counties.get(code):
+            continue
+        c = state[code]
+        cs = sorted(counties[code], key=lambda kv: kv[0])
+        placed = Counts()
+        for _, cc in cs:
+            placed += cc
+        table = [f'<div class="table-wrap"><table class="places sortable">{table_head("County")}<tbody>']
+        table += [table_row(n, cc, with_counts=True) for n, cc in cs]
+        table.append(f'</tbody><tfoot>{table_row("All counties", placed, with_counts=True)}</tfoot>'
+                     '</table></div>')
+        unplaced = c.total - placed.total
+        page(f"{code}-stats.html", f"{name} by county", "\n".join([
+            summary_panel(f"{name} by county", c, f" from {esc(name)}"),
+            f"""		<section class="panel">
+			<h2>BY COUNTY</h2>
+			<p>Each answer’s share of the responses from that county, with the number of
+			responses under it. Click a column heading to sort. Counties with only a few
+			responses can swing a long way by chance.</p>
+			{"".join(table)}
+			<p class="note">Responses are placed in a county by ZIP code. Where a ZIP code spans
+			several counties, it goes to the one with the most of its land.
+			{f"{fmt(unplaced)} of the {fmt(c.total)} responses from {esc(name)} didn’t give a ZIP code that could be placed, so they aren’t in this table. " if unplaced else ""}
+			<a href="../statistics/{PAGE[code]}">More about {esc(name)}</a>, including the
+			words typed in for “other”.</p>
+		</section>""",
+        ]), out_dir=COUNTY_OUT)
+        county_index.append(table_row(name, placed, href=f"{code}-stats.html"))
+    page("index.html", "Counties", "\n".join([
+        summary_panel("Pop vs Soda by county", usa, " from the United States"),
+        f"""		<section class="panel">
+			<h2>COUNTY PAGES</h2>
+			<p>Pick a state for a county-by-county breakdown. The numbers here count only
+			responses with a ZIP code that could be placed in a county.</p>
+			<div class="table-wrap"><table class="places sortable">{table_head("State")}<tbody>
+			{"".join(county_index)}
+			</tbody></table></div>
+		</section>""",
+    ]), out_dir=COUNTY_OUT)
 
     # TOTAL: every answer, with where it came from.
     by_answer = collections.defaultdict(collections.Counter)
@@ -423,7 +477,8 @@ def main():
         answers_panel("", no_location, "no location"),
     ]))
 
-    print(f"wrote {len(os.listdir(OUT))} files to {os.path.relpath(OUT, ROOT)}/")
+    print(f"wrote {len(os.listdir(OUT))} files to {os.path.relpath(OUT, ROOT)}/ "
+          f"and {len(os.listdir(COUNTY_OUT))} to {os.path.relpath(COUNTY_OUT, ROOT)}/")
 
 
 def rank_codes(code):

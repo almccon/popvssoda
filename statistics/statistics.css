@@ -61,6 +61,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 tr.group th { background: #f6f6f6; font-weight: bold; padding-top: 10px; }
 tbody.subtotal th, tbody.subtotal td { font-weight: bold; border-top: 2px solid #ccc; }
 tfoot th, tfoot td { font-weight: bold; border-top: 2px solid #ccc; }
+td.num small { display: block; color: #888; font-size: 10px; font-weight: normal; }
 
 .sortable thead th[data-sort] { cursor: pointer; user-select: none; }
 .sortable thead th[data-sort]:hover { background: #f6f6f6; }
