@@ -161,8 +161,15 @@
 			sizeFactor = Math.sqrt(pxPerKm(projection) / usPx);
 
 			const [south, north] = WAVE_LAT[which];
+			// The US + Canada projection draws Hawaii twice (its real place, off
+			// the map, and the moved-in inset), so an outline centroid would land
+			// between the two; inset areas use their projected geographic center.
+			const zones = PVS.regionZones(which);
 			for (const u of units) {
-				[u.homeX, u.homeY] = countries.includes(u.country) ? path.centroid(u.feature) : [NaN, NaN];
+				const center = d3.geoCentroid(u.feature);
+				[u.homeX, u.homeY] = !countries.includes(u.country) ? [NaN, NaN]
+					: which === "both" && zones.ofLonLat(...center) ? projection(center)
+						: path.centroid(u.feature);
 				u.delay = reducedMotion ? 0 : STAGGER_MS * Math.min(1, Math.max(0, (u.lat - south) / (north - south)));
 			}
 			for (const d of allPerAnswer.concat(allPerCounty)) {
