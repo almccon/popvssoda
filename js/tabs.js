@@ -1,10 +1,11 @@
-// Tabs above the homepage map. "Counties" is the map on this page; the other
-// tabs embed pages from experiments/ (with ?embed=1, which hides their
+// Tabs above the homepage map, named for how each shows the data.
+// "Choropleth" is the map on this page; the other tabs embed pages from
+// experiments/ (with ?embed=1, which hides their
 // navigation and intro), each loaded the first time its tab is opened. The
 // open tab is kept in the URL hash, e.g. #isoglosses.
 //
 // One region switch (US and Canada, US, Canada) applies to every tab: the
-// county map gets a "pvs-region" event, and each embedded page is loaded with
+// choropleth gets a "pvs-region" event, and each embedded page is loaded with
 // ?region=.
 
 (function () {
@@ -15,16 +16,16 @@
 			page: "experiments/isoglosses.html",
 			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses.",
 		},
-		"postal-codes": {
+		"voronoi": {
 			page: "experiments/postal-codes.html",
 			caption: "One cell for each ZIP code and Canadian postal area, colored by its mix of answers.",
 		},
-		"county-bubbles": {
+		"bubbles": {
 			page: "experiments/county-bubbles.html",
 			settings: "circles=blend&size-by=population&size=0.35",
 			caption: "One circle per county, sized by its population, colored by its mix of answers, and pushed apart so none overlap.",
 		},
-		"region-donuts": {
+		"donuts": {
 			page: "experiments/region-donuts.html",
 			caption: "One donut per state, province and territory, sized by its number of responses and split by answer.",
 		},
@@ -67,17 +68,17 @@
 	}
 
 	function select(name, { focus = false, updateHash = true } = {}) {
-		if (name !== "counties" && !VIEWS[name]) name = "counties";
+		if (name !== "choropleth" && !VIEWS[name]) name = "choropleth";
 		for (const tab of tabs) {
 			const on = tab.dataset.tab === name;
 			tab.setAttribute("aria-selected", String(on));
 			tab.tabIndex = on ? 0 : -1;
 			if (on && focus) tab.focus();
 		}
-		mapPanel.hidden = name !== "counties";
-		viewPanel.hidden = name === "counties";
-		reading.hidden = name !== "counties";
-		if (name !== "counties") {
+		mapPanel.hidden = name !== "choropleth";
+		viewPanel.hidden = name === "choropleth";
+		reading.hidden = name !== "choropleth";
+		if (name !== "choropleth") {
 			const view = VIEWS[name];
 			viewPanel.setAttribute("aria-labelledby", "tab-" + name);
 			caption.textContent = view.caption;
@@ -86,7 +87,7 @@
 			for (const f of Object.values(frames)) f.hidden = f !== frame;
 		}
 		if (updateHash) {
-			history.replaceState(null, "", name === "counties" ? location.pathname + location.search : "#" + name);
+			history.replaceState(null, "", name === "choropleth" ? location.pathname + location.search : "#" + name);
 		}
 	}
 
