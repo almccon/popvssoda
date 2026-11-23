@@ -52,6 +52,7 @@
 		// The contiguous US, southern Canada and Alaska, with Hawaii moved in
 		// close to the mainland (see common.js). The territories are left out.
 		const projection = PVS.regionProjection(which);
+		PVS.addCredit(document.getElementById("chart"), which);
 		const path = d3.geoPath(projection, ctx);
 
 		const points = [];

@@ -67,8 +67,10 @@
 		let unitPaths = null;
 		let path = null;
 
+		const credit = PVS.addCredit(document.getElementById("chart"));
 		function render() {
 			const which = region();
+			credit.setRegion(which);
 			const countries = which === "both" ? ["US", "CA"] : [which];
 			path = d3.geoPath(projectionFor(which));
 			const shown = units.filter((u) => countries.includes(u.country));

@@ -89,3 +89,7 @@ body { max-width: 1012px; }
 /* The homepage has one region switch for all its maps. */
 .embed .region-row { display: none; }
 .embed .panel { padding: 0; margin: 0; background: none; }
+
+/* The credit line overlay (common.js: addCredit). */
+.chart svg.credit { position: absolute; inset: 0; width: 100%; height: auto; pointer-events: none; }
+.credit text { font-size: 12px; font-style: italic; fill: #333; }

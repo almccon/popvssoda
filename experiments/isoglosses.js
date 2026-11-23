@@ -263,6 +263,7 @@
 		});
 
 		addIsoKey();
+		PVS.addCredit(chart, which);
 
 		const base = svg.append("g").attr("class", "basemap");
 		base.append("path").attr("class", "land").attr("d", path(land));

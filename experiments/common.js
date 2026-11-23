@@ -307,6 +307,26 @@ window.PVS = (function () {
 		return mix(shares);
 	};
 
+	// The credit line, bottom-left on every map, where the homepage choropleth
+	// has it: an overlay in map units, so it scales with the map. On the
+	// US + Canada map it sits lower, below Hawaii. Returns { setRegion(which) }.
+	const CREDIT = "CC-BY: Alan McConchie, PopVsSoda.com";
+	function addCredit(chart, which = "both") {
+		const ns = "http://www.w3.org/2000/svg";
+		const svg = document.createElementNS(ns, "svg");
+		svg.setAttribute("class", "credit");
+		svg.setAttribute("viewBox", `0 0 ${FRAME.width} ${FRAME.height}`);
+		svg.setAttribute("aria-hidden", "true");
+		const text = document.createElementNS(ns, "text");
+		text.setAttribute("x", 10);
+		text.textContent = CREDIT;
+		svg.append(text);
+		chart.append(svg);
+		const setRegion = (w) => text.setAttribute("y", w === "both" ? FRAME.height - 10 : 634);
+		setRegion(which);
+		return { setRegion };
+	}
+
 	// Put the triangle legend in the bottom-right corner of a map (open water
 	// in every frame), or hide it.
 	function showMixKey(chart, show = true, opts) {
@@ -608,6 +628,6 @@ window.PVS = (function () {
 
 	return {
 		TERMS, LABEL, COLOR, TERM_FILL, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
-		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, regionZones, pageRegion, reloadWithSettings, mix, mixCounts, mixKeyHTML, showMixKey, swellingOutlines, separateStates,
+		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, regionZones, pageRegion, reloadWithSettings, mix, mixCounts, mixKeyHTML, showMixKey, addCredit, swellingOutlines, separateStates,
 	};
 })();

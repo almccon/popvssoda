@@ -104,7 +104,7 @@
 	const overlay = svg.append("g").attr("transform", "translate(0,40) scale(1.2)");
 	const legend = buildLegend(overlay);
 
-	overlay.append("g")
+	const credit = overlay.append("g")
 		.attr("class", "author")
 		.append("text")
 		.attr("x", 8)
@@ -369,6 +369,9 @@
 		function draw() {
 			const countries = region === "both" ? ["US", "CA"] : [region];
 			path = d3.geoPath(PVS.regionProjection(region));
+			// The credit sits lower on the US + Canada map, below Hawaii
+			// (the same place as on the experiment maps: common.js addCredit).
+			credit.select("text").attr("y", region === "both" ? (HEIGHT - 10 - 40) / 1.2 : 495);
 			hideTooltip();
 			const lands = countries.map((c) => path(geo[c].land)).join("");
 			landLayer.selectAll("path").data([lands]).join("path").attr("class", "land").attr("d", (d) => d);

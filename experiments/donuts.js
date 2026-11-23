@@ -66,8 +66,10 @@
 
 		const projectionFor = regionProjection; // the same for every map; see common.js
 
+		const credit = PVS.addCredit(document.getElementById("chart"));
 		function render() {
 			const which = region();
+			credit.setRegion(which);
 			const shown = places.filter((p) => which === "both" || p.country === which);
 			const projection = projectionFor(which);
 			const path = d3.geoPath(projection);

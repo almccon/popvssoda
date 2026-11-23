@@ -44,6 +44,7 @@
 	const showHexes = document.getElementById("show-hexes");
 	const outlinesInput = document.getElementById("outlines");
 	const tooltip = makeTooltip(document.getElementById("chart"));
+	PVS.addCredit(document.getElementById("chart"));
 	document.getElementById("color-key").innerHTML = TERMS.map((t) =>
 		`<span class="key-item"><span class="disc" style="background:${FILL[t]};` +
 		`box-shadow:inset 0 0 0 1px ${OUTLINE[t]}"></span>${LABEL[t]}</span>`

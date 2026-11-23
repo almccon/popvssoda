@@ -18,6 +18,7 @@
 	const opacityValue = document.getElementById("opacity-value");
 	const tooltip = makeTooltip(document.getElementById("chart"));
 	PVS.showMixKey(document.getElementById("chart"));
+	PVS.addCredit(document.getElementById("chart"));
 
 	const dpr = window.devicePixelRatio || 1;
 	canvas.width = WIDTH * dpr;

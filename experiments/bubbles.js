@@ -146,8 +146,10 @@
 		// Set for the region shown, by setRegion().
 		let projection, landPath, lakePath, adminPath, stateShapes, perAnswer = [], perCounty = [];
 		let sizeFactor = 1; // circles follow the map scale: a closer view gets bigger circles
+		const credit = PVS.addCredit(document.getElementById("chart"));
 		function setRegion() {
 			const which = region();
+			credit.setRegion(which);
 			const countries = which === "both" ? ["US", "CA"] : [which];
 			projection = PVS.regionProjection(which);
 			const path = d3.geoPath(projection);
