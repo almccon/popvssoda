@@ -1,7 +1,7 @@
 // Hex bubbles: the ZIP code and FSA points are first gathered into a grid of
 // equal hexagons, then each hexagon gets up to four circles (pop / soda /
 // coke / other) with area proportional to its responses, spread apart with a
-// force layout. Like county bubbles, but starting from areas of one regular
+// force layout. Like the bubbles map, but starting from areas of one regular
 // size rather than counties, which vary enormously. The circles grow in from
 // the south while the layout runs. With outlines on, hexagons are split at
 // state and province lines and each state is outlined, its border swelling to
@@ -11,7 +11,7 @@
 	"use strict";
 
 	const { TERMS, LABEL, COLOR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, swellingOutlines, separateStates, drawBasemap } = PVS;
-	// Same colors as county bubbles (the isogloss map's 90% areas).
+	// Same colors as the bubbles map (the isogloss map's 90% areas).
 	const FILL = PVS.ZONE_FILL;
 	const OUTLINE = COLOR;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;

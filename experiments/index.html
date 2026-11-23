@@ -42,8 +42,8 @@
 		</p>
 		<ul class="experiments">
 			<li>
-				<a class="thumb" href="north-america-counties.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/north-america-counties.jpg" width="480" height="340" alt="" loading="lazy"></a>
-				<h2><a href="north-america-counties.html">Counties and census divisions</a></h2>
+				<a class="thumb" href="choropleth.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/choropleth.jpg" width="480" height="340" alt="" loading="lazy"></a>
+				<h2><a href="choropleth.html">Choropleth</a></h2>
 				<p>
 					The main county map extended into Canada, with census divisions (Canada's
 					closest equivalent to counties) in the same CMY mix. Switch between US and
@@ -63,12 +63,45 @@
 				<p class="data">ZIP codes and Canadian FSAs</p>
 			</li>
 			<li>
-				<a class="thumb" href="postal-codes.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/postal-codes.jpg" width="480" height="340" alt="" loading="lazy"></a>
-				<h2><a href="postal-codes.html">Postal codes</a></h2>
+				<a class="thumb" href="voronoi.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/voronoi.jpg" width="480" height="340" alt="" loading="lazy"></a>
+				<h2><a href="voronoi.html">Voronoi</a></h2>
 				<p>
 					One cell per ZIP code or FSA, colored with the main map's CMY mix. Cells
 					stop at the country (or state and province) border, and don't reach
 					further into empty land than they do anywhere in the lower 48.
+				</p>
+				<p class="data">ZIP codes and Canadian FSAs</p>
+			</li>
+			<li>
+				<a class="thumb" href="bubbles.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/bubbles.jpg" width="480" height="340" alt="" loading="lazy"></a>
+				<h2><a href="bubbles.html">Bubbles</a></h2>
+				<p>
+					Up to four circles per county or Canadian census division, one for
+					each answer, or one circle per county in the main map's CMY mix, sized by
+					the number of responses or by population and pushed apart so they don't
+					overlap. They bubble up from south to north as the layout settles. State
+					and province outlines can swell along with them.
+				</p>
+				<p class="data">US counties and Canadian census divisions</p>
+			</li>
+			<li>
+				<a class="thumb" href="donuts.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/donuts.jpg" width="480" height="340" alt="" loading="lazy"></a>
+				<h2><a href="donuts.html">Donuts</a></h2>
+				<p>
+					One donut per state, province and territory, sized by the number of
+					responses or by population and split by answer. Show the US and Canada
+					together or either one alone.
+				</p>
+				<p class="data">US states and Canadian provinces</p>
+			</li>
+			<li>
+				<a class="thumb" href="hex-bubbles.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/hex-bubbles.jpg" width="480" height="340" alt="" loading="lazy"></a>
+				<h2><a href="hex-bubbles.html">Hex bubbles</a></h2>
+				<p>
+					Like the bubbles, but the ZIP codes and FSAs are first gathered into
+					hexagons of equal size, so the starting areas are regular. You can
+					change the hexagon size, and outline each state and province with a
+					border that swells to hold its own bubbles.
 				</p>
 				<p class="data">ZIP codes and Canadian FSAs</p>
 			</li>
@@ -81,39 +114,6 @@
 					where they fall, biggest at the back.
 				</p>
 				<p class="data">ZIP codes and Canadian FSAs</p>
-			</li>
-			<li>
-				<a class="thumb" href="hex-bubbles.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/hex-bubbles.jpg" width="480" height="340" alt="" loading="lazy"></a>
-				<h2><a href="hex-bubbles.html">Hex bubbles</a></h2>
-				<p>
-					Like county bubbles, but the ZIP codes and FSAs are first gathered into
-					hexagons of equal size, so the starting areas are regular. You can
-					change the hexagon size, and outline each state and province with a
-					border that swells to hold its own bubbles.
-				</p>
-				<p class="data">ZIP codes and Canadian FSAs</p>
-			</li>
-			<li>
-				<a class="thumb" href="county-bubbles.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/county-bubbles.jpg" width="480" height="340" alt="" loading="lazy"></a>
-				<h2><a href="county-bubbles.html">County bubbles</a></h2>
-				<p>
-					Up to four circles per county or Canadian census division, one for
-					each answer, or one circle per county in the main map's CMY mix, sized by
-					the number of responses or by population and pushed apart so they don't
-					overlap. They bubble up from south to north as the layout settles. State
-					and province outlines can swell along with them.
-				</p>
-				<p class="data">US counties and Canadian census divisions</p>
-			</li>
-			<li>
-				<a class="thumb" href="region-donuts.html" tabindex="-1" aria-hidden="true"><img src="thumbnails/region-donuts.jpg" width="480" height="340" alt="" loading="lazy"></a>
-				<h2><a href="region-donuts.html">Region donuts</a></h2>
-				<p>
-					One donut per state, province and territory, sized by the number of
-					responses or by population and split by answer. Show the US and Canada
-					together or either one alone.
-				</p>
-				<p class="data">US states and Canadian provinces</p>
 			</li>
 		</ul>
 	</section>

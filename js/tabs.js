@@ -17,16 +17,16 @@
 			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses.",
 		},
 		"voronoi": {
-			page: "experiments/postal-codes.html",
+			page: "experiments/voronoi.html",
 			caption: "One cell for each ZIP code and Canadian postal area, colored by its mix of answers.",
 		},
 		"bubbles": {
-			page: "experiments/county-bubbles.html",
+			page: "experiments/bubbles.html",
 			settings: "circles=blend&size-by=population&size=0.35",
 			caption: "One circle per county, sized by its population, colored by its mix of answers, and pushed apart so none overlap.",
 		},
 		"donuts": {
-			page: "experiments/region-donuts.html",
+			page: "experiments/donuts.html",
 			caption: "One donut per state, province and territory, sized by its number of responses and split by answer.",
 		},
 	};

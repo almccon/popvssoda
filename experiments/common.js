@@ -48,7 +48,7 @@ window.PVS = (function () {
 		"55": "WI", "56": "WY",
 	};
 
-	// Background layers shared by every map (the region donuts' look): the page
+	// Background layers shared by every map (the donuts' look): the page
 	// panel (#eee) shows through as the background field (water), land is a
 	// pale gray, and lakes are water too. experiments.css has the same colors for SVG maps.
 	const BASEMAP = {

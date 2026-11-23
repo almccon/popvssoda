@@ -103,7 +103,7 @@ people's names. Long comments and spam aren't included either.
 
 This isn't survey data: it's the 2010 Census population of each county
 (`county_fips`, `name`, `population_2010`), used to size the circles on the
-county bubbles experiment. 2010 falls in the middle of the survey's run, and
+bubbles experiment. 2010 falls in the middle of the survey's run, and
 its county codes match the older map in `d3/us.json`. Three Alaska areas that
 were split up in 2007–08 get the sum of the areas that replaced them. It's
 built by `scripts/fetch_county_population.py`.
@@ -114,7 +114,7 @@ The Canadian counterpart, also not survey data: Statistics Canada's estimate
 of each census division's population on July 1, 2010 (`cduid`, `name`,
 `population_2010`), on 2021 boundaries, so the codes match
 `census_division_counts.csv` and `d3/canada.json`. It sizes the Canadian
-circles on the county bubbles experiment. It's built by
+circles on the bubbles experiment. It's built by
 `scripts/fetch_canada_population.py` from Table 17-10-0152-01.
 
 `state_counts.csv`, `county_counts.csv` and `other_answers.csv` are used to build the statistics pages in `statistics/` and the county pages in `countystats/`

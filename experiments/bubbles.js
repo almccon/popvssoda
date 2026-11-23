@@ -1,4 +1,4 @@
-// County bubbles: four circles per county (pop / soda / coke / other), area
+// Bubbles: four circles per county (pop / soda / coke / other), area
 // proportional to the number of responses, spread apart with a force layout.
 // Or one circle per county, colored with the main map's CMY mix. Canada is
 // included as census divisions, its closest equivalent to counties, and the
