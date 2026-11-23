@@ -50,11 +50,16 @@
 	function fitFrame(frame) {
 		const doc = frame.contentDocument;
 		if (!doc || !doc.body) return;
-		// A hidden frame's page has no layout and measures 0 tall; keep the last
-		// real height rather than collapsing (which made the text below jump up).
+		// Only measure a frame that's showing: hidden, its page lays out at no
+		// width (0 tall, or very tall where text wraps), and using that height
+		// made the boxes below jump when switching back. Keep the last real one.
 		const fit = () => {
+			if (!frame.offsetWidth) return;
 			const h = Math.ceil(doc.body.getBoundingClientRect().height);
-			if (h > 0) frame.style.height = h + "px";
+			if (h > 0) {
+				frame.style.height = h + "px";
+				if (!frame.hidden) settleHold();
+			}
 		};
 		new ResizeObserver(fit).observe(doc.body);
 		fit();
@@ -72,8 +77,30 @@
 		return (frames[name] = frame);
 	}
 
+	// While a tab's page loads (or is measured after being hidden), keep the
+	// panel at least as tall as what was showing before, so the boxes below
+	// never move up into the map's space and then back down.
+	let holdTimer = null;
+	function holdHeight(height) {
+		viewPanel.style.minHeight = height + "px";
+		clearTimeout(holdTimer);
+		holdTimer = setTimeout(releaseHold, 3000); // in case the page never reports
+	}
+	function releaseHold() {
+		clearTimeout(holdTimer);
+		viewPanel.style.minHeight = "";
+	}
+	// The shown page reported a height: let go once it has stopped changing.
+	function settleHold() {
+		if (!viewPanel.style.minHeight) return;
+		clearTimeout(holdTimer);
+		holdTimer = setTimeout(releaseHold, 400);
+	}
+	const shownPanel = () => (mapPanel.hidden ? viewPanel : mapPanel);
+
 	function select(name, { focus = false, updateHash = true } = {}) {
 		if (name !== "choropleth" && !VIEWS[name]) name = "choropleth";
+		const before = shownPanel().getBoundingClientRect().height;
 		for (const tab of tabs) {
 			const on = tab.dataset.tab === name;
 			tab.setAttribute("aria-selected", String(on));
@@ -88,8 +115,11 @@
 			viewPanel.setAttribute("aria-labelledby", "tab-" + name);
 			caption.textContent = view.caption;
 			fullLink.href = `${view.page}?region=${region}${view.settings ? "&" + view.settings : ""}`;
+			holdHeight(before);
 			const frame = frameFor(name);
 			for (const f of Object.values(frames)) f.hidden = f !== frame;
+		} else {
+			releaseHold();
 		}
 		if (updateHash) {
 			history.replaceState(null, "", name === "choropleth" ? location.pathname + location.search : "#" + name);
@@ -113,6 +143,7 @@
 		for (const b of regionButtons) b.setAttribute("aria-pressed", String(b.dataset.region === value));
 		document.dispatchEvent(new CustomEvent("pvs-region", { detail: value }));
 		// Embedded pages take the region at load.
+		if (!viewPanel.hidden) holdHeight(viewPanel.getBoundingClientRect().height);
 		for (const [name, frame] of Object.entries(frames)) frame.src = frameSrc(name);
 		const open = tabs.find((t) => t.getAttribute("aria-selected") === "true");
 		if (open && VIEWS[open.dataset.tab]) {
