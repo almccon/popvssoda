@@ -6,7 +6,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML } = PVS;
+	const { TERMS, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML, drawBasemap } = PVS;
 	const WIDTH = 960, HEIGHT = 700;
 
 	const canvas = document.getElementById("canvas");
@@ -58,17 +58,7 @@
 
 		function draw() {
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			ctx.fillStyle = "#f7f7f7";
-			ctx.fill(landPath, "evenodd");
-			ctx.fillStyle = "#fff";
-			ctx.fill(lakePath);
-			ctx.strokeStyle = "#e2e2e2";
-			ctx.lineWidth = 0.75;
-			ctx.stroke(adminPath);
-			ctx.stroke(lakePath);
-			ctx.strokeStyle = "#d0d0d0";
-			ctx.lineWidth = 1;
-			ctx.stroke(landPath);
+			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: adminPath });
 
 			ctx.globalAlpha = +opacityInput.value * (hovered ? 0.4 : 1);
 			ctx.lineWidth = 0.5;

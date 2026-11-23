@@ -12,8 +12,11 @@ body { max-width: 1012px; }
 .chart { position: relative; }
 .chart svg, .chart canvas { display: block; width: 100%; height: auto; touch-action: manipulation; }
 
+/* Background layers shared by every map; common.js (BASEMAP) has the same
+   colors for canvas maps. The panel's #eee is the background field. */
 .basemap .land { fill: #f7f7f7; stroke: #d6d6d6; stroke-width: 1px; }
-.basemap .states { fill: none; stroke: #ddd; stroke-width: 0.75px; }
+.basemap .lake, .basemap .lakes { fill: #fff; stroke: #ddd; stroke-width: 0.5px; }
+.basemap .states, .basemap .admin { fill: none; stroke: #ddd; stroke-width: 0.75px; }
 
 .key {
 	display: flex;

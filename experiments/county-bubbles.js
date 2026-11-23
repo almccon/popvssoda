@@ -9,7 +9,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, mixKeyHTML, swellingOutlines, separateStates } = PVS;
+	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, mixKeyHTML, swellingOutlines, separateStates, drawBasemap } = PVS;
 	// Same colors as the 90% areas on the isogloss map: the CMY fills as they
 	// look after three stacked 30% bands over the land (and a gray for
 	// "other"), outlined in the darker line colors from common.js.
@@ -63,11 +63,16 @@
 	const blended = () => [...circleInputs].find((el) => el.checked).value === "blend";
 	const outlinesInput = document.getElementById("outlines");
 
-	Promise.all([loadData("../"), d3.csv("../data/county_population_2010.csv")]).then(([data, popRows]) => {
+	Promise.all([
+		loadData("../"),
+		d3.csv("../data/county_population_2010.csv"),
+		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
+	]).then(([data, popRows, lakes]) => {
 		const population = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
 		const projection = d3.geoAlbersUsa().fitExtent([[10, 10], [WIDTH - 10, HEIGHT - 10]], data.land);
 		const path = d3.geoPath(projection);
 		const landPath = new Path2D(path(data.land));
+		const lakePath = new Path2D(path(lakes));
 		const statePath = new Path2D(path(data.stateMesh));
 
 		const featureById = new Map(data.countyFeatures.map((f) => [+f.id, f]));
@@ -114,21 +119,11 @@
 
 		function draw() {
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			ctx.fillStyle = "#f7f7f7";
-			ctx.fill(landPath);
-			ctx.strokeStyle = "#d6d6d6";
-			ctx.lineWidth = 1;
-			ctx.stroke(landPath);
-			if (outlines) {
-				// Under the bubbles: each state's outline runs just outside its own
-				// bubbles, in the gap kept between states, and any stretch of border
-				// that wanders under other bubbles is hidden.
-				outlines.draw(ctx);
-			} else {
-				ctx.strokeStyle = "#ddd";
-				ctx.lineWidth = 0.75;
-				ctx.stroke(statePath);
-			}
+			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : statePath });
+			// Under the bubbles: each state's outline runs just outside its own
+			// bubbles, in the gap kept between states, and any stretch of border
+			// that wanders under other bubbles is hidden.
+			if (outlines) outlines.draw(ctx);
 
 			ctx.globalAlpha = hovered ? 0.35 : 1;
 			ctx.lineWidth = 0.75;

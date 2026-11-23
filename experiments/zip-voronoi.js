@@ -6,7 +6,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, fmt, breakdownHTML, makeTooltip } = window.PVS;
+	const { TERMS, BASEMAP, fmt, breakdownHTML, makeTooltip } = window.PVS;
 	const WIDTH = 960;
 	const HEIGHT = 700;
 	const NA_IDS = { US: "840", CA: "124" }; // world-atlas (Natural Earth) country ids
@@ -169,8 +169,11 @@
 			sliderLabel.textContent = `${minN} response${minN === 1 ? "" : "s"}`;
 
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			ctx.fillStyle = "#fff";
-			ctx.fillRect(0, 0, WIDTH, HEIGHT);
+			// Land with no cells (the far north) shows as plain land.
+			ctx.beginPath();
+			path(land);
+			ctx.fillStyle = BASEMAP.land;
+			ctx.fill("evenodd");
 
 			let cells = 0, responses = 0, merged = 0;
 			for (const region of partitions[mode]) {
@@ -219,10 +222,10 @@
 			// The country outlines include the Great Lakes etc.; paint them back out.
 			ctx.beginPath();
 			path(lakes);
-			ctx.fillStyle = "#fff";
+			ctx.fillStyle = BASEMAP.lake;
 			ctx.fill();
 			ctx.lineWidth = 0.5;
-			ctx.strokeStyle = "#999";
+			ctx.strokeStyle = BASEMAP.lakeStroke;
 			ctx.stroke();
 
 			ctx.lineWidth = 0.5;
@@ -237,8 +240,8 @@
 			path(borders);
 			ctx.stroke();
 
-			ctx.lineWidth = 0.75;
-			ctx.strokeStyle = "#999";
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = BASEMAP.landStroke;
 			ctx.beginPath();
 			path(land);
 			ctx.stroke();

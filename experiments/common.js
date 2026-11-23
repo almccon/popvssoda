@@ -44,6 +44,32 @@ window.PVS = (function () {
 		"55": "WI", "56": "WY",
 	};
 
+	// Background layers shared by every map (the state donuts' look): the page
+	// panel (#eee) shows through as the background field, land is a pale gray,
+	// lakes are white. experiments.css has the same colors for SVG maps.
+	const BASEMAP = {
+		land: "#f7f7f7", landStroke: "#d6d6d6",
+		lake: "#fff", lakeStroke: "#ddd",
+		admin: "#ddd",
+	};
+
+	// Draw the background layers on a canvas. Each argument is a Path2D or
+	// null: land (filled even-odd, so holes cut out by lakes stay open), lakes,
+	// and state/province lines.
+	function drawBasemap(ctx, { land, lakes, admin }) {
+		if (land) { ctx.fillStyle = BASEMAP.land; ctx.fill(land, "evenodd"); }
+		if (lakes) { ctx.fillStyle = BASEMAP.lake; ctx.fill(lakes); }
+		ctx.lineWidth = 0.75;
+		ctx.strokeStyle = BASEMAP.admin;
+		if (admin) ctx.stroke(admin);
+		ctx.lineWidth = 0.5;
+		ctx.strokeStyle = BASEMAP.lakeStroke;
+		if (lakes) ctx.stroke(lakes);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = BASEMAP.landStroke;
+		if (land) ctx.stroke(land);
+	}
+
 	const fmt = d3.format(",");
 	const pct = (v) => Math.round(v * 100) + "%";
 
@@ -448,7 +474,7 @@ window.PVS = (function () {
 	}
 
 	return {
-		TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
+		TERMS, LABEL, COLOR, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
 		northAmericaProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
 	};
 })();

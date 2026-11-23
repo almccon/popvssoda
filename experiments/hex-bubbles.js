@@ -10,7 +10,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, LABEL, COLOR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, swellingOutlines, separateStates } = PVS;
+	const { TERMS, LABEL, COLOR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, swellingOutlines, separateStates, drawBasemap } = PVS;
 	// Same colors as county bubbles (the isogloss map's 90% areas).
 	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
 	const OUTLINE = COLOR;
@@ -161,17 +161,7 @@
 
 		function draw() {
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			ctx.fillStyle = "#f7f7f7";
-			ctx.fill(landPath, "evenodd");
-			ctx.fillStyle = "#fff";
-			ctx.fill(lakePath);
-			ctx.strokeStyle = "#e2e2e2";
-			ctx.lineWidth = 0.75;
-			if (!outlines) ctx.stroke(adminPath);
-			ctx.stroke(lakePath);
-			ctx.strokeStyle = "#d0d0d0";
-			ctx.lineWidth = 1;
-			ctx.stroke(landPath);
+			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : adminPath });
 			// Under the bubbles, so stretches of border that wander under other
 			// states' bubbles are hidden.
 			if (outlines) outlines.draw(ctx);

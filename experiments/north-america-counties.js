@@ -26,7 +26,8 @@
 		d3.json("../d3/canada.json"),
 		d3.csv("../data/county_counts.csv"),
 		d3.csv("../data/census_division_counts.csv"),
-	]).then(([us, canada, countyRows, cdRows]) => {
+		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
+	]).then(([us, canada, countyRows, cdRows, lakes]) => {
 		const record = (r, name) => {
 			const counts = {};
 			for (const t of TERMS) counts[t] = +r[t] || 0;
@@ -64,8 +65,9 @@
 			return northAmericaProjection(WIDTH, HEIGHT).projection;
 		}
 
-		const landLayer = svg.append("g").attr("class", "na-land");
+		const landLayer = svg.append("g").attr("class", "basemap");
 		const unitLayer = svg.append("g").attr("class", "na-units");
+		const lakeLayer = svg.append("g").attr("class", "basemap");
 		const lineLayer = svg.append("g").attr("class", "na-lines");
 		const hoverPath = svg.append("path").attr("class", "na-hover");
 		let unitPaths = null;
@@ -78,6 +80,7 @@
 			const shown = units.filter((u) => countries.includes(u.country));
 
 			landLayer.selectAll("*").remove();
+			lakeLayer.selectAll("*").remove();
 			lineLayer.selectAll("*").remove();
 			hoverPath.attr("d", null);
 			tooltip.hide();
@@ -87,6 +90,7 @@
 				.data(shown, (u) => `${u.country}-${u.feature.id}`)
 				.join("path")
 				.attr("d", (u) => path(u.feature));
+			lakeLayer.append("path").attr("class", "lake").attr("d", path(lakes));
 			for (const c of countries) {
 				lineLayer.append("path").attr("class", "inner").attr("d", path(outlines[c].inner));
 				lineLayer.append("path").attr("class", "outer").attr("d", path(outlines[c].land));

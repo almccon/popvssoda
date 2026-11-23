@@ -91,6 +91,7 @@
 	// Layers, bottom to top.
 	const landLayer = svg.append("g");
 	const countyLayer = svg.append("g").attr("class", "counties");
+	const lakeLayer = svg.append("g");
 	const stateLayer = svg.append("g");
 	const hoverPath = svg.append("path").attr("class", "hover");
 	const legend = buildLegend(svg);
@@ -295,7 +296,8 @@
 	Promise.all([
 		d3.json("d3/us.json"),
 		d3.csv("data/county_counts.csv"),
-	]).then(([us, rows]) => {
+		d3.json("vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
+	]).then(([us, rows, lakes]) => {
 		// Sum counts per county shape, then turn them into shares.
 		const byId = new Map();
 		for (const r of rows) {
@@ -320,7 +322,12 @@
 
 		landLayer.append("path")
 			.datum(topojson.feature(us, us.objects.land))
-			.attr("class", "landshadow")
+			.attr("class", "land")
+			.attr("d", path);
+
+		lakeLayer.append("path")
+			.datum(lakes)
+			.attr("class", "lakes")
 			.attr("d", path);
 
 		counties = countyLayer.selectAll("path")
