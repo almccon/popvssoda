@@ -15,8 +15,8 @@
 			page: "experiments/isoglosses.html",
 			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses.",
 		},
-		"zip-voronoi": {
-			page: "experiments/zip-voronoi.html",
+		"postal-codes": {
+			page: "experiments/postal-codes.html",
 			caption: "One cell for each ZIP code and Canadian postal area, colored by its mix of answers.",
 		},
 		"county-bubbles": {
