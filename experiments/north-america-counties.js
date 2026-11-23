@@ -7,7 +7,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, STATE_ABBR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML } = PVS;
+	const { TERMS, countyRecords, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML } = PVS;
 	const WIDTH = 960, HEIGHT = 680;
 	const NO_DATA = "#fff";
 
@@ -32,27 +32,7 @@
 			for (const t of TERMS) counts[t] = +r[t] || 0;
 			return { name, counts, total: +r.total || 0 };
 		};
-		// The county shapes (d3/us.json) predate some changes to county codes.
-		// Newer codes are counted in the older county that covers them.
-		const OLD_FIPS = {
-			2063: 2261, 2066: 2261,   // Chugach, Copper River → Valdez-Cordova
-			2105: 2232, 2230: 2232,   // Hoonah-Angoon, Skagway → Skagway-Hoonah-Angoon
-			2158: 2270,               // Kusilvak → Wade Hampton
-			2195: 2280, 2275: 2280,   // Petersburg, Wrangell → Wrangell-Petersburg
-			2198: 2201,               // Prince of Wales-Hyder → Prince of Wales-Outer Ketchikan
-			46102: 46113,             // Oglala Lakota → Shannon
-		};
-		const countyData = new Map();
-		for (const r of countyRows) {
-			const id = OLD_FIPS[+r.county_fips] || +r.county_fips;
-			const rec = record(r, `${r.county_name}, ${STATE_ABBR[r.county_fips.slice(0, 2)] || ""}`);
-			const prev = countyData.get(id);
-			if (prev) {
-				prev.name = prev.name.replace(/, (\w+)$/, ` and ${rec.name}`);
-				for (const t of TERMS) prev.counts[t] += rec.counts[t];
-				prev.total += rec.total;
-			} else countyData.set(id, rec);
-		}
+		const countyData = countyRecords(countyRows);
 		const cdData = new Map(cdRows.map((r) =>
 			[r.cduid, record(r, `${r.cd_name}${r.cd_type && r.cd_type !== "Census division" ? ` (${r.cd_type})` : ""}, ${r.province}`)]));
 

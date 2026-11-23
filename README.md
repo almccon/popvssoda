@@ -8,7 +8,7 @@ The Pop vs Soda Page is a linguistic survey created by [Alan McConchie](https://
 - `index.html`, `js/map.js`, `css/style.css`: the interactive county map.
 - `vendor/`: vendored copies of [D3](https://d3js.org) v7.9.0 and [topojson-client](https://github.com/topojson/topojson-client) v3.1.0.
 - `d3/us.json`: US county, state and land boundaries (TopoJSON).
-- `d3/pvscounty_fips.tsv`: survey responses aggregated by county (joined on the `id` column, the county FIPS code).
+- `data/`: survey responses aggregated by ZIP code, county, census division and state. See `data/README.md`.
 - `experiments/`: work-in-progress alternative views of the survey data (US counties with Canadian census divisions, isoglosses, ZIP Voronoi, ZIP circles, hex bubbles, county bubbles, state and province donuts). See `experiments/index.html`.
 - `statistics/`, `countystats/`: static statistics pages (by state and province, and by county), at the same addresses as the old site's. Built by `scripts/build_statistics.py`.
 - `archive/`: earlier versions of the page.

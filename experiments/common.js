@@ -6,7 +6,6 @@ window.PVS = (function () {
 
 	const TERMS = ["pop", "soda", "coke", "other"];
 	const LABEL = { pop: "Pop", soda: "Soda", coke: "Coke", other: "Other" };
-	const COUNT_FIELD = { pop: "SUMPOP", soda: "SUMSODA", coke: "SUMCOKE", other: "SUMOTHER" };
 
 	// Darker relatives of the main map's yellow / cyan / magenta, so small
 	// marks stay visible on white. "Other" is a deliberately neutral gray,
@@ -27,25 +26,46 @@ window.PVS = (function () {
 	const fmt = d3.format(",");
 	const pct = (v) => Math.round(v * 100) + "%";
 
-	// Load boundaries and county data. Each county record:
-	// { id, name, state (2-digit FIPS), stateName, counts: {pop,...}, total }
+	// The county shapes in d3/us.json predate some changes to county codes.
+	// Responses with a newer code are counted in the older county covering it.
+	// (js/map.js has the same table.)
+	const OLD_FIPS = {
+		2063: 2261, 2066: 2261,   // Chugach, Copper River → Valdez-Cordova
+		2105: 2232, 2230: 2232,   // Hoonah-Angoon, Skagway → Skagway-Hoonah-Angoon
+		2158: 2270,               // Kusilvak → Wade Hampton
+		2195: 2280, 2275: 2280,   // Petersburg, Wrangell → Wrangell-Petersburg
+		2198: 2201,               // Prince of Wales-Hyder → Prince of Wales-Outer Ketchikan
+		46102: 46113,             // Oglala Lakota → Shannon
+	};
+
+	// Rows of data/county_counts.csv → one record per county shape:
+	// { id, name, state (2-digit FIPS), counts: {pop,...}, total }
+	function countyRecords(rows) {
+		const byId = new Map();
+		for (const r of rows) {
+			const id = OLD_FIPS[+r.county_fips] || +r.county_fips;
+			const counts = {};
+			for (const t of TERMS) counts[t] = +r[t] || 0;
+			const name = `${r.county_name}, ${STATE_ABBR[r.county_fips.slice(0, 2)] || ""}`;
+			const prev = byId.get(id);
+			if (prev) {
+				prev.name = prev.name.replace(/, (\w+)$/, ` and ${name}`);
+				for (const t of TERMS) prev.counts[t] += counts[t];
+				prev.total += +r.total;
+			} else {
+				byId.set(id, { id, name, state: String(id).padStart(5, "0").slice(0, 2), counts, total: +r.total });
+			}
+		}
+		return byId;
+	}
+
+	// Load boundaries and county data (records as from countyRecords).
 	function loadData(base) {
 		return Promise.all([
 			d3.json(base + "d3/us.json"),
-			d3.tsv(base + "d3/pvscounty_fips.tsv"),
+			d3.csv(base + "data/county_counts.csv"),
 		]).then(([us, rows]) => {
-			const counties = rows.map((r) => {
-				const counts = {};
-				for (const t of TERMS) counts[t] = +r[COUNT_FIELD[t]] || 0;
-				return {
-					id: +r.id,
-					name: `${r.County_Name} ${r.ENGTYPE}, ${r.State}`,
-					state: r.FIPS_State,
-					stateName: r.State,
-					counts,
-					total: d3.sum(TERMS, (t) => counts[t]),
-				};
-			});
+			const counties = [...countyRecords(rows).values()];
 			return {
 				us,
 				counties,
@@ -407,7 +427,7 @@ window.PVS = (function () {
 	}
 
 	return {
-		TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, breakdownHTML, makeTooltip, colorKeyHTML,
+		TERMS, LABEL, COLOR, STATE_ABBR, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
 		northAmericaProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
 	};
 })();

@@ -7,9 +7,34 @@
 	const WIDTH = 800;
 	const HEIGHT = 500;
 	const TERMS = ["pop", "soda", "coke", "other"];
-	const COUNT_FIELD = { pop: "SUMPOP", soda: "SUMSODA", coke: "SUMCOKE", other: "SUMOTHER" };
 	const LABEL = { pop: "Pop", soda: "Soda", coke: "Coke", other: "Other" };
 	const NO_DATA_FILL = "white";
+
+	const STATE_NAME = {
+		"01": "Alabama", "02": "Alaska", "04": "Arizona", "05": "Arkansas", "06": "California",
+		"08": "Colorado", "09": "Connecticut", "10": "Delaware", "11": "District of Columbia",
+		"12": "Florida", "13": "Georgia", "15": "Hawaii", "16": "Idaho", "17": "Illinois",
+		"18": "Indiana", "19": "Iowa", "20": "Kansas", "21": "Kentucky", "22": "Louisiana",
+		"23": "Maine", "24": "Maryland", "25": "Massachusetts", "26": "Michigan", "27": "Minnesota",
+		"28": "Mississippi", "29": "Missouri", "30": "Montana", "31": "Nebraska", "32": "Nevada",
+		"33": "New Hampshire", "34": "New Jersey", "35": "New Mexico", "36": "New York",
+		"37": "North Carolina", "38": "North Dakota", "39": "Ohio", "40": "Oklahoma", "41": "Oregon",
+		"42": "Pennsylvania", "44": "Rhode Island", "45": "South Carolina", "46": "South Dakota",
+		"47": "Tennessee", "48": "Texas", "49": "Utah", "50": "Vermont", "51": "Virginia",
+		"53": "Washington", "54": "West Virginia", "55": "Wisconsin", "56": "Wyoming",
+	};
+
+	// The county shapes in d3/us.json predate some changes to county codes.
+	// Responses with a newer code are counted in the older county covering it.
+	// (experiments/common.js has the same table.)
+	const OLD_FIPS = {
+		2063: 2261, 2066: 2261,   // Chugach, Copper River → Valdez-Cordova
+		2105: 2232, 2230: 2232,   // Hoonah-Angoon, Skagway → Skagway-Hoonah-Angoon
+		2158: 2270,               // Kusilvak → Wade Hampton
+		2195: 2280, 2275: 2280,   // Petersburg, Wrangell → Wrangell-Petersburg
+		2198: 2201,               // Prince of Wales-Hyder → Prince of Wales-Outer Ketchikan
+		46102: 46113,             // Oglala Lakota → Shannon
+	};
 
 	// ---- Color schemes ------------------------------------------------------
 
@@ -269,31 +294,27 @@
 
 	Promise.all([
 		d3.json("d3/us.json"),
-		d3.tsv("d3/pvscounty_fips.tsv"),
+		d3.csv("data/county_counts.csv"),
 	]).then(([us, rows]) => {
+		// Sum counts per county shape, then turn them into shares.
 		const byId = new Map();
 		for (const r of rows) {
-			const shares = {
-				pop: +r.PCTPOP || 0,
-				soda: +r.PCTSODA || 0,
-				coke: +r.PCTCOKE || 0,
-				other: +r.PCTOTHER || 0,
-			};
-			const counts = {};
-			for (const t of TERMS) counts[t] = +r[COUNT_FIELD[t]] || 0;
-			byId.set(+r.id, {
-				...shares,
-				counts,
-				total: +r.SUMCOUNT || 0,
-				name: `${r.County_Name} ${r.ENGTYPE}, ${r.State}`,
-				noData: shares.pop + shares.soda + shares.coke + shares.other === 0,
-			});
+			const id = OLD_FIPS[+r.county_fips] || +r.county_fips;
+			const name = `${r.county_name}, ${STATE_NAME[r.county_fips.slice(0, 2)] || ""}`;
+			let rec = byId.get(id);
+			if (rec) rec.name = rec.name.replace(/, ([^,]+)$/, ` and ${name}`);
+			else byId.set(id, rec = { name, counts: { pop: 0, soda: 0, coke: 0, other: 0 }, total: 0 });
+			for (const t of TERMS) rec.counts[t] += +r[t] || 0;
+			rec.total += +r.total || 0;
+		}
+		for (const rec of byId.values()) {
+			for (const t of TERMS) rec[t] = rec.total ? rec.counts[t] / rec.total : 0;
+			rec.noData = !rec.total;
 		}
 
 		const features = topojson.feature(us, us.objects.counties).features;
 		for (const f of features) {
-			// Counties missing from the TSV (e.g. Baltimore city, St. Louis city)
-			// are drawn as no data.
+			// Counties with no responses are drawn as no data.
 			f.properties = byId.get(+f.id) || { noData: true };
 		}
 
