@@ -41,9 +41,12 @@
 	const frames = {};
 	const regionButtons = [...document.querySelectorAll("[data-region]")];
 	let region = "both";
+	// Bump with the experiment pages, so browsers don't reuse cached copies
+	// that link older scripts or styles.
+	const PAGE_VERSION = "2026-11-24f";
 	const frameSrc = (name) => {
 		const view = VIEWS[name];
-		return `${view.page}?embed=1&region=${region}${view.settings ? "&" + view.settings : ""}`;
+		return `${view.page}?embed=1&region=${region}${view.settings ? "&" + view.settings : ""}&v=${PAGE_VERSION}`;
 	};
 
 	// Size the frame to its page's content, and keep it sized as that changes.
