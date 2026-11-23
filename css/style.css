@@ -70,9 +70,43 @@ header h1 img { display: inline-block; width: 282px; }
 	font-weight: bold;
 }
 
+/* Tabs on the left, the region switch on the right. */
+.view-bar {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: flex-end;
+	gap: 6px 16px;
+}
+
+.region-switch {
+	display: flex;
+	gap: 2px;
+	margin-bottom: 4px;
+	font-size: 12px;
+}
+
+.region-switch button {
+	font: inherit;
+	color: #333;
+	background: transparent;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 3px 9px;
+	cursor: pointer;
+}
+
+.region-switch button:hover { background: #f2f2f2; }
+
+.region-switch button[aria-pressed="true"] {
+	background: #eee;
+	border-color: #999;
+	font-weight: bold;
+}
+
 /* The panel under the tabs joins up with the selected tab. */
-.view-tabs + .panel,
-.view-tabs ~ #map { border-top-left-radius: 0; }
+.view-bar + .panel,
+.view-bar ~ #map { border-top-left-radius: 0; }
 
 [role=tabpanel][hidden] { display: none; }
 

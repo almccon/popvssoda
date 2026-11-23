@@ -2,6 +2,10 @@
 // tabs embed pages from experiments/ (with ?embed=1, which hides their
 // navigation and intro), each loaded the first time its tab is opened. The
 // open tab is kept in the URL hash, e.g. #isoglosses.
+//
+// One region switch (US and Canada, US, Canada) applies to every tab: the
+// county map gets a "pvs-region" event, and each embedded page is loaded with
+// ?region=.
 
 (function () {
 	"use strict";
@@ -9,7 +13,7 @@
 	const VIEWS = {
 		"isoglosses": {
 			page: "experiments/isoglosses.html",
-			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses, in the US and Canada.",
+			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses.",
 		},
 		"zip-voronoi": {
 			page: "experiments/zip-voronoi.html",
@@ -34,6 +38,12 @@
 	const fullLink = document.getElementById("view-full");
 	const reading = document.getElementById("reading"); // describes the county map only
 	const frames = {};
+	const regionButtons = [...document.querySelectorAll("[data-region]")];
+	let region = "both";
+	const frameSrc = (name) => {
+		const view = VIEWS[name];
+		return `${view.page}?embed=1&region=${region}${view.settings ? "&" + view.settings : ""}`;
+	};
 
 	// Size the frame to its page's content, and keep it sized as that changes.
 	function fitFrame(frame) {
@@ -50,7 +60,7 @@
 		const frame = document.createElement("iframe");
 		frame.className = "view-frame";
 		frame.title = document.getElementById("tab-" + name).textContent + " map";
-		frame.src = `${view.page}?embed=1${view.settings ? "&" + view.settings : ""}`;
+		frame.src = frameSrc(name);
 		frame.addEventListener("load", () => fitFrame(frame));
 		framesEl.append(frame);
 		return (frames[name] = frame);
@@ -71,7 +81,7 @@
 			const view = VIEWS[name];
 			viewPanel.setAttribute("aria-labelledby", "tab-" + name);
 			caption.textContent = view.caption;
-			fullLink.href = view.page + (view.settings ? "?" + view.settings : "");
+			fullLink.href = `${view.page}?region=${region}${view.settings ? "&" + view.settings : ""}`;
 			const frame = frameFor(name);
 			for (const f of Object.values(frames)) f.hidden = f !== frame;
 		}
@@ -90,6 +100,21 @@
 			select(tabs[(next + tabs.length) % tabs.length].dataset.tab, { focus: true });
 		});
 	}
+
+	function setRegion(value) {
+		region = value;
+		window.PVS_REGION = value; // for js/map.js, if its data is still loading
+		for (const b of regionButtons) b.setAttribute("aria-pressed", String(b.dataset.region === value));
+		document.dispatchEvent(new CustomEvent("pvs-region", { detail: value }));
+		// Embedded pages take the region at load.
+		for (const [name, frame] of Object.entries(frames)) frame.src = frameSrc(name);
+		const open = tabs.find((t) => t.getAttribute("aria-selected") === "true");
+		if (open && VIEWS[open.dataset.tab]) {
+			const view = VIEWS[open.dataset.tab];
+			fullLink.href = `${view.page}?region=${region}${view.settings ? "&" + view.settings : ""}`;
+		}
+	}
+	for (const b of regionButtons) b.addEventListener("click", () => setRegion(b.dataset.region));
 
 	window.addEventListener("hashchange", () => select(location.hash.slice(1), { updateHash: false }));
 	if (location.hash) select(location.hash.slice(1), { updateHash: false });

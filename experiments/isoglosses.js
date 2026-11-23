@@ -18,7 +18,6 @@
 	const { width: WIDTH, height: HEIGHT } = window.PVS.FRAME;
 	const KM_PER_MILE = 1.609344;
 	const EARTH_KM = 6371;
-	const NA_IDS = ["840", "124"]; // USA, Canada in world-atlas
 	// Pop, soda and coke get filled bands and lines at the majority levels.
 	// "Other" rarely reaches a majority, so it is drawn as gray lines only,
 	// starting much lower; its 10 / 25 / 33% lines always show with it.
@@ -179,20 +178,30 @@
 		chart.append(el);
 	}
 
+	// The region is set up once at load, so switching reloads with the settings kept.
+	document.querySelectorAll("input[name=region]").forEach((el) => el.addEventListener("change", PVS.reloadWithSettings));
+
 	Promise.all([
 		d3.json("../vendor/world-atlas-2.0.2-countries-50m.json"),
 		d3.json("../vendor/naturalearth-5.1.2-admin1-50m-us-canada.geojson"),
 		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
 		d3.csv("../data/postal_counts.csv"),
-	]).then(([world, admin1, lakes, rows]) => {
-		const naGeoms = world.objects.countries.geometries.filter((g) => NA_IDS.includes(g.id));
+	]).then(([world, admin1All, lakes, rows]) => {
+		// The region (US and Canada, or one alone) is set at load; switching
+		// reloads the page with the other settings kept.
+		const which = PVS.pageRegion();
+		const countries = which === "both" ? ["US", "CA"] : [which];
+		const countryIds = { US: "840", CA: "124" };
+		const naGeoms = world.objects.countries.geometries.filter((g) => countries.some((c) => countryIds[c] === g.id));
+		const admin1 = { type: "FeatureCollection", features: admin1All.features.filter((f) => countries.includes(f.properties.country)) };
 		const land = topojson.merge(world, naGeoms);
 
 		// Same frame as the Voronoi page, with Hawaii moved in close to the
 		// mainland. Hawaii's responses and the mainland's never mix: each point
 		// and grid cell has a zone (1 = the Hawaii inset), and windows only
 		// gather points from their own zone.
-		const { projection, inInsetPx, inInsetLonLat } = window.PVS.northAmericaProjection(WIDTH, HEIGHT);
+		const projection = PVS.regionProjection(which);
+		const zones = PVS.regionZones(which); // keeps inset (Alaska, Hawaii) points apart
 		const path = d3.geoPath(projection);
 
 		// The projection is conformal, so a circle on the ground is (locally) a
@@ -202,11 +211,11 @@
 
 		const points = [];
 		for (const r of rows) {
-			if (!r.lat) continue;
+			if (!r.lat || !countries.includes(r.country)) continue;
 			const xy = projection([+r.lon, +r.lat]);
 			if (!xy || xy[0] < 0 || xy[0] > WIDTH || xy[1] < 0 || xy[1] > HEIGHT) continue;
 			points.push({
-				x: xy[0], y: xy[1], kmPerPx: kmPerPxAt(xy[0], xy[1]), zone: inInsetLonLat(+r.lon, +r.lat) ? 1 : 0,
+				x: xy[0], y: xy[1], kmPerPx: kmPerPxAt(xy[0], xy[1]), zone: zones.ofLonLat(+r.lon, +r.lat),
 				total: +r.total, pop: +r.pop, soda: +r.soda, coke: +r.coke,
 			});
 		}
@@ -255,7 +264,9 @@
 		const base = svg.append("g").attr("class", "basemap");
 		base.append("path").attr("class", "land").attr("d", path(land));
 		base.append("path").attr("class", "admin").attr("d", path(admin1));
-		base.append("path").attr("class", "lakes").attr("d", path(lakes));
+		// Lakes only inside the land shown, so a hidden country's lakes don't float.
+		defs.append("clipPath").attr("id", "shown-land").append("path").attr("d", path(land));
+		base.append("path").attr("class", "lakes").attr("clip-path", "url(#shown-land)").attr("d", path(lakes));
 
 		const bands = svg.append("g").attr("clip-path", "url(#land-clip)");
 		const dots = svg.append("g").attr("clip-path", "url(#land-clip)");
@@ -270,7 +281,7 @@
 			const w = Math.ceil(WIDTH / step), h = Math.ceil(HEIGHT / step), n = w * h;
 			const zone = new Uint8Array(n);
 			for (let j = 0; j < h; j++) {
-				for (let i = 0; i < w; i++) zone[j * w + i] = inInsetPx((i + 0.5) * step, (j + 0.5) * step) ? 1 : 0;
+				for (let i = 0; i < w; i++) zone[j * w + i] = zones.ofPx((i + 0.5) * step, (j + 0.5) * step);
 			}
 			return {
 				step, w, h, zone,
@@ -457,6 +468,11 @@
 		}
 
 		applyMethodRanges(currentMethod(), false);
+		// Values from the URL were capped by the sliders' original ranges;
+		// set them again now that the ranges fit the method.
+		const params = new URLSearchParams(location.search);
+		if (params.has("radius")) radiusInput.value = params.get("radius");
+		if (params.has("min-n")) minInput.value = params.get("min-n");
 		updateLabels();
 		radiusInput.addEventListener("input", updateLabels);
 		minInput.addEventListener("input", updateLabels);

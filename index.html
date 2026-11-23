@@ -5,11 +5,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>The Pop vs. Soda Page</title>
 	<meta name="description" content="A map of the geographic distribution of the terms &quot;pop&quot;, &quot;soda&quot; and &quot;coke&quot; used to describe carbonated soft drinks in the United States.">
-	<link href="css/style.css?v=2026-11-23g" rel="stylesheet">
+	<link href="css/style.css?v=2026-11-23p" rel="stylesheet">
 	<script src="vendor/d3.v7.9.0.min.js" defer></script>
 	<script src="vendor/topojson-client.v3.1.0.min.js" defer></script>
-	<script src="js/map.js?v=2026-11-23g" defer></script>
-	<script src="js/tabs.js?v=2026-11-23g" defer></script>
+	<script src="experiments/common.js?v=2026-11-23p" defer></script>
+	<script src="js/map.js?v=2026-11-23q" defer></script>
+	<script src="js/tabs.js?v=2026-11-23q" defer></script>
 </head>
 <body>
 	<header>
@@ -17,12 +18,19 @@
 	</header>
 
 	<main>
+		<div class="view-bar">
 		<div class="view-tabs" role="tablist" aria-label="Map views">
 			<button type="button" role="tab" id="tab-counties" data-tab="counties" aria-controls="map" aria-selected="true">Counties</button>
 			<button type="button" role="tab" id="tab-isoglosses" data-tab="isoglosses" aria-controls="view-panel" aria-selected="false" tabindex="-1">Isoglosses</button>
 			<button type="button" role="tab" id="tab-zip-voronoi" data-tab="zip-voronoi" aria-controls="view-panel" aria-selected="false" tabindex="-1">ZIP Voronoi</button>
 			<button type="button" role="tab" id="tab-county-bubbles" data-tab="county-bubbles" aria-controls="view-panel" aria-selected="false" tabindex="-1">County bubbles</button>
 			<button type="button" role="tab" id="tab-state-donuts" data-tab="state-donuts" aria-controls="view-panel" aria-selected="false" tabindex="-1">State donuts</button>
+		</div>
+		<div class="region-switch" role="group" aria-label="Region shown on every map">
+			<button type="button" data-region="both" aria-pressed="true">US and Canada</button>
+			<button type="button" data-region="US" aria-pressed="false">US</button>
+			<button type="button" data-region="CA" aria-pressed="false">Canada</button>
+		</div>
 		</div>
 
 		<section id="view-panel" class="panel" role="tabpanel" hidden>
@@ -33,7 +41,7 @@
 		<section id="map" class="panel" role="tabpanel" aria-labelledby="tab-counties">
 			<div id="map-container">
 				<svg id="d3map" viewBox="0 0 960 680" role="img"
-					aria-label="Map of US counties colored by whether survey respondents call soft drinks pop, soda, coke or something else"></svg>
+					aria-label="Map of US counties and Canadian census divisions colored by whether survey respondents call soft drinks pop, soda, coke or something else"></svg>
 				<p class="loading-message" id="map-status">Loading map…</p>
 				<div class="tooltip" id="tooltip" role="status" hidden></div>
 			</div>
@@ -98,8 +106,9 @@
 			<section id="reading" class="panel">
 				<h2>READING THE MAP</h2>
 				<p>
-					In the full-color views, each county is colored by the mix of answers
-					given by people from there, as shown in the triangle legend.
+					In the full-color views, each county (or, in Canada, census division,
+					its closest equivalent) is colored by the mix of answers given by
+					people from there, as shown in the triangle legend.
 				</p>
 				<ul class="key-list" id="color-key">
 					<li><span class="swatch" style="background:#ff0"></span>

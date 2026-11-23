@@ -199,6 +199,48 @@ window.PVS = (function () {
 					[-133, 54.2]],
 			});
 
+	// Insets: on the US + Canada map Hawaii is moved in close (zone 1), and on
+	// the US-only map Alaska (1) and Hawaii (2) are insets. Pages that measure
+	// distances on the map (the isoglosses) keep each zone's points apart.
+	// Returns { ofLonLat(lon, lat), ofPx(x, y) } for a region's projection.
+	function regionZones(which) {
+		if (which === "CA") return { ofLonLat: () => 0, ofPx: () => 0 };
+		if (which === "US") {
+			const proj = usProjection();
+			const ofLonLat = (lon, lat) => (lat > 50 && (lon < -129 || lon > 170) ? 1 : lat < 23 && lon < -150 ? 2 : 0);
+			return {
+				ofLonLat,
+				ofPx: (x, y) => {
+					const ll = proj.invert([x, y]);
+					return ll ? ofLonLat(ll[0], ll[1]) : -1;
+				},
+			};
+		}
+		const { inInsetLonLat, inInsetPx } = northAmericaProjection(FRAME.width, FRAME.height);
+		return { ofLonLat: (lon, lat) => (inInsetLonLat(lon, lat) ? 1 : 0), ofPx: (x, y) => (inInsetPx(x, y) ? 1 : 0) };
+	}
+
+	// The region a page was asked for (its region radio buttons, which
+	// applyURLSettings sets from ?region=), or "both".
+	function pageRegion() {
+		const el = document.querySelector("input[name=region]:checked");
+		return el ? el.value : "both";
+	}
+
+	// Reload the page with its current control settings in the URL, for pages
+	// that set things up once at load (like the region).
+	function reloadWithSettings() {
+		const params = new URLSearchParams();
+		if (document.documentElement.classList.contains("embed")) params.set("embed", "1");
+		for (const el of document.querySelectorAll("input")) {
+			if (el.type === "radio") { if (el.checked && el.name) params.set(el.name, el.value); }
+			else if (!el.id) continue;
+			else if (el.type === "checkbox") params.set(el.id, el.checked ? "1" : "0");
+			else params.set(el.id, el.value);
+		}
+		location.search = params.toString();
+	}
+
 	// "both", "US" or "CA".
 	const regionProjection = (which) =>
 		which === "US" ? usProjection() : which === "CA" ? canadaProjection()
@@ -565,6 +607,6 @@ window.PVS = (function () {
 
 	return {
 		TERMS, LABEL, COLOR, ZONE_FILL, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
-		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, mix, mixCounts, mixKeyHTML, showMixKey, swellingOutlines, separateStates,
+		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, regionZones, pageRegion, reloadWithSettings, mix, mixCounts, mixKeyHTML, showMixKey, swellingOutlines, separateStates,
 	};
 })();

@@ -87,8 +87,11 @@
 	const tooltip = d3.select("#tooltip");
 	const container = document.getElementById("map-container");
 
-	const projection = d3.geoAlbersUsa().scale(1027).translate([WIDTH / 2, HEIGHT / 2]);
-	const path = d3.geoPath(projection);
+	// The region shown: "both" (US and Canada), "US" or "CA". The homepage's
+	// region switch (js/tabs.js) sets it with a "pvs-region" event. Each region
+	// has the same projection on every map (experiments/common.js).
+	let region = "both";
+	let path = d3.geoPath(PVS.regionProjection(region));
 
 	// Layers, bottom to top.
 	const landLayer = svg.append("g");
@@ -104,7 +107,7 @@
 	overlay.append("g")
 		.attr("class", "author")
 		.append("text")
-		.attr("x", 550)
+		.attr("x", 8)
 		.attr("y", 495)
 		.text("CC-BY: Alan McConchie, PopVsSoda.com");
 
@@ -120,7 +123,10 @@
 		// colored by the mix at its centroid.
 		const DIVISIONS = 10;
 		const side = 64;
-		const top = [690, 398];
+		// A compact block in the bottom-right corner, which is open water in
+		// every region's map: the triangle, with "no data" and the "other" ramp
+		// in a row beneath it.
+		const top = [748, 372];
 		const height = (side * Math.sqrt(3)) / 2;
 		const corners = {
 			soda: top,
@@ -174,7 +180,7 @@
 
 		// Linear legend: a ramp of swatches from 0% to 100% of one term.
 		const STEPS = 20;
-		const rampX = 545, rampY = 446, rampW = 70, rampH = 10;
+		const rampX = 722, rampY = 466, rampW = 70, rampH = 10;
 		const lin = g.append("g");
 		lin.append("rect")
 			.attr("class", "landshadow")
@@ -198,11 +204,11 @@
 		const noData = g.append("g");
 		noData.append("rect")
 			.attr("class", "landshadow")
-			.attr("x", 480).attr("y", rampY).attr("width", 26).attr("height", rampH);
+			.attr("x", 682).attr("y", rampY).attr("width", 26).attr("height", rampH);
 		noData.append("rect")
-			.attr("x", 480).attr("y", rampY).attr("width", 26).attr("height", rampH)
+			.attr("x", 682).attr("y", rampY).attr("width", 26).attr("height", rampH)
 			.attr("fill", NO_DATA_FILL);
-		noData.append("text").attr("x", 493).attr("y", rampY + 21).attr("text-anchor", "middle").text("no data");
+		noData.append("text").attr("x", 695).attr("y", rampY + 21).attr("text-anchor", "middle").text("no data");
 
 		return {
 			update(state) {
@@ -302,8 +308,16 @@
 		d3.json("d3/us.json"),
 		d3.csv("data/county_counts.csv"),
 		d3.json("vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
-	]).then(([us, rows, lakes]) => {
-		// Sum counts per county shape, then turn them into shares.
+		d3.json("d3/canada.json"),
+		d3.csv("data/census_division_counts.csv"),
+	]).then(([us, rows, lakes, canada, cdRows]) => {
+		const withShares = (rec) => {
+			for (const t of TERMS) rec[t] = rec.total ? rec.counts[t] / rec.total : 0;
+			rec.noData = !rec.total;
+			return rec;
+		};
+
+		// US counties: sum counts per county shape, then turn them into shares.
 		const byId = new Map();
 		for (const r of rows) {
 			const id = OLD_FIPS[+r.county_fips] || +r.county_fips;
@@ -314,42 +328,68 @@
 			for (const t of TERMS) rec.counts[t] += +r[t] || 0;
 			rec.total += +r.total || 0;
 		}
-		for (const rec of byId.values()) {
-			for (const t of TERMS) rec[t] = rec.total ? rec.counts[t] / rec.total : 0;
-			rec.noData = !rec.total;
-		}
-
-		const features = topojson.feature(us, us.objects.counties).features;
-		for (const f of features) {
+		byId.forEach(withShares);
+		const usFeatures = topojson.feature(us, us.objects.counties).features;
+		for (const f of usFeatures) {
 			// Counties with no responses are drawn as no data.
 			f.properties = byId.get(+f.id) || { noData: true };
+			f.country = "US";
 		}
 
-		const land = topojson.feature(us, us.objects.land);
-		landLayer.append("path")
-			.datum(land)
-			.attr("class", "land")
-			.attr("d", path);
+		// Canadian census divisions, Canada's closest equivalent to counties.
+		const cdById = new Map(cdRows.map((r) => {
+			const counts = {};
+			for (const t of TERMS) counts[t] = +r[t] || 0;
+			return [r.cduid, withShares({ name: `${r.cd_name}, ${r.province}`, counts, total: +r.total || 0 })];
+		}));
+		const caFeatures = topojson.feature(canada, canada.objects.census_divisions).features;
+		for (const f of caFeatures) {
+			f.properties = cdById.get(String(f.id)) ||
+				{ name: `${f.properties.name}, ${f.properties.province}`, noData: true };
+			f.country = "CA";
+		}
 
-		// Lakes inside the US only: the map shows no Canadian land, and the
-		// Great Lakes are already open water.
-		svg.append("clipPath").attr("id", "us-land-clip")
-			.append("path").attr("d", path(land));
-		lakeLayer.attr("clip-path", "url(#us-land-clip)")
-			.append("path")
-			.datum(lakes)
-			.attr("class", "lakes")
-			.attr("d", path);
+		const geo = {
+			US: {
+				land: topojson.feature(us, us.objects.land),
+				lines: topojson.mesh(us, us.objects.states, (a, b) => a !== b),
+			},
+			CA: {
+				land: topojson.merge(canada, canada.objects.provinces.geometries),
+				lines: topojson.mesh(canada, canada.objects.provinces, (a, b) => a !== b),
+			},
+		};
+		const allFeatures = usFeatures.concat(caFeatures);
 
-		counties = countyLayer.selectAll("path")
-			.data(features)
-			.join("path")
-			.attr("d", path);
+		// Lakes only inside the land shown: the Great Lakes are already open
+		// water, and lakes in a country that isn't shown would float.
+		const landClip = svg.append("clipPath").attr("id", "land-clip").append("path");
+		lakeLayer.attr("clip-path", "url(#land-clip)");
 
-		stateLayer.append("path")
-			.datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
-			.attr("class", "states")
-			.attr("d", path);
+		function draw() {
+			const countries = region === "both" ? ["US", "CA"] : [region];
+			path = d3.geoPath(PVS.regionProjection(region));
+			hideTooltip();
+			const lands = countries.map((c) => path(geo[c].land)).join("");
+			landLayer.selectAll("path").data([lands]).join("path").attr("class", "land").attr("d", (d) => d);
+			landClip.attr("d", lands);
+			lakeLayer.selectAll("path").data([lakes]).join("path").attr("class", "lakes").attr("d", path);
+			counties = countyLayer.selectAll("path")
+				.data(allFeatures.filter((f) => countries.includes(f.country)))
+				.join("path")
+				.attr("d", path);
+			stateLayer.selectAll("path")
+				.data(countries.map((c) => geo[c].lines))
+				.join("path")
+				.attr("class", "states")
+				.attr("d", path);
+			render();
+		}
+		document.addEventListener("pvs-region", (event) => {
+			region = event.detail;
+			draw();
+		});
+		region = window.PVS_REGION || region; // set by js/tabs.js if it ran first
 
 		countyLayer
 			.on("pointermove pointerdown", (event) => {
@@ -367,7 +407,7 @@
 		});
 
 		document.getElementById("map-status").remove();
-		render();
+		draw();
 	}).catch((error) => {
 		console.error(error);
 		document.getElementById("map-status").textContent = "Sorry, the map data could not be loaded.";

@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Pop vs Soda ZIP Voronoi</title>
-	<link href="../css/style.css?v=2026-11-23o" rel="stylesheet">
-	<link href="experiments.css?v=2026-11-23o" rel="stylesheet">
+	<link href="../css/style.css?v=2026-11-23p" rel="stylesheet">
+	<link href="experiments.css?v=2026-11-23p" rel="stylesheet">
 	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
 	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
-	<script src="common.js?v=2026-11-23o" defer></script>
-	<script src="zip-voronoi.js?v=2026-11-23o" defer></script>
+	<script src="common.js?v=2026-11-23p" defer></script>
+	<script src="zip-voronoi.js?v=2026-11-23p" defer></script>
 </head>
 <body>
 	<nav class="nav">
@@ -35,6 +35,12 @@
 		<div class="chart" id="chart">
 			<canvas id="canvas" role="img"
 				aria-label="Voronoi map of the US and Canada with one cell per ZIP code or FSA, colored by the mix of pop, soda and coke responses"></canvas>
+		</div>
+		<div class="slider-row region-row">
+			<span>Show</span>
+			<label><input type="radio" name="region" value="both" checked> US and Canada</label>
+			<label><input type="radio" name="region" value="US"> US only</label>
+			<label><input type="radio" name="region" value="CA"> Canada only</label>
 		</div>
 		<div class="slider-row">
 			<span>Separate diagrams for each</span>

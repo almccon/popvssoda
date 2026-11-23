@@ -28,6 +28,9 @@
 	const ctx = canvas.getContext("2d");
 	ctx.scale(dpr, dpr);
 
+	// The region is set up once at load, so switching reloads with the settings kept.
+	document.querySelectorAll("input[name=region]").forEach((el) => el.addEventListener("change", PVS.reloadWithSettings));
+
 	Promise.all([
 		d3.json("../vendor/world-atlas-2.0.2-countries-50m.json"),
 		d3.json("../vendor/naturalearth-5.1.2-admin1-50m-us-canada.geojson"),
@@ -38,9 +41,17 @@
 		const land = topojson.merge(world, naGeoms);
 		const borders = topojson.mesh(world, { type: "GeometryCollection", geometries: naGeoms }, (a, b) => a !== b);
 
+		// The region (US and Canada, or one alone) is set at load. With one
+		// country shown, the other's cells are still built (they set the reach
+		// cap) but not drawn.
+		const which = PVS.pageRegion();
+		const countries = which === "both" ? ["US", "CA"] : [which];
+		const shownLand = topojson.merge(world, naGeoms.filter((g) => countries.some((c) => NA_IDS[c] === g.id)));
+		const shownAdmin = { type: "FeatureCollection", features: admin1.features.filter((f) => countries.includes(f.properties.country)) };
+
 		// The contiguous US, southern Canada and Alaska, with Hawaii moved in
 		// close to the mainland (see common.js). The territories are left out.
-		const { projection } = window.PVS.northAmericaProjection(WIDTH, HEIGHT);
+		const projection = PVS.regionProjection(which);
 		const path = d3.geoPath(projection, ctx);
 
 		const points = [];
@@ -65,12 +76,12 @@
 		// happens to fall on.
 		const partitions = {
 			country: Object.entries(NA_IDS).map(([key, id]) => ({
-				key,
+				key, country: key,
 				shape: topojson.feature(world, naGeoms.find((g) => g.id === id)),
 				points: points.filter((p) => p.country === key),
 			})),
 			state: admin1.features.map((f) => ({
-				key: f.properties.postal,
+				key: f.properties.postal, country: f.properties.country,
 				shape: f,
 				points: points.filter((p) => p.state === f.properties.postal),
 			})),
@@ -171,14 +182,14 @@
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
 			// Land with no cells (the far north) shows as plain land.
 			ctx.beginPath();
-			path(land);
+			path(shownLand);
 			ctx.fillStyle = BASEMAP.land;
 			ctx.fill("evenodd");
 
 			let cells = 0, responses = 0, merged = 0;
 			for (const region of partitions[mode]) {
 				region.shown = region.points.filter((p) => p.total >= minN);
-				merged += region.points.length - region.shown.length;
+				if (countries.includes(region.country)) merged += region.points.length - region.shown.length;
 				region.delaunay = region.shown.length
 					? d3.Delaunay.from(region.shown, (p) => p.x, (p) => p.y) : null;
 			}
@@ -186,7 +197,7 @@
 			const capCircle = d3.geoCircle().radius((capKm / EARTH_KM) * (180 / Math.PI));
 
 			for (const region of partitions[mode]) {
-				if (!region.delaunay) continue;
+				if (!region.delaunay || !countries.includes(region.country)) continue;
 				const voronoi = region.delaunay.voronoi([0, 0, WIDTH, HEIGHT]);
 
 				ctx.save();
@@ -219,7 +230,12 @@
 				ctx.restore();
 			}
 
-			// The country outlines include the Great Lakes etc.; paint them back out.
+			// The country outlines include the Great Lakes etc.; paint them back
+			// out (only inside the land shown, so a hidden country's lakes don't float).
+			ctx.save();
+			ctx.beginPath();
+			path(shownLand);
+			ctx.clip();
 			ctx.beginPath();
 			path(lakes);
 			ctx.fillStyle = BASEMAP.lake;
@@ -227,23 +243,26 @@
 			ctx.lineWidth = 0.75;
 			ctx.strokeStyle = BASEMAP.lakeStroke;
 			ctx.stroke();
+			ctx.restore();
 
 			ctx.lineWidth = 0.5;
 			ctx.strokeStyle = "rgba(255,255,255,0.75)";
 			ctx.beginPath();
-			path(admin1);
+			path(shownAdmin);
 			ctx.stroke();
 
-			ctx.lineWidth = 1;
-			ctx.strokeStyle = "rgba(255,255,255,0.9)";
-			ctx.beginPath();
-			path(borders);
-			ctx.stroke();
+			if (which === "both") {
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = "rgba(255,255,255,0.9)";
+				ctx.beginPath();
+				path(borders);
+				ctx.stroke();
+			}
 
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = BASEMAP.landStroke;
 			ctx.beginPath();
-			path(land);
+			path(shownLand);
 			ctx.stroke();
 
 			status.textContent = `${fmt(cells)} cells, ${fmt(responses)} responses` +
@@ -261,7 +280,7 @@
 			const x = (event.clientX - box.left) * (WIDTH / box.width);
 			const y = (event.clientY - box.top) * (HEIGHT / box.height);
 			const region = regionAt(currentMode(), x, y);
-			if (!region || !region.delaunay) return tooltip.hide();
+			if (!region || !region.delaunay || !countries.includes(region.country)) return tooltip.hide();
 			const p = region.shown[region.delaunay.find(x, y)];
 			if (kmBetween(projection.invert([x, y]), p.lonLat) > capKm) return tooltip.hide();
 			tooltip.show(event, breakdownHTML(p.title, p.counts, p.total));
