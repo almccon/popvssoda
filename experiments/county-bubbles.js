@@ -9,7 +9,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, mixKeyHTML, swellingOutlines, separateStates, drawBasemap } = PVS;
+	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, swellingOutlines, separateStates, drawBasemap } = PVS;
 	// Same colors as the 90% areas on the isogloss map: the CMY fills as they
 	// look after three stacked 30% bands over the land (and a gray for
 	// "other"), outlined in the darker line colors from common.js.
@@ -225,7 +225,8 @@
 		function start() {
 			nodes = blended() ? perCounty : perAnswer;
 			hovered = null;
-			document.getElementById("color-key").innerHTML = blended() ? mixKeyHTML() : termKeyHTML;
+			document.getElementById("color-key").innerHTML = blended() ? "" : termKeyHTML;
+			PVS.showMixKey(document.getElementById("chart"), blended());
 			// A blended circle holds a whole county, so at the same slider
 			// setting it has the area of that county's four separate circles.
 			for (const d of nodes) {

@@ -108,6 +108,77 @@
 		).join("");
 	const keyBoxes = document.querySelectorAll("#key input[type=checkbox]");
 
+	// The main map's triangle legend, drawn the isogloss way: in the triangle
+	// of pop / soda / coke shares, each term's 50%, 75% and 90% areas are the
+	// nested corner triangles, filled and outlined exactly as on the map. Beside
+	// it, nested blobs show "other": dots at 10%, 25% and 33%, filled above 50%.
+	// Uses the dot patterns from the map's <defs>, so call it after those exist.
+	function addIsoKey() {
+		const width = 150;
+		const text = (x, y, str, anchor = "middle") =>
+			`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${str}</text>`;
+
+		// "Other", on top: nested circles, outermost 10%, then 25%, 33% and filled
+		// at 50%. Each sits well off the center of the one around it (but doesn't
+		// touch it), the way the map's nested areas do. Labels sit in a column on
+		// the right, each with a level leader to the edge of its own circle.
+		const ox = 48, oy = 40; // center of the outer circle
+		const rings = [
+			{ l: 0.1, r: 30, x: ox, y: oy, ly: oy - 18 },
+			{ l: 0.25, r: 22, x: ox - 3, y: oy + 4, ly: oy - 7 },
+			{ l: 1 / 3, r: 14, x: ox - 1, y: oy + 8, ly: oy + 4 },
+			{ l: 0.5, r: 7, x: ox - 4, y: oy + 11, ly: oy + 15 },
+		];
+		const circle = (c, attrs) => `<circle cx="${c.x}" cy="${c.y}" r="${c.r}" ${attrs}/>`;
+		let oth = text(ox, 6, "other");
+		rings.forEach((c, k) => {
+			oth += isMinor(c.l)
+				? circle(c, `fill="url(#other-dots-${k})"`)
+				: circle(c, `class="iso-band" fill="${FILL.other}" fill-opacity="${BAND_OPACITY}"`);
+		});
+		for (const c of rings) oth += circle(c, `fill="none" stroke="${LINE.other}" stroke-width="${OTHER_LINE_WIDTH[c.l]}"`);
+		const labelX = ox + 30 + 8;
+		for (const c of rings) {
+			const edge = c.x + Math.sqrt(c.r * c.r - (c.ly - c.y) ** 2);
+			oth += `<line x1="${edge.toFixed(1)}" y1="${c.ly}" x2="${labelX - 2}" y2="${c.ly}" stroke="#999" stroke-width="0.5"/>` +
+				text(labelX, c.ly + 3, levelLabel(c.l), "start");
+		}
+
+		// Pop / soda / coke, below: in the triangle of shares, each term's 50%,
+		// 75% and 90% areas are its nested corner triangles.
+		const side = 76, h = (side * Math.sqrt(3)) / 2;
+		const top = [56, 96], base = top[1] + h;
+		const corner = { soda: top, pop: [top[0] - side / 2, base], coke: [top[0] + side / 2, base] };
+		const at = (q) => ["soda", "pop", "coke"].reduce(
+			(acc, t) => [acc[0] + (q[t] || 0) * corner[t][0], acc[1] + (q[t] || 0) * corner[t][1]], [0, 0]);
+		const pts = (list) => list.map((q) => at(q).map((v) => v.toFixed(1)).join(",")).join(" ");
+		const others = { pop: ["soda", "coke"], soda: ["pop", "coke"], coke: ["pop", "soda"] };
+		let tri = `<polygon points="${pts([{ soda: 1 }, { pop: 1 }, { coke: 1 }])}" fill="#f7f7f7" stroke="#d6d6d6"/>`;
+		for (const t of ["pop", "soda", "coke"]) {
+			for (const l of LEVELS) {
+				const [a, b] = others[t];
+				tri += `<polygon class="iso-band" points="${pts([{ [t]: 1 }, { [t]: l, [a]: 1 - l }, { [t]: l, [b]: 1 - l }])}" ` +
+					`fill="${FILL[t]}" fill-opacity="${BAND_OPACITY}"/>` +
+					`<polyline points="${pts([{ [t]: l, [a]: 1 - l }, { [t]: l, [b]: 1 - l }])}" fill="none" ` +
+					`stroke="${LINE[t]}" stroke-width="${LINE_WIDTH[l]}"/>`;
+			}
+		}
+		tri += text(top[0], top[1] - 5, "soda") + text(corner.pop[0] - 4, base + 13, "pop") +
+			text(corner.coke[0] + 4, base + 13, "coke");
+		for (const l of LEVELS) { // where soda's lines meet the right-hand edge
+			const [x, y] = at({ soda: l, coke: 1 - l });
+			tri += text(x + 4, y + 3, levelLabel(l), "start");
+		}
+
+		const height = Math.ceil(base + 17);
+		const el = document.createElement("div");
+		el.className = "map-key";
+		el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" style="width:${((width * 1.2) / WIDTH) * 100}%" ` +
+			`role="img" aria-label="Key: nested blobs for other at 10, 25, 33 and 50 percent; nested triangles ` +
+			`for where pop, soda or coke reaches 50, 75 and 90 percent">${oth}${tri}</svg>`;
+		chart.append(el);
+	}
+
 	Promise.all([
 		d3.json("../vendor/world-atlas-2.0.2-countries-50m.json"),
 		d3.json("../vendor/naturalearth-5.1.2-admin1-50m-us-canada.geojson"),
@@ -178,6 +249,8 @@
 				}
 			}
 		});
+
+		addIsoKey();
 
 		const base = svg.append("g").attr("class", "basemap");
 		base.append("path").attr("class", "land").attr("d", path(land));

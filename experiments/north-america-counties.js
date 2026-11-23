@@ -7,7 +7,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, countyRecords, fmt, breakdownHTML, makeTooltip, regionProjection, mixCounts, mixKeyHTML } = PVS;
+	const { TERMS, countyRecords, fmt, breakdownHTML, makeTooltip, regionProjection, mixCounts } = PVS;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const NO_DATA = "#fff";
 
@@ -16,8 +16,7 @@
 	const statusEl = document.getElementById("status");
 	const minInput = document.getElementById("min");
 	const minValue = document.getElementById("min-value");
-	document.getElementById("color-key").innerHTML = mixKeyHTML() +
-		`<span class="key-item"><span class="disc" style="background:${NO_DATA};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></span>No data (or too few responses)</span>`;
+	PVS.showMixKey(document.getElementById("chart"), true, { noData: true });
 	const regionInputs = document.querySelectorAll("input[name=region]");
 	const region = () => [...regionInputs].find((el) => el.checked).value;
 

@@ -260,14 +260,67 @@ window.PVS = (function () {
 		return mix(shares);
 	};
 
-	// Key for the mixed colors: the three pure colors, two blends, and "other".
-	function mixKeyHTML() {
-		const item = (shares, label) =>
-			`<span class="key-item"><span class="disc" style="background:${mix({ pop: 0, soda: 0, coke: 0, other: 0, ...shares })};` +
-			`box-shadow:inset 0 0 0 1px rgba(0,0,0,0.3)"></span>${label}</span>`;
-		return item({ pop: 1 }, "Pop") + item({ soda: 1 }, "Soda") + item({ coke: 1 }, "Coke") +
-			item({ pop: 0.5, soda: 0.5 }, "Pop and soda") + item({ soda: 0.5, coke: 0.5 }, "Soda and coke") +
-			item({ pop: 0.5, other: 0.5 }, "Darker: more \"other\"");
+	// Put the triangle legend in the bottom-right corner of a map (open water
+	// in every frame), or hide it.
+	function showMixKey(chart, show = true, opts) {
+		let el = chart.querySelector(".map-key");
+		if (!el) {
+			el = document.createElement("div");
+			el.className = "map-key";
+			el.innerHTML = mixKeyHTML(opts);
+			chart.append(el);
+		}
+		el.hidden = !show;
+	}
+
+	// Key for the mixed colors: the main map's triangle legend (soda at the
+	// top, pop bottom left, coke bottom right, blends in between), a ramp for
+	// how much "other" darkens a color, and optionally a "no data" swatch.
+	function mixKeyHTML({ noData = false } = {}) {
+		const DIV = 10, side = 64, h = (side * Math.sqrt(3)) / 2;
+		const top = [42, 16];
+		const corner = { soda: top, pop: [top[0] - side / 2, top[1] + h], coke: [top[0] + side / 2, top[1] + h] };
+		const at = (i, j) => ({ soda: (DIV - i) / DIV, pop: (i - j) / DIV, coke: j / DIV });
+		const xy = (q) => ["soda", "pop", "coke"].reduce(
+			(acc, t) => [acc[0] + q[t] * corner[t][0], acc[1] + q[t] * corner[t][1]], [0, 0]);
+		const cell = (pts) => {
+			const c = { pop: 0, soda: 0, coke: 0, other: 0 };
+			for (const q of pts) for (const t of ["pop", "soda", "coke"]) c[t] += q[t] / 3;
+			const d = "M" + pts.map((q) => xy(q).map((v) => v.toFixed(1)).join(",")).join("L") + "Z";
+			return `<path d="${d}" fill="${mix(c)}" stroke="${mix(c)}" stroke-width="0.3"/>`;
+		};
+		let cells = "";
+		for (let i = 0; i < DIV; i++) {
+			for (let j = 0; j <= i; j++) {
+				cells += cell([at(i, j), at(i + 1, j), at(i + 1, j + 1)]);
+				if (j < i) cells += cell([at(i, j), at(i, j + 1), at(i + 1, j + 1)]);
+			}
+		}
+		const base = top[1] + h;
+		const label = (x, y, text, anchor = "middle") =>
+			`<text x="${x}" y="${y}" text-anchor="${anchor}">${text}</text>`;
+
+		// "other" ramp, white to black, as on the main map.
+		const rx = 112, rw = 70, rh = 10, ry = base - rh, STEPS = 20;
+		let ramp = "";
+		for (let k = 0; k <= STEPS; k++) {
+			const o = k / STEPS;
+			ramp += `<rect x="${(rx + (k * rw) / (STEPS + 1)).toFixed(1)}" y="${ry}" width="${(rw / (STEPS + 1) + 0.5).toFixed(1)}" height="${rh}" fill="${d3.interpolateRgb("white", "black")(o)}"/>`;
+		}
+		const nd = noData
+			? `<rect x="204" y="${ry}" width="26" height="${rh}" fill="#fff" stroke="#bbb" stroke-width="0.5"/>` + label(217, base + 13, "no data")
+			: "";
+		const width = noData ? 240 : 196;
+		const height = Math.ceil(base + 17);
+		// Sized like the main map's legend: 1.2 × these units in a FRAME-wide map.
+		return `<svg class="mix-key" viewBox="0 0 ${width} ${height}" ` +
+			`style="width:${((width * 1.2) / FRAME.width) * 100}%" role="img" ` +
+			`aria-label="Color key: yellow for pop, cyan for soda, magenta for coke, blended where answers are split, darker with more other answers">` +
+			`<g stroke="none">${cells}</g>` +
+			label(top[0], top[1] - 5, "soda") + label(corner.pop[0] - 4, base + 13, "pop") + label(corner.coke[0] + 4, base + 13, "coke") +
+			ramp + `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="none" stroke="#bbb" stroke-width="0.5"/>` +
+			label(rx + rw / 2, ry - 5, "other") + label(rx, base + 13, "0%", "start") + label(rx + rw, base + 13, "100%", "end") +
+			nd + "</svg>";
 	}
 
 	// Swelling state outlines for the bubble maps. Each state starts as its own
@@ -507,6 +560,6 @@ window.PVS = (function () {
 
 	return {
 		TERMS, LABEL, COLOR, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
-		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
+		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, mix, mixCounts, mixKeyHTML, showMixKey, swellingOutlines, separateStates,
 	};
 })();

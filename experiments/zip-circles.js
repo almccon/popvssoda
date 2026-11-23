@@ -6,7 +6,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML, drawBasemap } = PVS;
+	const { TERMS, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, drawBasemap } = PVS;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 
 	const canvas = document.getElementById("canvas");
@@ -17,7 +17,7 @@
 	const opacityInput = document.getElementById("opacity");
 	const opacityValue = document.getElementById("opacity-value");
 	const tooltip = makeTooltip(document.getElementById("chart"));
-	document.getElementById("color-key").innerHTML = mixKeyHTML();
+	PVS.showMixKey(document.getElementById("chart"));
 
 	const dpr = window.devicePixelRatio || 1;
 	canvas.width = WIDTH * dpr;

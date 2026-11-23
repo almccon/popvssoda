@@ -16,6 +16,7 @@
 	const canvas = document.getElementById("canvas");
 	const chart = document.getElementById("chart");
 	const status = document.getElementById("status");
+	window.PVS.showMixKey(document.getElementById("chart"));
 	const slider = document.getElementById("min-n");
 	const sliderLabel = document.getElementById("min-n-label");
 	const modeInputs = document.querySelectorAll("input[name=partition]");

@@ -47,6 +47,18 @@ body { max-width: 1012px; }
 .key svg { display: inline-block; vertical-align: middle; overflow: visible; }
 .key svg circle { fill: none; stroke: #777; }
 .key svg text { font-size: 10px; fill: #555; }
+/* The triangle legend for mixed colors, in the map's bottom-right corner. */
+.map-key {
+	position: absolute;
+	inset: auto 0 1.5% 0;
+	display: flex;
+	justify-content: flex-end;
+	padding-right: 2%;
+	pointer-events: none;
+}
+.map-key[hidden] { display: none; }
+.map-key svg { display: block; height: auto; overflow: visible; }
+.map-key text { font-size: 10px; fill: #333; }
 
 .status { color: #777; font-size: 12px; margin-top: 6px; min-height: 1.6em; }
 
