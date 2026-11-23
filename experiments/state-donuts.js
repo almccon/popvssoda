@@ -7,7 +7,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
+	const { TERMS, COLOR, ZONE_FILL, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const MAX_RADIUS = 52;      // radius of the place with the most responses
 	const HOLE = 0.5;           // inner radius as a fraction of outer radius
@@ -131,7 +131,10 @@
 					})))
 				.join("path")
 				.attr("d", arc)
-				.attr("fill", (p) => COLOR[p.data.term]);
+				// The isogloss map's 90% zone colors, outlined like its lines.
+				.attr("fill", (p) => ZONE_FILL[p.data.term])
+				.attr("stroke", (p) => COLOR[p.data.term])
+				.attr("stroke-width", 0.75);
 
 			// Transparent disc so the hole is hoverable too.
 			donuts.append("circle")

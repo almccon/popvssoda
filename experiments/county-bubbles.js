@@ -12,10 +12,8 @@
 	"use strict";
 
 	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, swellingOutlines, separateStates, drawBasemap } = PVS;
-	// Same colors as the 90% areas on the isogloss map: the CMY fills as they
-	// look after three stacked 30% bands over the land (and a gray for
-	// "other"), outlined in the darker line colors from common.js.
-	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
+	// The 90% zones' colors from the isogloss map, outlined in the line colors.
+	const FILL = PVS.ZONE_FILL;
 	const OUTLINE = COLOR;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles

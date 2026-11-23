@@ -12,7 +12,7 @@
 
 	const { TERMS, LABEL, COLOR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, swellingOutlines, separateStates, drawBasemap } = PVS;
 	// Same colors as county bubbles (the isogloss map's 90% areas).
-	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
+	const FILL = PVS.ZONE_FILL;
 	const OUTLINE = COLOR;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles
