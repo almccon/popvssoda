@@ -7,8 +7,8 @@
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, northAmericaProjection } = PVS;
-	const WIDTH = 960, HEIGHT = 680;
+	const { TERMS, COLOR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
+	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const MAX_RADIUS = 52;      // radius of the place with the most responses
 	const HOLE = 0.5;           // inner radius as a fraction of outer radius
 	const GAP = 1.5;            // minimum space between donuts, px
@@ -51,12 +51,7 @@
 		// isn't a map of specks. The size key follows.
 		const radius = d3.scaleSqrt().range([0, MAX_RADIUS]);
 
-		function projectionFor(which) {
-			const pad = [[10, 10], [WIDTH - 10, HEIGHT - 10]];
-			if (which === "US") return d3.geoAlbersUsa().fitExtent(pad, land.US);
-			if (which === "CA") return d3.geoConicConformal().rotate([96, 0]).parallels([49, 77]).fitExtent(pad, land.CA);
-			return northAmericaProjection(WIDTH, HEIGHT).projection;
-		}
+		const projectionFor = regionProjection; // the same for every map; see common.js
 
 		function render() {
 			const which = region();

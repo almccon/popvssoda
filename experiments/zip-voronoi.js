@@ -7,8 +7,7 @@
 	"use strict";
 
 	const { TERMS, BASEMAP, fmt, breakdownHTML, makeTooltip } = window.PVS;
-	const WIDTH = 960;
-	const HEIGHT = 700;
+	const { width: WIDTH, height: HEIGHT } = window.PVS.FRAME;
 	const NA_IDS = { US: "840", CA: "124" }; // world-atlas (Natural Earth) country ids
 
 	// Same mix as the main map's "cmy" palette (see common.js).

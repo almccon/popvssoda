@@ -175,6 +175,31 @@ window.PVS = (function () {
 	//
 	// Returns the projection plus `inInsetPx(x, y)` and `inInsetLonLat(lon, lat)`,
 	// which say whether a pixel or a location belongs to the Hawaii inset.
+	// Every map uses this frame, and each region (US only, Canada only, both)
+	// always uses the same projection, so maps of the same region line up
+	// exactly and switching between them (as the homepage tabs do) doesn't jump.
+	// js/map.js repeats the frame and the US projection.
+	const FRAME = { width: 960, height: 680 };
+
+	const usProjection = () =>
+		d3.geoAlbersUsa().scale(1027).translate([FRAME.width / 2, FRAME.height / 2]);
+
+	// Fitted to Canada's extremes (not to a particular boundary file), so every
+	// Canada-only map gets exactly the same projection.
+	const canadaProjection = () =>
+		d3.geoConicConformal().rotate([96, 0]).parallels([49, 77])
+			.fitExtent([[10, 10], [FRAME.width - 10, FRAME.height - 10]], {
+				type: "MultiPoint",
+				coordinates: [[-141, 60.3], [-141, 69.6], [-128, 70.3], [-120, 76.5], [-95, 81.5], [-75, 83.1],
+					[-62, 82.5], [-63, 67], [-52.6, 47.5], [-64.5, 43.4], [-82.6, 41.7], [-95, 49], [-123.3, 48.3],
+					[-133, 54.2]],
+			});
+
+	// "both", "US" or "CA".
+	const regionProjection = (which) =>
+		which === "US" ? usProjection() : which === "CA" ? canadaProjection()
+			: northAmericaProjection(FRAME.width, FRAME.height).projection;
+
 	function northAmericaProjection(width, height) {
 		const main = d3.geoConicConformal()
 			.rotate([100, 0]).parallels([30, 60])
@@ -482,6 +507,6 @@ window.PVS = (function () {
 
 	return {
 		TERMS, LABEL, COLOR, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
-		northAmericaProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
+		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, mix, mixCounts, mixKeyHTML, swellingOutlines, separateStates,
 	};
 })();

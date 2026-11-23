@@ -7,8 +7,8 @@
 (function () {
 	"use strict";
 
-	const { TERMS, countyRecords, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML } = PVS;
-	const WIDTH = 960, HEIGHT = 680;
+	const { TERMS, countyRecords, fmt, breakdownHTML, makeTooltip, regionProjection, mixCounts, mixKeyHTML } = PVS;
+	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const NO_DATA = "#fff";
 
 	const svg = d3.select("#svg");
@@ -58,12 +58,7 @@
 			},
 		};
 
-		function projectionFor(which) {
-			const pad = [[10, 10], [WIDTH - 10, HEIGHT - 10]];
-			if (which === "US") return d3.geoAlbersUsa().fitExtent(pad, outlines.US.land);
-			if (which === "CA") return d3.geoConicConformal().rotate([96, 0]).parallels([49, 77]).fitExtent(pad, outlines.CA.land);
-			return northAmericaProjection(WIDTH, HEIGHT).projection;
-		}
+		const projectionFor = regionProjection; // the same for every map; see common.js
 
 		const landLayer = svg.append("g").attr("class", "basemap");
 		const unitLayer = svg.append("g").attr("class", "na-units");

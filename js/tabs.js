@@ -29,6 +29,7 @@
 	const tabs = [...document.querySelectorAll("[role=tab][data-tab]")];
 	const mapPanel = document.getElementById("map");
 	const viewPanel = document.getElementById("view-panel");
+	const framesEl = document.getElementById("view-frames");
 	const caption = document.getElementById("view-caption");
 	const fullLink = document.getElementById("view-full");
 	const reading = document.getElementById("reading"); // describes the county map only
@@ -51,7 +52,7 @@
 		frame.title = document.getElementById("tab-" + name).textContent + " map";
 		frame.src = `${view.page}?embed=1${view.settings ? "&" + view.settings : ""}`;
 		frame.addEventListener("load", () => fitFrame(frame));
-		viewPanel.append(frame);
+		framesEl.append(frame);
 		return (frames[name] = frame);
 	}
 

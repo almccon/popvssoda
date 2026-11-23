@@ -4,8 +4,10 @@
 (function () {
 	"use strict";
 
-	const WIDTH = 800;
-	const HEIGHT = 500;
+	// Every map on the site shares this frame and, for the US, this projection
+	// (experiments/common.js: FRAME and usProjection), so the homepage tabs line up.
+	const WIDTH = 960;
+	const HEIGHT = 680;
 	const TERMS = ["pop", "soda", "coke", "other"];
 	const LABEL = { pop: "Pop", soda: "Soda", coke: "Coke", other: "Other" };
 	const NO_DATA_FILL = "white";
@@ -85,7 +87,7 @@
 	const tooltip = d3.select("#tooltip");
 	const container = document.getElementById("map-container");
 
-	const projection = d3.geoAlbersUsa().scale(856).translate([WIDTH / 2, HEIGHT / 2]);
+	const projection = d3.geoAlbersUsa().scale(1027).translate([WIDTH / 2, HEIGHT / 2]);
 	const path = d3.geoPath(projection);
 
 	// Layers, bottom to top.
@@ -94,9 +96,12 @@
 	const lakeLayer = svg.append("g");
 	const stateLayer = svg.append("g");
 	const hoverPath = svg.append("path").attr("class", "hover");
-	const legend = buildLegend(svg);
+	// The legend and credit were laid out for an 800 × 500 map; scale them up
+	// to match and center them vertically like the map.
+	const overlay = svg.append("g").attr("transform", "translate(0,40) scale(1.2)");
+	const legend = buildLegend(overlay);
 
-	svg.append("g")
+	overlay.append("g")
 		.attr("class", "author")
 		.append("text")
 		.attr("x", 550)

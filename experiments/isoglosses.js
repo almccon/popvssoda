@@ -15,8 +15,7 @@
 	"use strict";
 
 	const { fmt, LABEL, breakdownHTML, makeTooltip } = window.PVS;
-	const WIDTH = 960;
-	const HEIGHT = 700;
+	const { width: WIDTH, height: HEIGHT } = window.PVS.FRAME;
 	const KM_PER_MILE = 1.609344;
 	const EARTH_KM = 6371;
 	const NA_IDS = ["840", "124"]; // USA, Canada in world-atlas

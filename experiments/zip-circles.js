@@ -7,7 +7,7 @@
 	"use strict";
 
 	const { TERMS, fmt, breakdownHTML, makeTooltip, northAmericaProjection, mixCounts, mixKeyHTML, drawBasemap } = PVS;
-	const WIDTH = 960, HEIGHT = 700;
+	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 
 	const canvas = document.getElementById("canvas");
 	const ctx = canvas.getContext("2d");

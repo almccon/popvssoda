@@ -14,7 +14,7 @@
 	// Same colors as county bubbles (the isogloss map's 90% areas).
 	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
 	const OUTLINE = COLOR;
-	const WIDTH = 960, HEIGHT = 700;
+	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles
 	const STATE_GAP = 5; // px between circles from different states, with outlines on
 	const SQRT3 = Math.sqrt(3);

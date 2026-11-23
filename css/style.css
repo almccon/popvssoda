@@ -76,7 +76,8 @@ header h1 img { display: inline-block; width: 282px; }
 
 [role=tabpanel][hidden] { display: none; }
 
-.view-caption { margin-bottom: 10px; }
+/* Below the map, so every tab's map starts at the same height. */
+.view-caption { margin-top: 10px; }
 
 .view-frame {
 	display: block;

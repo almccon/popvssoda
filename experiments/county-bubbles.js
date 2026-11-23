@@ -15,7 +15,7 @@
 	// "other"), outlined in the darker line colors from common.js.
 	const FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
 	const OUTLINE = COLOR;
-	const WIDTH = 960, HEIGHT = 600;
+	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles
 	const STATE_GAP = 5; // px between circles from different states, with outlines on
 
@@ -69,7 +69,7 @@
 		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
 	]).then(([data, popRows, lakes]) => {
 		const population = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
-		const projection = d3.geoAlbersUsa().fitExtent([[10, 10], [WIDTH - 10, HEIGHT - 10]], data.land);
+		const projection = PVS.usProjection();
 		const path = d3.geoPath(projection);
 		const landPath = new Path2D(path(data.land));
 		const lakePath = new Path2D(path(lakes));
