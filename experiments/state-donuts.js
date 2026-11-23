@@ -1,13 +1,13 @@
 // State and province donut cartogram (Dorling-style): one donut per state,
-// province or territory, area proportional to the number of responses, slices
-// for each term. Counts come from data/state_counts.csv, which includes every
+// province or territory, area proportional to the number of responses (or to
+// its 2010 population), slices for each term. Counts come from data/state_counts.csv, which includes every
 // response that named a state or province, with or without a usable ZIP code.
 // Each donut starts at the center of its state's responses.
 
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, ZONE_FILL, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
+	const { TERMS, COLOR, ZONE_FILL, STATE_ABBR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const MAX_RADIUS = 52;      // radius of the place with the most responses
 	const HOLE = 0.5;           // inner radius as a fraction of outer radius
@@ -19,6 +19,10 @@
 	document.getElementById("color-key").innerHTML = colorKeyHTML("wedge");
 	const regionInputs = document.querySelectorAll("input[name=region]");
 	const region = () => [...regionInputs].find((el) => el.checked).value;
+	const sizeInputs = document.querySelectorAll("input[name=size-by]");
+	const byPopulation = () => [...sizeInputs].find((el) => el.checked).value === "population";
+	// Census division codes start with the province's 2-digit code.
+	const PROVINCE = { 10: "NL", 11: "PE", 12: "NS", 13: "NB", 24: "QC", 35: "ON", 46: "MB", 47: "SK", 48: "AB", 59: "BC", 60: "YT", 61: "NT", 62: "NU" };
 
 	Promise.all([
 		d3.json("../vendor/world-atlas-2.0.2-countries-50m.json"),
@@ -26,7 +30,16 @@
 		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
 		d3.csv("../data/state_counts.csv"),
 		d3.csv("../data/postal_counts.csv"),
-	]).then(([world, admin1, lakes, rows, postal]) => {
+		d3.csv("../data/county_population_2010.csv"),
+		d3.csv("../data/census_division_population_2010.csv"),
+	]).then(([world, admin1, lakes, rows, postal, countyPop, cdPop]) => {
+		// 2010 populations: the US census by county and Statistics Canada's
+		// estimates by census division, summed by state and province.
+		const population = new Map();
+		const add = (key, n) => population.set(key, (population.get(key) || 0) + n);
+		for (const r of countyPop) add(`US-${STATE_ABBR[r.county_fips.slice(0, 2)]}`, +r.population_2010);
+		for (const r of cdPop) add(`CA-${PROVINCE[r.cduid.slice(0, 2)]}`, +r.population_2010);
+
 		const countryLand = (id) => topojson.feature(world,
 			{ type: "GeometryCollection", geometries: world.objects.countries.geometries.filter((g) => g.id === id) });
 		const land = { US: countryLand("840"), CA: countryLand("124") };
@@ -42,7 +55,7 @@
 			for (const t of TERMS) counts[t] = +r[t];
 			places.push({
 				country: r.country, abbr: r.state, name: f.properties.name, feature: f,
-				counts, total: +r.total,
+				counts, total: +r.total, population: population.get(`${r.country}-${r.state}`) || 0,
 				points: postal.filter((p) => p.country === r.country && p.state === r.state && p.lat && +p.total),
 			});
 		}
@@ -59,7 +72,8 @@
 			const projection = projectionFor(which);
 			const path = d3.geoPath(projection);
 
-			radius.domain([0, d3.max(shown, (p) => p.total)]);
+			const sized = (p) => (byPopulation() ? p.population : p.total);
+			radius.domain([0, d3.max(shown, sized)]);
 			updateSizeKey();
 			for (const p of shown) {
 				// Home: the center of the state's responses (each ZIP code or FSA
@@ -72,7 +86,7 @@
 					sx += xy[0] * q.total; sy += xy[1] * q.total; sw += +q.total;
 				}
 				[p.homeX, p.homeY] = sw ? [sx / sw, sy / sw] : path.centroid(p.feature);
-				p.r = radius(p.total);
+				p.r = radius(sized(p));
 				p.x = p.homeX;
 				p.y = p.homeY;
 				p.vx = p.vy = 0;
@@ -154,7 +168,7 @@
 			donuts
 				.on("pointermove pointerdown", (event, d) => {
 					donuts.attr("opacity", (o) => (o === d ? 1 : 0.35));
-					tooltip.show(event, breakdownHTML(d.name, d.counts, d.total));
+					tooltip.show(event, breakdownHTML(`${d.name} (population ${fmt(d.population)})`, d.counts, d.total));
 				})
 				.on("pointerleave", (event) => {
 					if (event.pointerType === "mouse") {
@@ -166,7 +180,8 @@
 			const n = d3.sum(nodes, (d) => d.total);
 			const states = nodes.filter((d) => d.country === "US").length;
 			const provs = nodes.filter((d) => d.country === "CA").length;
-			statusEl.textContent = `${fmt(n)} responses: ` + [
+			statusEl.textContent = `${fmt(n)} responses` +
+				(byPopulation() ? `, donuts sized by ${fmt(d3.sum(nodes, (d) => d.population))} people (2010)` : "") + ": " + [
 				states && `${states} states (with DC)`,
 				provs && `${provs} provinces and territories`,
 			].filter(Boolean).join(" and ") + ". Hover over (or tap) a donut for its numbers.";
@@ -179,14 +194,17 @@
 			}
 		});
 		regionInputs.forEach((el) => el.addEventListener("change", render));
+		sizeInputs.forEach((el) => el.addEventListener("change", render));
 
 		function updateSizeKey() {
 			const top = radius.domain()[1];
-			const sizes = [100, 500, 1000, 5000, 20000].filter((v) => v <= top).slice(-3);
+			const sizes = (byPopulation()
+				? [100000, 1000000, 5000000, 10000000, 30000000]
+				: [100, 500, 1000, 5000, 20000]).filter((v) => v <= top).slice(-3);
 			const big = radius(sizes[sizes.length - 1]);
 			const key = d3.select("#size-key").html("");
 			const k = key.append("svg")
-				.attr("width", big * 2 + 70)
+				.attr("width", big * 2 + (byPopulation() ? 90 : 70))
 				.attr("height", big * 2 + 4)
 				.append("g").attr("transform", `translate(${big + 2},${big * 2 + 2})`);
 			for (const v of sizes) {
@@ -198,7 +216,7 @@
 					.attr("stroke", "#bbb").attr("stroke-dasharray", "2,2");
 				k.append("text").attr("x", big + 10).attr("y", -2 * r).attr("dy", "0.35em").text(fmt(v));
 			}
-			key.append("span").text("responses");
+			key.append("span").text(byPopulation() ? "people" : "responses");
 		}
 
 		render();

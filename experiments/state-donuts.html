@@ -9,7 +9,7 @@
 	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
 	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
 	<script src="common.js?v=2026-11-23p" defer></script>
-	<script src="state-donuts.js?v=2026-11-23p" defer></script>
+	<script src="state-donuts.js?v=2026-11-23q" defer></script>
 </head>
 <body>
 	<nav class="nav">
@@ -26,14 +26,16 @@
 		<h1>Pop vs Soda by state and province</h1>
 		<p class="intro">
 			Each state, province and territory is a donut sized by its number of
-			responses, split into the share answering pop, soda, coke or something
-			else. Donuts are nudged apart so they don't overlap, so each sits near (not
-			exactly on) the center of its state or province's responses. Each view is scaled to its own biggest donut, so check the size key when switching.
-			Built from <code>data/state_counts.csv</code>.
+			responses, or by its population in 2010 (the US census, and Statistics
+			Canada's estimates), split into the share answering pop, soda, coke or
+			something else. Donuts are nudged apart so they don't overlap, so each sits
+			near (not exactly on) the center of its state or province's responses. Each
+			view is scaled to its own biggest donut, so check the size key when
+			switching. Built from <code>data/state_counts.csv</code>.
 		</p>
 		<div class="chart" id="chart">
 			<svg id="svg" viewBox="0 0 960 680" role="img"
-				aria-label="Donut chart for each US state and Canadian province and territory showing the share of responses for pop, soda, coke and other, sized by number of responses"></svg>
+				aria-label="Donut chart for each US state and Canadian province and territory showing the share of responses for pop, soda, coke and other, sized by number of responses or by population"></svg>
 		</div>
 		<div class="status" id="status">Loading…</div>
 		<div class="slider-row region-row">
@@ -41,6 +43,11 @@
 			<label><input type="radio" name="region" value="both" checked> US and Canada</label>
 			<label><input type="radio" name="region" value="US"> US only</label>
 			<label><input type="radio" name="region" value="CA"> Canada only</label>
+		</div>
+		<div class="slider-row">
+			<span>Size donuts by</span>
+			<label><input type="radio" name="size-by" value="responses" checked> number of responses</label>
+			<label><input type="radio" name="size-by" value="population"> population (2010)</label>
 		</div>
 		<div class="key">
 			<span id="color-key"></span>
