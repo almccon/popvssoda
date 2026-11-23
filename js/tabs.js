@@ -9,7 +9,6 @@
 	const VIEWS = {
 		"isoglosses": {
 			page: "experiments/isoglosses.html",
-			settings: "method=adaptive&radius=300&min-n=500",
 			caption: "Smoothed lines around the areas where pop, soda, coke or \"other\" reaches 50%, 75% or 90% of nearby responses, in the US and Canada.",
 		},
 		"zip-voronoi": {

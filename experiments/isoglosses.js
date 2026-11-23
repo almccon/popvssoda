@@ -52,12 +52,12 @@
 			minLabel: "Leave blank where the window has fewer than", minRange: [1, 200, 1], min: 10,
 		},
 		gaussian: {
-			radiusLabel: "Smoothing distance (Gaussian σ)", radiusRange: [5, 400, 5], radius: 75,
-			minLabel: "Leave blank where the weighted count is below", minRange: [1, 200, 1], min: 10,
+			radiusLabel: "Smoothing distance (Gaussian σ)", radiusRange: [5, 400, 5], radius: 50,
+			minLabel: "Leave blank where the weighted count is below", minRange: [1, 200, 1], min: 20,
 		},
 		adaptive: {
-			radiusLabel: "Largest window allowed", radiusRange: [25, 1000, 25], radius: 300,
-			minLabel: "Grow each window until it holds", minRange: [25, 3000, 25], min: 500,
+			radiusLabel: "Largest window allowed", radiusRange: [25, 1000, 25], radius: 600,
+			minLabel: "Grow each window until it holds", minRange: [25, 3000, 25], min: 600,
 		},
 	};
 	function applyMethodRanges(method, resetValues) {
