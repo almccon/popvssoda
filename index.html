@@ -5,10 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>The Pop vs. Soda Page</title>
 	<meta name="description" content="A map of the geographic distribution of the terms &quot;pop&quot;, &quot;soda&quot; and &quot;coke&quot; used to describe carbonated soft drinks in the United States.">
-	<link href="css/style.css?v=2026" rel="stylesheet">
+	<link href="css/style.css?v=2026-11-23" rel="stylesheet">
 	<script src="vendor/d3.v7.9.0.min.js" defer></script>
 	<script src="vendor/topojson-client.v3.1.0.min.js" defer></script>
 	<script src="js/map.js?v=2026-11-23" defer></script>
+	<script src="js/tabs.js?v=2026-11-23" defer></script>
 </head>
 <body>
 	<header>
@@ -16,7 +17,19 @@
 	</header>
 
 	<main>
-		<section id="map" class="panel" aria-label="Map">
+		<div class="view-tabs" role="tablist" aria-label="Map views">
+			<button type="button" role="tab" id="tab-counties" data-tab="counties" aria-controls="map" aria-selected="true">Counties</button>
+			<button type="button" role="tab" id="tab-isoglosses" data-tab="isoglosses" aria-controls="view-panel" aria-selected="false" tabindex="-1">Isoglosses</button>
+			<button type="button" role="tab" id="tab-zip-voronoi" data-tab="zip-voronoi" aria-controls="view-panel" aria-selected="false" tabindex="-1">ZIP Voronoi</button>
+			<button type="button" role="tab" id="tab-county-bubbles" data-tab="county-bubbles" aria-controls="view-panel" aria-selected="false" tabindex="-1">County bubbles</button>
+			<button type="button" role="tab" id="tab-state-donuts" data-tab="state-donuts" aria-controls="view-panel" aria-selected="false" tabindex="-1">State donuts</button>
+		</div>
+
+		<section id="view-panel" class="panel" role="tabpanel" hidden>
+			<p class="view-caption"><span id="view-caption"></span> <a id="view-full" href="experiments/">Open the full page</a></p>
+		</section>
+
+		<section id="map" class="panel" role="tabpanel" aria-labelledby="tab-counties">
 			<div id="map-container">
 				<svg id="d3map" viewBox="0 0 800 500" role="img"
 					aria-label="Map of US counties colored by whether survey respondents call soft drinks pop, soda, coke or something else"></svg>

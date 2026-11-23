@@ -43,6 +43,50 @@ header h1 img { display: inline-block; width: 282px; }
 
 .panel p + p { margin-top: 0.8em; }
 
+/* ---- View tabs ------------------------------------------------------------ */
+
+.view-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 0;
+}
+
+.view-tabs [role=tab] {
+	font: inherit;
+	font-size: 12px;
+	color: #333;
+	background: #f6f6f6;
+	border: none;
+	border-radius: 5px 5px 0 0;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.view-tabs [role=tab]:hover { background: #e4e4e4; }
+
+.view-tabs [role=tab][aria-selected="true"] {
+	background: #eee;
+	font-weight: bold;
+}
+
+/* The panel under the tabs joins up with the selected tab. */
+.view-tabs + .panel,
+.view-tabs ~ #map { border-top-left-radius: 0; }
+
+[role=tabpanel][hidden] { display: none; }
+
+.view-caption { margin-bottom: 10px; }
+
+.view-frame {
+	display: block;
+	width: 100%;
+	height: 600px; /* until the page loads and the frame is fitted to it */
+	border: 0;
+}
+
+.view-frame[hidden] { display: none; }
+
 /* ---- Map ---------------------------------------------------------------- */
 
 #map-container { position: relative; }
@@ -169,6 +213,10 @@ header h1 img { display: inline-block; width: 282px; }
 	gap: 0 1em;
 	align-items: start;
 }
+
+/* Other map tabs hide "Reading the map"; the remaining boxes take the full width. */
+#reading[hidden] { display: none; }
+.columns:has(#reading[hidden]) { grid-template-columns: 1fr; }
 
 .key-list { list-style: none; padding: 0; }
 .key-list li { margin: 0.25em 0; }

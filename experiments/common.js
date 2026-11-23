@@ -4,6 +4,27 @@
 window.PVS = (function () {
 	"use strict";
 
+	// Page settings from the URL, so the homepage can embed a page with chosen
+	// defaults: ?embed=1 hides the navigation and intro, and any other key sets
+	// the control with that name (radio buttons) or id (checkboxes take 1 or 0,
+	// other inputs take the value). This runs before each page's own script.
+	(function applyURLSettings() {
+		const params = new URLSearchParams(location.search);
+		if (params.get("embed") === "1") document.documentElement.classList.add("embed");
+		for (const [key, value] of params) {
+			if (key === "embed") continue;
+			const radios = document.querySelectorAll(`input[type=radio][name="${CSS.escape(key)}"]`);
+			if (radios.length) {
+				for (const r of radios) r.checked = r.value === value;
+				continue;
+			}
+			const el = document.getElementById(key);
+			if (!el || el.tagName !== "INPUT") continue;
+			if (el.type === "checkbox") el.checked = value === "1" || value === "true";
+			else el.value = value;
+		}
+	})();
+
 	const TERMS = ["pop", "soda", "coke", "other"];
 	const LABEL = { pop: "Pop", soda: "Soda", coke: "Coke", other: "Other" };
 

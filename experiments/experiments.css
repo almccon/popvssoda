@@ -64,3 +64,10 @@ body { max-width: 1012px; }
 	padding: 3px 10px;
 	cursor: pointer;
 }
+
+/* Embedded in the homepage tabs (?embed=1): no navigation or intro, and no
+   panel box, since the homepage supplies its own. */
+.embed, .embed body { background: #eee; }
+.embed body { max-width: none; padding: 0; }
+.embed .nav, .embed .panel > h1, .embed .intro { display: none; }
+.embed .panel { padding: 0; margin: 0; background: none; }
