@@ -32,10 +32,11 @@ window.PVS = (function () {
 	// marks stay visible on white. "Other" is a deliberately neutral gray,
 	// matching the main map, where "other" darkens a county towards black.
 	const COLOR = { pop: "#c49a00", soda: "#0a8fbf", coke: "#d13a8a", other: "#555555" };
-	// Fills for the four answers: the 90% zones on the isogloss map (its CMY
-	// fills after three stacked 30% bands over the land, and a gray for
-	// "other"). Shapes filled with these are outlined in COLOR.
-	const ZONE_FILL = { pop: "#fbfb54", soda: "#54fbfb", coke: "#fb54fb", other: "#b9b9b9" };
+	// Fills for the four answers on the donuts and bubbles: the pure colors of
+	// the main map's mix (what the choropleth and Voronoi show where everyone
+	// gave one answer), and a gray for "other". Shapes filled with these are
+	// outlined in COLOR.
+	const TERM_FILL = { pop: "#ffff00", soda: "#00ffff", coke: "#ff00ff", other: "#b9b9b9" };
 
 	const STATE_ABBR = {
 		"01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT",
@@ -138,7 +139,7 @@ window.PVS = (function () {
 	function breakdownHTML(title, counts, total, highlight) {
 		const rows = TERMS.map((t) =>
 			`<tr${t === highlight ? ' class="hl"' : ""}>` +
-			`<td><span class="dot" style="background:${ZONE_FILL[t]};box-shadow:inset 0 0 0 1px ${COLOR[t]}"></span>${LABEL[t]}</td>` +
+			`<td><span class="dot" style="background:${TERM_FILL[t]};box-shadow:inset 0 0 0 1px ${COLOR[t]}"></span>${LABEL[t]}</td>` +
 			`<td class="num">${fmt(counts[t])}</td>` +
 			`<td class="num">${total ? pct(counts[t] / total) : "–"}</td></tr>`
 		).join("");
@@ -600,13 +601,13 @@ window.PVS = (function () {
 	// Color key: one swatch + name per term.
 	function colorKeyHTML(shape) {
 		return TERMS.map((t) =>
-			`<span class="key-item"><span class="${shape}" style="background:${ZONE_FILL[t]};` +
+			`<span class="key-item"><span class="${shape}" style="background:${TERM_FILL[t]};` +
 			`box-shadow:inset 0 0 0 1px ${COLOR[t]}"></span>${LABEL[t]}</span>`
 		).join("");
 	}
 
 	return {
-		TERMS, LABEL, COLOR, ZONE_FILL, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
+		TERMS, LABEL, COLOR, TERM_FILL, STATE_ABBR, BASEMAP, drawBasemap, fmt, pct, loadData, countyRecords, breakdownHTML, makeTooltip, colorKeyHTML,
 		northAmericaProjection, FRAME, usProjection, canadaProjection, regionProjection, regionZones, pageRegion, reloadWithSettings, mix, mixCounts, mixKeyHTML, showMixKey, swellingOutlines, separateStates,
 	};
 })();

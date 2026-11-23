@@ -232,10 +232,13 @@
 
 		// --- static layers ---------------------------------------------------
 		const defs = svg.append("defs");
-		defs.append("clipPath").attr("id", "land-clip")
-			.append("path")
-			.attr("clip-rule", "evenodd") // land minus lakes
-			.attr("d", path(land) + path(lakes));
+		// Bands, dots and lines show only on the land shown, minus lakes. A mask
+		// rather than an even-odd clip: with one country shown its land stops
+		// mid-lake, and an even-odd clip would fill the other country's half.
+		const landMask = defs.append("mask").attr("id", "land-mask")
+			.attr("maskUnits", "userSpaceOnUse").attr("x", 0).attr("y", 0).attr("width", WIDTH).attr("height", HEIGHT);
+		landMask.append("path").attr("fill", "#fff").attr("d", path(land));
+		landMask.append("path").attr("fill", "#000").attr("d", path(lakes));
 
 		// Sub-grid spacing is DOT_GAP * sqrt(3), in horizontal rows; the three
 		// sub-grids are shifted 0, 1 and 2 * DOT_GAP straight down.
@@ -268,9 +271,9 @@
 		defs.append("clipPath").attr("id", "shown-land").append("path").attr("d", path(land));
 		base.append("path").attr("class", "lakes").attr("clip-path", "url(#shown-land)").attr("d", path(lakes));
 
-		const bands = svg.append("g").attr("clip-path", "url(#land-clip)");
-		const dots = svg.append("g").attr("clip-path", "url(#land-clip)");
-		const lines = svg.append("g").attr("clip-path", "url(#land-clip)");
+		const bands = svg.append("g").attr("mask", "url(#land-mask)");
+		const dots = svg.append("g").attr("mask", "url(#land-mask)");
+		const lines = svg.append("g").attr("mask", "url(#land-mask)");
 		// State / province lines again on top, faintly, so they read through the bands.
 		svg.append("path").attr("class", "admin-over").attr("d", path(admin1));
 

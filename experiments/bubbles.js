@@ -12,8 +12,8 @@
 	"use strict";
 
 	const { TERMS, LABEL, COLOR, fmt, loadData, breakdownHTML, makeTooltip, mixCounts, swellingOutlines, separateStates, drawBasemap } = PVS;
-	// The 90% zones' colors from the isogloss map, outlined in the line colors.
-	const FILL = PVS.ZONE_FILL;
+	// Pure colors like the main map's, outlined in the darker line colors.
+	const FILL = PVS.TERM_FILL;
 	const OUTLINE = COLOR;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles

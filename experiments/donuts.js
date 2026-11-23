@@ -7,7 +7,7 @@
 (function () {
 	"use strict";
 
-	const { TERMS, COLOR, ZONE_FILL, STATE_ABBR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
+	const { TERMS, COLOR, TERM_FILL, STATE_ABBR, fmt, breakdownHTML, makeTooltip, colorKeyHTML, regionProjection } = PVS;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const MAX_RADIUS = 52;      // radius of the place with the most responses
 	const HOLE = 0.5;           // inner radius as a fraction of outer radius
@@ -145,8 +145,8 @@
 					})))
 				.join("path")
 				.attr("d", arc)
-				// The isogloss map's 90% zone colors, outlined like its lines.
-				.attr("fill", (p) => ZONE_FILL[p.data.term])
+				// Pure colors like the main map's, outlined in the darker line colors.
+				.attr("fill", (p) => TERM_FILL[p.data.term])
 				.attr("stroke", (p) => COLOR[p.data.term])
 				.attr("stroke-width", 0.75);
 

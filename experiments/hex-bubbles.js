@@ -11,8 +11,8 @@
 	"use strict";
 
 	const { TERMS, LABEL, COLOR, fmt, breakdownHTML, makeTooltip, northAmericaProjection, swellingOutlines, separateStates, drawBasemap } = PVS;
-	// Same colors as the bubbles map (the isogloss map's 90% areas).
-	const FILL = PVS.ZONE_FILL;
+	// Same colors as the bubbles map.
+	const FILL = PVS.TERM_FILL;
 	const OUTLINE = COLOR;
 	const { width: WIDTH, height: HEIGHT } = PVS.FRAME;
 	const PADDING = 0.4; // px between touching circles
