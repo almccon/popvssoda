@@ -138,7 +138,7 @@ window.PVS = (function () {
 	function breakdownHTML(title, counts, total, highlight) {
 		const rows = TERMS.map((t) =>
 			`<tr${t === highlight ? ' class="hl"' : ""}>` +
-			`<td><span class="dot" style="background:${COLOR[t]}"></span>${LABEL[t]}</td>` +
+			`<td><span class="dot" style="background:${ZONE_FILL[t]};box-shadow:inset 0 0 0 1px ${COLOR[t]}"></span>${LABEL[t]}</td>` +
 			`<td class="num">${fmt(counts[t])}</td>` +
 			`<td class="num">${total ? pct(counts[t] / total) : "–"}</td></tr>`
 		).join("");
