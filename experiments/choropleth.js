@@ -16,7 +16,7 @@
 	const statusEl = document.getElementById("status");
 	const minInput = document.getElementById("min");
 	const minValue = document.getElementById("min-value");
-	PVS.showMixKey(document.getElementById("chart"), true, { noData: true });
+	PVS.showMixKey(document.getElementById("chart"));
 	const regionInputs = document.querySelectorAll("input[name=region]");
 	const region = () => [...regionInputs].find((el) => el.checked).value;
 

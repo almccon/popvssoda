@@ -327,25 +327,14 @@ window.PVS = (function () {
 		return { setRegion };
 	}
 
-	// Put the triangle legend in the bottom-right corner of a map (open water
-	// in every frame), or hide it.
-	function showMixKey(chart, show = true, opts) {
-		let el = chart.querySelector(".map-key");
-		if (!el) {
-			el = document.createElement("div");
-			el.className = "map-key";
-			el.innerHTML = mixKeyHTML(opts);
-			chart.append(el);
-		}
-		el.hidden = !show;
-	}
-
-	// Key for the mixed colors: the main map's triangle legend (soda at the
-	// top, pop bottom left, coke bottom right, blends in between), a ramp for
-	// how much "other" darkens a color, and optionally a "no data" swatch.
-	function mixKeyHTML({ noData = false } = {}) {
+	// The mixed-color legend, drawn exactly as on the homepage choropleth
+	// (js/map.js buildLegend): the triangle, the "no data" swatch and the
+	// "other" ramp in the bottom-right corner, laid out in the choropleth's
+	// 800 × 500 units and scaled into FRAME the same way. It's an overlay in
+	// map units, so it lines up with the choropleth when switching tabs.
+	function mixKeyHTML() {
 		const DIV = 10, side = 64, h = (side * Math.sqrt(3)) / 2;
-		const top = [42, 16];
+		const top = [748, 372];
 		const corner = { soda: top, pop: [top[0] - side / 2, top[1] + h], coke: [top[0] + side / 2, top[1] + h] };
 		const at = (i, j) => ({ soda: (DIV - i) / DIV, pop: (i - j) / DIV, coke: j / DIV });
 		const xy = (q) => ["soda", "pop", "coke"].reduce(
@@ -353,8 +342,7 @@ window.PVS = (function () {
 		const cell = (pts) => {
 			const c = { pop: 0, soda: 0, coke: 0, other: 0 };
 			for (const q of pts) for (const t of ["pop", "soda", "coke"]) c[t] += q[t] / 3;
-			const d = "M" + pts.map((q) => xy(q).map((v) => v.toFixed(1)).join(",")).join("L") + "Z";
-			return `<path d="${d}" fill="${mix(c)}" stroke="${mix(c)}" stroke-width="0.3"/>`;
+			return `<path d="M${pts.map((q) => xy(q).join(",")).join("L")}Z" fill="${mix(c)}"/>`;
 		};
 		let cells = "";
 		for (let i = 0; i < DIV; i++) {
@@ -363,31 +351,42 @@ window.PVS = (function () {
 				if (j < i) cells += cell([at(i, j), at(i, j + 1), at(i + 1, j + 1)]);
 			}
 		}
-		const base = top[1] + h;
-		const label = (x, y, text, anchor = "middle") =>
-			`<text x="${x}" y="${y}" text-anchor="${anchor}">${text}</text>`;
+		const text = (x, y, str, anchor = "middle") => `<text x="${x}" y="${y}" text-anchor="${anchor}">${str}</text>`;
+		const halo = (attrs) => `<${attrs} class="halo"/>`;
 
-		// "other" ramp, white to black, as on the main map.
-		const rx = 112, rw = 70, rh = 10, ry = base - rh, STEPS = 20;
+		const STEPS = 20, rampX = 722, rampY = 466, rampW = 70, rampH = 10;
 		let ramp = "";
 		for (let k = 0; k <= STEPS; k++) {
-			const o = k / STEPS;
-			ramp += `<rect x="${(rx + (k * rw) / (STEPS + 1)).toFixed(1)}" y="${ry}" width="${(rw / (STEPS + 1) + 0.5).toFixed(1)}" height="${rh}" fill="${d3.interpolateRgb("white", "black")(o)}"/>`;
+			ramp += `<rect x="${rampX + (k * rampW) / (STEPS + 1)}" y="${rampY}" width="${rampW / (STEPS + 1) + 0.5}" ` +
+				`height="${rampH}" fill="${d3.interpolateRgb("white", "black")(k / STEPS)}"/>`;
 		}
-		const nd = noData
-			? `<rect x="204" y="${ry}" width="26" height="${rh}" fill="#fff" stroke="#bbb" stroke-width="0.5"/>` + label(217, base + 13, "no data")
-			: "";
-		const width = noData ? 240 : 196;
-		const height = Math.ceil(base + 17);
-		// Sized like the main map's legend: 1.2 × these units in a FRAME-wide map.
-		return `<svg class="mix-key" viewBox="0 0 ${width} ${height}" ` +
-			`style="width:${((width * 1.2) / FRAME.width) * 100}%" role="img" ` +
-			`aria-label="Color key: yellow for pop, cyan for soda, magenta for coke, blended where answers are split, darker with more other answers">` +
-			`<g stroke="none">${cells}</g>` +
-			label(top[0], top[1] - 5, "soda") + label(corner.pop[0] - 4, base + 13, "pop") + label(corner.coke[0] + 4, base + 13, "coke") +
-			ramp + `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="none" stroke="#bbb" stroke-width="0.5"/>` +
-			label(rx + rw / 2, ry - 5, "other") + label(rx, base + 13, "0%", "start") + label(rx + rw, base + 13, "100%", "end") +
-			nd + "</svg>";
+
+		return `<svg class="mix-key" viewBox="0 0 ${FRAME.width} ${FRAME.height}" role="img" ` +
+			`aria-label="Color key: yellow for pop, cyan for soda, magenta for coke, blended where answers are split, ` +
+			`darker with more other answers, white for no data">` +
+			`<g transform="translate(0,40) scale(1.2)">` +
+			halo(`path d="M${[corner.soda, corner.pop, corner.coke].join("L")}Z"`) + cells +
+			text(corner.soda[0], corner.soda[1] - 6, "soda") +
+			text(corner.pop[0] - 4, corner.pop[1] + 13, "pop") + text(corner.coke[0] + 4, corner.coke[1] + 13, "coke") +
+			halo(`rect x="${rampX}" y="${rampY}" width="${rampW}" height="${rampH}"`) + ramp +
+			text(rampX, rampY + 21, "0%", "start") + text(rampX + rampW, rampY + 21, "100%", "end") +
+			text(rampX + rampW / 2, rampY - 5, "other") +
+			halo(`rect x="682" y="${rampY}" width="26" height="${rampH}"`) +
+			`<rect x="682" y="${rampY}" width="26" height="${rampH}" fill="#fff"/>` +
+			text(695, rampY + 21, "no data") +
+			"</g></svg>";
+	}
+
+	// Show the mixed-color legend on a map, or hide it.
+	function showMixKey(chart, show = true) {
+		let el = chart.querySelector(".map-key-frame");
+		if (!el) {
+			el = document.createElement("div");
+			el.className = "map-key-frame";
+			el.innerHTML = mixKeyHTML();
+			chart.append(el);
+		}
+		el.hidden = !show;
 	}
 
 	// Swelling state outlines for the bubble maps. Each state starts as its own

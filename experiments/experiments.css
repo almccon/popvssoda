@@ -93,3 +93,11 @@ body { max-width: 1012px; }
 /* The credit line overlay (common.js: addCredit). */
 .chart svg.credit { position: absolute; inset: 0; width: 100%; height: auto; pointer-events: none; }
 .credit text { font-size: 12px; font-style: italic; fill: #333; }
+
+/* The mixed-color legend (common.js: showMixKey), an overlay in map units
+   styled like the homepage choropleth's legend. */
+.map-key-frame { position: absolute; inset: 0; pointer-events: none; }
+.map-key-frame[hidden] { display: none; }
+.map-key-frame svg { display: block; width: 100%; height: auto; }
+.mix-key text { font-size: 10px; fill: #333; }
+.mix-key .halo { fill: none; stroke: #ccc; stroke-width: 4px; stroke-linejoin: round; }
