@@ -119,7 +119,7 @@
 
 		function draw() {
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : statePath });
+			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : statePath, clipLakes: true });
 			// Under the bubbles: each state's outline runs just outside its own
 			// bubbles, in the gap kept between states, and any stretch of border
 			// that wanders under other bubbles is hidden.

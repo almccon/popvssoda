@@ -45,26 +45,33 @@ window.PVS = (function () {
 	};
 
 	// Background layers shared by every map (the state donuts' look): the page
-	// panel (#eee) shows through as the background field, land is a pale gray,
-	// lakes are white. experiments.css has the same colors for SVG maps.
+	// panel (#eee) shows through as the background field (water), land is a
+	// pale gray, and lakes are water too. experiments.css has the same colors for SVG maps.
 	const BASEMAP = {
 		land: "#f7f7f7", landStroke: "#d6d6d6",
-		lake: "#fff", lakeStroke: "#ddd",
+		lake: "#eee", lakeStroke: "#d6d6d6", // lakes are the same "water" as the background
 		admin: "#ddd",
 	};
 
 	// Draw the background layers on a canvas. Each argument is a Path2D or
 	// null: land (filled even-odd, so holes cut out by lakes stay open), lakes,
-	// and state/province lines.
-	function drawBasemap(ctx, { land, lakes, admin }) {
+	// and state/province lines. With clipLakes, lakes are drawn only inside the
+	// land shape (for US-only maps, which show no Canadian land).
+	function drawBasemap(ctx, { land, lakes, admin, clipLakes = false }) {
 		if (land) { ctx.fillStyle = BASEMAP.land; ctx.fill(land, "evenodd"); }
-		if (lakes) { ctx.fillStyle = BASEMAP.lake; ctx.fill(lakes); }
 		ctx.lineWidth = 0.75;
 		ctx.strokeStyle = BASEMAP.admin;
 		if (admin) ctx.stroke(admin);
-		ctx.lineWidth = 0.5;
-		ctx.strokeStyle = BASEMAP.lakeStroke;
-		if (lakes) ctx.stroke(lakes);
+		if (lakes) {
+			ctx.save();
+			if (clipLakes && land) ctx.clip(land, "evenodd");
+			ctx.fillStyle = BASEMAP.lake;
+			ctx.fill(lakes);
+			ctx.lineWidth = 0.75;
+			ctx.strokeStyle = BASEMAP.lakeStroke;
+			ctx.stroke(lakes);
+			ctx.restore();
+		}
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = BASEMAP.landStroke;
 		if (land) ctx.stroke(land);

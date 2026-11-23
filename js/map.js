@@ -320,12 +320,18 @@
 			f.properties = byId.get(+f.id) || { noData: true };
 		}
 
+		const land = topojson.feature(us, us.objects.land);
 		landLayer.append("path")
-			.datum(topojson.feature(us, us.objects.land))
+			.datum(land)
 			.attr("class", "land")
 			.attr("d", path);
 
-		lakeLayer.append("path")
+		// Lakes inside the US only: the map shows no Canadian land, and the
+		// Great Lakes are already open water.
+		svg.append("clipPath").attr("id", "us-land-clip")
+			.append("path").attr("d", path(land));
+		lakeLayer.attr("clip-path", "url(#us-land-clip)")
+			.append("path")
 			.datum(lakes)
 			.attr("class", "lakes")
 			.attr("d", path);

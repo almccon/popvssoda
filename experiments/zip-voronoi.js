@@ -224,7 +224,7 @@
 			path(lakes);
 			ctx.fillStyle = BASEMAP.lake;
 			ctx.fill();
-			ctx.lineWidth = 0.5;
+			ctx.lineWidth = 0.75;
 			ctx.strokeStyle = BASEMAP.lakeStroke;
 			ctx.stroke();
 
