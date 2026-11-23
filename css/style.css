@@ -113,10 +113,15 @@ header h1 img { display: inline-block; width: 282px; }
 /* Below the map, so every tab's map starts at the same height. */
 .view-caption { margin-top: 10px; }
 
+/* Every map is 960 × 680, so a frame is never shorter than its map: the
+   space is reserved before the page loads or while it's being measured. */
+#view-frames { container-type: inline-size; }
+
 .view-frame {
 	display: block;
 	width: 100%;
-	height: 600px; /* until the page loads and the frame is fitted to it */
+	height: calc(100cqw * 680 / 960);
+	min-height: calc(100cqw * 680 / 960);
 	border: 0;
 }
 

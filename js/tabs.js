@@ -50,7 +50,12 @@
 	function fitFrame(frame) {
 		const doc = frame.contentDocument;
 		if (!doc || !doc.body) return;
-		const fit = () => { frame.style.height = Math.ceil(doc.body.getBoundingClientRect().height) + "px"; };
+		// A hidden frame's page has no layout and measures 0 tall; keep the last
+		// real height rather than collapsing (which made the text below jump up).
+		const fit = () => {
+			const h = Math.ceil(doc.body.getBoundingClientRect().height);
+			if (h > 0) frame.style.height = h + "px";
+		};
 		new ResizeObserver(fit).observe(doc.body);
 		fit();
 	}
