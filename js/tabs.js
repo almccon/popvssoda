@@ -24,8 +24,8 @@
 			settings: "circles=blend&size-by=population&size=0.35",
 			caption: "One circle per county, sized by its population, colored by its mix of answers, and pushed apart so none overlap.",
 		},
-		"state-donuts": {
-			page: "experiments/state-donuts.html",
+		"region-donuts": {
+			page: "experiments/region-donuts.html",
 			caption: "One donut per state, province and territory, sized by its number of responses and split by answer.",
 		},
 	};
