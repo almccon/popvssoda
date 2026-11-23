@@ -108,6 +108,15 @@ its county codes match the older map in `d3/us.json`. Three Alaska areas that
 were split up in 2007–08 get the sum of the areas that replaced them. It's
 built by `scripts/fetch_county_population.py`.
 
+## `census_division_population_2010.csv`
+
+The Canadian counterpart, also not survey data: Statistics Canada's estimate
+of each census division's population on July 1, 2010 (`cduid`, `name`,
+`population_2010`), on 2021 boundaries, so the codes match
+`census_division_counts.csv` and `d3/canada.json`. It sizes the Canadian
+circles on the county bubbles experiment. It's built by
+`scripts/fetch_canada_population.py` from Table 17-10-0152-01.
+
 `state_counts.csv`, `county_counts.csv` and `other_answers.csv` are used to build the statistics pages in `statistics/` and the county pages in `countystats/`
 (`python3 scripts/build_statistics.py`).
 
@@ -147,6 +156,9 @@ Genuine long comments in the "other" box are kept as "other" votes.
   divisions and FSAs, under the
   [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada).
   `scripts/fetch_canada_boundaries.py` downloads them.
+- Statistics Canada, Table 17-10-0152-01, Population estimates, July 1, by
+  census division, 2021 boundaries, under the
+  [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/terms-conditions/open-licence).
 
 ## Notes
 

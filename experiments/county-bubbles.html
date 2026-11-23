@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Pop vs Soda County Bubbles</title>
-	<link href="../css/style.css?v=2026-11-23h" rel="stylesheet">
-	<link href="experiments.css?v=2026-11-23h" rel="stylesheet">
+	<link href="../css/style.css?v=2026-11-23m" rel="stylesheet">
+	<link href="experiments.css?v=2026-11-23m" rel="stylesheet">
 	<script src="../vendor/d3.v7.9.0.min.js" defer></script>
 	<script src="../vendor/topojson-client.v3.1.0.min.js" defer></script>
-	<script src="common.js?v=2026-11-23h" defer></script>
-	<script src="county-bubbles.js?v=2026-11-23h" defer></script>
+	<script src="common.js?v=2026-11-23m" defer></script>
+	<script src="county-bubbles.js?v=2026-11-23m" defer></script>
 </head>
 <body>
 	<nav class="nav">
@@ -25,22 +25,25 @@
 	<section class="panel">
 		<h1>Pop vs Soda county bubbles</h1>
 		<p class="intro">
-			Each county gets up to four circles: pop, soda, coke and other, each with
+			Each US county and Canadian census division (Canada's closest equivalent
+			to a county) gets up to four circles: pop, soda, coke and other, each with
 			area proportional to the number of people who gave that answer. The circles
 			start at the county's center and push each other apart, so crowded metro
 			areas spread out into clusters while sparse regions keep lots of space.
 			They bubble up from the south, each growing to full size over 5 seconds
 			while the layout makes room. Size the circles by the number of responses,
-			or by the county's population (2010 census) split between the four
-			circles in proportion to how people there answered. Or draw one circle per
-			county, colored like the main map: yellow for pop, cyan for soda, magenta
-			for coke, mixed in proportion and darker for "other". With state outlines
-			on, each state starts as its border, which swells and shifts with the
-			bubbles so you can still tell which state each came from.
+			or by population in 2010 (the US census, and Statistics Canada's estimates)
+			split between the four circles in proportion to how people there answered.
+			Or draw one circle per county, colored like the main map: yellow for pop,
+			cyan for soda, magenta for coke, mixed in proportion and darker for
+			"other". With outlines on, each state and province starts as its border,
+			which swells and shifts with the bubbles so you can still tell where each
+			came from. Closer views of one country get bigger circles, in step with
+			the map.
 		</p>
 		<div class="chart" id="chart">
 			<canvas id="canvas" role="img"
-				aria-label="Map of US counties drawn as circles, one per answer, sized by number of responses or by county population"></canvas>
+				aria-label="Map of US counties and Canadian census divisions drawn as circles, sized by number of responses or by population"></canvas>
 		</div>
 		<div class="status" id="status">Loading…</div>
 		<div class="key">
@@ -48,15 +51,21 @@
 			<span class="key-item" id="size-key"></span>
 		</div>
 		<div class="slider-row">
+			<span>Show</span>
+			<label><input type="radio" name="region" value="both" checked> US and Canada</label>
+			<label><input type="radio" name="region" value="US"> US only</label>
+			<label><input type="radio" name="region" value="CA"> Canada only</label>
+		</div>
+		<div class="slider-row">
 			<span>Circles</span>
 			<label><input type="radio" name="circles" value="answers" checked> one per answer</label>
 			<label><input type="radio" name="circles" value="blend"> one per county, colors mixed</label>
-			<label><input type="checkbox" id="outlines"> state outlines</label>
+			<label><input type="checkbox" id="outlines"> state and province outlines</label>
 		</div>
 		<div class="slider-row">
 			<span>Size circles by</span>
 			<label><input type="radio" name="size-by" value="responses" checked> number of responses</label>
-			<label><input type="radio" name="size-by" value="population"> county population</label>
+			<label><input type="radio" name="size-by" value="population"> population</label>
 		</div>
 		<div class="slider-row">
 			<label for="size">Circle size</label>

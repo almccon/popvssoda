@@ -1,8 +1,10 @@
 // County bubbles: four circles per county (pop / soda / coke / other), area
 // proportional to the number of responses, spread apart with a force layout.
-// Or one circle per county, colored with the main map's CMY mix. Optionally
-// each state is outlined, its border swelling to hold its own bubbles.
-// Drawn on canvas: there are ~9,000 circles and they move while settling.
+// Or one circle per county, colored with the main map's CMY mix. Canada is
+// included as census divisions, its closest equivalent to counties, and the
+// map shows the US and Canada together or either alone. Optionally each
+// state and province is outlined, its border swelling to hold its bubbles.
+// Drawn on canvas: there are ~9,500 circles and they move while settling.
 // The circles grow from nothing while the layout runs, starting in the south
 // and rising northward like bubbles in a glass.
 
@@ -26,7 +28,8 @@
 	// Alaska with the far north), so the wave moves steadily up the map.
 	const GROW_MS = 5000;
 	const STAGGER_MS = 5000;
-	const SOUTH_LAT = 25, NORTH_LAT = 49;
+	// Latitudes the wave runs between, for each region.
+	const WAVE_LAT = { US: [25, 49], CA: [42, 62], both: [25, 60] };
 	const grow = d3.easeQuadOut;
 	const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -62,64 +65,125 @@
 	const circleInputs = document.querySelectorAll("input[name=circles]");
 	const blended = () => [...circleInputs].find((el) => el.checked).value === "blend";
 	const outlinesInput = document.getElementById("outlines");
+	const regionInputs = document.querySelectorAll("input[name=region]");
+	const region = () => [...regionInputs].find((el) => el.checked).value;
 
 	Promise.all([
 		loadData("../"),
+		d3.json("../d3/canada.json"),
 		d3.csv("../data/county_population_2010.csv"),
+		d3.csv("../data/census_division_counts.csv"),
+		d3.csv("../data/census_division_population_2010.csv"),
 		d3.json("../vendor/naturalearth-5.1.2-lakes-50m-north-america.geojson"),
-	]).then(([data, popRows, lakes]) => {
-		const population = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
-		const projection = PVS.usProjection();
-		const path = d3.geoPath(projection);
-		const landPath = new Path2D(path(data.land));
-		const lakePath = new Path2D(path(lakes));
-		const statePath = new Path2D(path(data.stateMesh));
+	]).then(([data, canada, popRows, cdRows, cdPopRows, lakes]) => {
+		const usPopulation = new Map(popRows.map((r) => [+r.county_fips, +r.population_2010]));
+		const cdPopulation = new Map(cdPopRows.map((r) => [r.cduid, +r.population_2010]));
 
-		const featureById = new Map(data.countyFeatures.map((f) => [+f.id, f]));
-
-		// One node per (county, term) with at least one response, or (blended)
-		// one node per county.
-		const perAnswer = [], perCounty = [];
+		// Every county and census division with responses:
+		// { name, counts, total, population, feature, country, stateKey, lat }
+		const units = [];
+		const countyFeature = new Map(data.countyFeatures.map((f) => [+f.id, f]));
 		for (const c of data.counties) {
-			const f = featureById.get(c.id);
-			if (!f) continue;
-			const [hx, hy] = path.centroid(f);
-			if (!isFinite(hx)) continue;
-			const lat = d3.geoCentroid(f)[1];
-			c.population = population.get(c.id) || 0;
-			const delay = reducedMotion ? 0
-				: STAGGER_MS * Math.min(1, Math.max(0, (lat - SOUTH_LAT) / (NORTH_LAT - SOUTH_LAT)));
-			const stateKey = +c.state;
+			const f = countyFeature.get(c.id);
+			if (!f || !c.total) continue;
+			Object.assign(c, { population: usPopulation.get(c.id) || 0, feature: f, country: "US", stateKey: `US-${c.state}` });
+			units.push(c);
+		}
+		const cdFeature = new Map(topojson.feature(canada, canada.objects.census_divisions).features.map((f) => [String(f.id), f]));
+		for (const r of cdRows) {
+			const f = cdFeature.get(r.cduid);
+			if (!f || !+r.total) continue;
+			const counts = {};
+			for (const t of TERMS) counts[t] = +r[t];
+			units.push({
+				name: `${r.cd_name}, ${r.province}`, counts, total: +r.total,
+				population: cdPopulation.get(r.cduid) || 0, feature: f, country: "CA", stateKey: `CA-${r.province}`,
+			});
+		}
+		for (const u of units) u.lat = d3.geoCentroid(u.feature)[1];
+
+		// One node per (unit, term) with at least one response, or (blended) one per unit.
+		const allPerAnswer = [], allPerCounty = [];
+		for (const u of units) {
 			for (const t of TERMS) {
-				// `people`: the county's population split in proportion to its answers.
-				if (c.counts[t] > 0) perAnswer.push({
-					county: c, term: t, n: c.counts[t], homeX: hx, homeY: hy, delay, stateKey,
-					people: c.population * c.counts[t] / c.total,
+				// `people`: the unit's population split in proportion to its answers.
+				if (u.counts[t] > 0) allPerAnswer.push({
+					county: u, term: t, n: u.counts[t], stateKey: u.stateKey,
+					people: u.population * u.counts[t] / u.total,
 					fill: FILL[t], stroke: OUTLINE[t], offset: START_OFFSET[t],
 				});
 			}
-			if (c.total > 0) perCounty.push({
-				county: c, term: null, n: c.total, homeX: hx, homeY: hy, delay, stateKey,
-				people: c.population,
-				fill: mixCounts(c.counts, c.total), stroke: BLEND_OUTLINE, offset: [0, 0],
+			allPerCounty.push({
+				county: u, term: null, n: u.total, stateKey: u.stateKey, people: u.population,
+				fill: mixCounts(u.counts, u.total), stroke: BLEND_OUTLINE, offset: [0, 0],
 			});
 		}
-		let nodes = perAnswer;
-		let outlines = null;
-		const stateShapes = data.stateFeatures.map((f) => ({ key: +f.id, feature: f }));
 
 		// In population mode, people are scaled by the ratio of responses to
-		// population over the mapped counties, so both modes put about the same
+		// population over everything mapped, so both modes put about the same
 		// total area on the map and share the size slider.
-		const PEOPLE_PER_RESPONSE = d3.sum(perAnswer, (d) => d.people) / d3.sum(perAnswer, (d) => d.n);
+		const PEOPLE_PER_RESPONSE = d3.sum(allPerAnswer, (d) => d.people) / d3.sum(allPerAnswer, (d) => d.n);
 		const sizeValue = (d) => (sizeBy() === "population" ? d.people / PEOPLE_PER_RESPONSE : d.n);
+
+		// Background layers and outline shapes for each country.
+		const geo = {
+			US: {
+				land: data.land, admin: data.stateMesh,
+				states: data.stateFeatures.map((f) => ({ key: `US-${String(f.id).padStart(2, "0")}`, feature: f })),
+			},
+			CA: {
+				land: topojson.merge(canada, canada.objects.provinces.geometries),
+				admin: topojson.mesh(canada, canada.objects.provinces, (a, b) => a !== b),
+				states: topojson.feature(canada, canada.objects.provinces).features
+					.map((f) => ({ key: `CA-${f.properties.province}`, feature: f })),
+			},
+		};
+		// Map scale near the 49th parallel, which every region shows.
+		function pxPerKm(proj) {
+			const a = proj([-90, 48]), b = proj([-89, 48]);
+			return Math.hypot(b[0] - a[0], b[1] - a[1]) / (111.32 * Math.cos((48 * Math.PI) / 180));
+		}
+		const usPx = pxPerKm(PVS.usProjection());
+
+		// Set for the region shown, by setRegion().
+		let projection, landPath, lakePath, adminPath, stateShapes, perAnswer = [], perCounty = [];
+		let sizeFactor = 1; // circles follow the map scale: a closer view gets bigger circles
+		function setRegion() {
+			const which = region();
+			const countries = which === "both" ? ["US", "CA"] : [which];
+			projection = PVS.regionProjection(which);
+			const path = d3.geoPath(projection);
+			const joined = (layer) => new Path2D(countries.map((c) => path(geo[c][layer]) || "").join(""));
+			landPath = joined("land");
+			adminPath = joined("admin");
+			lakePath = new Path2D(path(lakes));
+			stateShapes = countries.flatMap((c) => geo[c].states);
+			sizeFactor = Math.sqrt(pxPerKm(projection) / usPx);
+
+			const [south, north] = WAVE_LAT[which];
+			for (const u of units) {
+				[u.homeX, u.homeY] = countries.includes(u.country) ? path.centroid(u.feature) : [NaN, NaN];
+				u.delay = reducedMotion ? 0 : STAGGER_MS * Math.min(1, Math.max(0, (u.lat - south) / (north - south)));
+			}
+			for (const d of allPerAnswer.concat(allPerCounty)) {
+				d.homeX = d.county.homeX;
+				d.homeY = d.county.homeY;
+				d.delay = d.county.delay;
+			}
+			const shown = (d) => isFinite(d.homeX) && isFinite(d.homeY);
+			perAnswer = allPerAnswer.filter(shown);
+			perCounty = allPerCounty.filter(shown);
+		}
+
+		let nodes = perAnswer;
+		let outlines = null;
 
 		let scale = +slider.value; // px of radius per sqrt(response)
 		let hovered = null;        // county record under the pointer
 
 		function draw() {
 			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : statePath, clipLakes: true });
+			drawBasemap(ctx, { land: landPath, lakes: lakePath, admin: outlines ? null : adminPath, clipLakes: true });
 			// Under the bubbles: each state's outline runs just outside its own
 			// bubbles, in the gap kept between states, and any stretch of border
 			// that wanders under other bubbles is hidden.
@@ -209,9 +273,9 @@
 			.on("end", () => {
 				statusEl.textContent = `${fmt(nodes.length)} circles for ${fmt(d3.sum(nodes, (d) => d.n))} responses` +
 					(sizeBy() === "population"
-						? `, sized by ${fmt(Math.round(d3.sum(nodes, (d) => d.people)))} people (2010 census). `
+						? `, sized by ${fmt(Math.round(d3.sum(nodes, (d) => d.people)))} people (2010). `
 						: ". ") +
-					"Hover over (or tap) a circle for its county.";
+					"Hover over (or tap) a circle for its county or census division.";
 			});
 
 		// Stop bubbles from being pushed off the edge of the map.
@@ -223,6 +287,7 @@
 		}
 
 		function start() {
+			setRegion();
 			nodes = blended() ? perCounty : perAnswer;
 			hovered = null;
 			document.getElementById("color-key").innerHTML = blended() ? "" : termKeyHTML;
@@ -230,7 +295,7 @@
 			// A blended circle holds a whole county, so at the same slider
 			// setting it has the area of that county's four separate circles.
 			for (const d of nodes) {
-				d.fullR = scale * Math.sqrt(sizeValue(d));
+				d.fullR = scale * sizeFactor * Math.sqrt(sizeValue(d));
 				const [ox, oy] = d.offset;
 				d.x = d.homeX + ox;
 				d.y = d.homeY + oy;
@@ -255,12 +320,12 @@
 			const byPeople = sizeBy() === "population";
 			const sizes = byPeople ? [100000, 1000000, 5000000] : [100, 1000, 5000];
 			const unit = byPeople ? 1 / PEOPLE_PER_RESPONSE : 1;
-			const big = scale * Math.sqrt(sizes[sizes.length - 1] * unit);
+			const big = scale * sizeFactor * Math.sqrt(sizes[sizes.length - 1] * unit);
 			const key = d3.select("#size-key").html("");
 			const svg = key.append("svg").attr("width", big * 2 + (byPeople ? 76 : 50)).attr("height", big * 2 + 4);
 			const g = svg.append("g").attr("transform", `translate(${big + 2},${big * 2 + 2})`);
 			for (const v of sizes) {
-				const r = scale * Math.sqrt(v * unit);
+				const r = scale * sizeFactor * Math.sqrt(v * unit);
 				g.append("circle").attr("cy", -r).attr("r", r);
 				g.append("line")
 					.attr("x1", 0).attr("x2", big + 6)
@@ -325,6 +390,7 @@
 		sizeInputs.forEach((el) => el.addEventListener("change", start));
 		circleInputs.forEach((el) => el.addEventListener("change", start));
 		outlinesInput.addEventListener("change", start);
+		regionInputs.forEach((el) => el.addEventListener("change", start));
 		document.getElementById("replay").addEventListener("click", start);
 
 		start();
